@@ -32,7 +32,23 @@ public class NGApi {
     static let instance = NGApi()
     
     init() {
-        // TODO: init library
+        // Init library
+        let cacheDir = NSHomeDirectory() + "/Library/Caches"
+        let settingsDir = NSHomeDirectory() + "/Library/Preferences"
+        let gdalData = NSHomeDirectory() + "/Library/Frameworks/ngstore.framework/Resources/gdal"
+//        let mapStore = NSHomeDirectory() + "/Library/Application Support/maps"
+//        let dataStore = NSHomeDirectory() + "/Library/Application Support/geodata"
+//        let projectionsDir = NSHomeDirectory() + "/Library/Application Support/projections"
+        
+        let options = [
+            "GDAL_DATA=" + gdalData,
+            "CACHE_DIR=" + cacheDir,
+            "SETTINGS_DIR=" + settingsDir,
+            "NUM_THREADS=ALL_CPUS",
+            "DEBUG_MODE=OFF"
+        ]
+        
+        ngsInit(toArrayOfCStrings(options))
     }
     
     deinit {
@@ -40,13 +56,32 @@ public class NGApi {
         ngsUnInit()
     }
     
-    func version(component: String) -> Int {
+    public func version(component: String) -> Int {
         return Int(ngsGetVersion(component))
     }
     
     
-    func versionString(component: String) -> String {
+    public func versionString(component: String) -> String {
         return String(cString: ngsGetVersionString(component))
+    }
+    
+    public func freeResources(full: Bool) {
+        ngsFreeResources(full ? 1 : 0)
+    }
+    
+    public func lastError() -> String {
+        return String(cString: ngsGetLastErrorMessage())
+    }
+    
+
+    private func toArrayOfCStrings(_ values: [String]) -> UnsafeMutablePointer<UnsafeMutablePointer<Int8>?> {
+        let buffer = UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>.allocate(capacity: values.count + 1)
+        for (index, value) in values.enumerated() {
+            buffer[index] = UnsafeMutablePointer<Int8>(mutating: (value as NSString).utf8String!)
+        }
+        buffer[values.count] = nil
+        return buffer
+
     }
     
     /*
