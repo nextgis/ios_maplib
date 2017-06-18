@@ -73,7 +73,7 @@ public class NGApi {
         return String(cString: ngsGetLastErrorMessage())
     }
     
-
+    // https://stackoverflow.com/a/40189217/2901140
     private func toArrayOfCStrings(_ values: [String]) -> UnsafeMutablePointer<UnsafeMutablePointer<Int8>?> {
         let buffer = UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>.allocate(capacity: values.count + 1)
         for (index, value) in values.enumerated() {

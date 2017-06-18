@@ -21,6 +21,14 @@ class MapLibTests: XCTestCase {
         super.tearDown()
     }
     
+    func testVersion() {
+        let version = NGApi.instance.version(component: "self")
+        XCTAssertTrue(version > 100, "Invalid version \(version)")
+        
+        let versionStr = NGApi.instance.versionString(component: "self")
+        XCTAssertFalse(versionStr.isEmpty, "Invalid version string")
+    }
+    
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
