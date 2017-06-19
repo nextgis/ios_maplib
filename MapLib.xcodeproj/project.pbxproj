@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		359273071EF3E8CF005AB77B /* ngstore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 359273061EF3E8CF005AB77B /* ngstore.framework */; settings = {ATTRIBUTES = (Required, ); }; };
+		35C1A8D51EF6EE5F00C2CF67 /* ngstore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35C1A8D41EF6EE5F00C2CF67 /* ngstore.framework */; };
 		35D46B781EEF568E00024E7E /* MapLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D46B6E1EEF568E00024E7E /* MapLib.framework */; };
 		35D46B7D1EEF568E00024E7E /* MapLibTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D46B7C1EEF568E00024E7E /* MapLibTests.swift */; };
 		35D46B7F1EEF568E00024E7E /* MapLib.h in Headers */ = {isa = PBXBuildFile; fileRef = 35D46B711EEF568E00024E7E /* MapLib.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -27,7 +27,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		359273061EF3E8CF005AB77B /* ngstore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ngstore.framework; path = Carthage/Build/ngstore.framework; sourceTree = "<group>"; };
+		35C1A8D41EF6EE5F00C2CF67 /* ngstore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ngstore.framework; path = Carthage/Build/iOS/ngstore.framework; sourceTree = "<group>"; };
 		35D46B6E1EEF568E00024E7E /* MapLib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MapLib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		35D46B711EEF568E00024E7E /* MapLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MapLib.h; sourceTree = "<group>"; };
 		35D46B721EEF568E00024E7E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -44,7 +44,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				359273071EF3E8CF005AB77B /* ngstore.framework in Frameworks */,
+				35C1A8D51EF6EE5F00C2CF67 /* ngstore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,7 +62,7 @@
 		359273051EF3E8CF005AB77B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				359273061EF3E8CF005AB77B /* ngstore.framework */,
+				35C1A8D41EF6EE5F00C2CF67 /* ngstore.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -125,11 +125,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 35D46B821EEF568E00024E7E /* Build configuration list for PBXNativeTarget "MapLib" */;
 			buildPhases = (
-				35CEFE111EF023570088AFFF /* Build NextGIS maplib */,
 				35D46B691EEF568E00024E7E /* Sources */,
 				35D46B6A1EEF568E00024E7E /* Frameworks */,
 				35D46B6B1EEF568E00024E7E /* Headers */,
 				35D46B6C1EEF568E00024E7E /* Resources */,
+				35C1A8D71EF6F17800C2CF67 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -215,19 +215,19 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		35CEFE111EF023570088AFFF /* Build NextGIS maplib */ = {
+		35C1A8D71EF6F17800C2CF67 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/iOS/ngstore.framework",
 			);
-			name = "Build NextGIS maplib";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "python ${SRCROOT}/lib/opt/ios/build_framework.py ${SRCROOT}/Carthage/Build";
+			shellScript = "/usr/local/bin/carthage copy-frameworks";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -287,6 +287,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -303,7 +304,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -341,6 +342,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -351,7 +353,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -374,6 +376,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				INFOPLIST_FILE = MapLib/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -399,6 +402,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				INFOPLIST_FILE = MapLib/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -415,6 +419,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = MapLibTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.nextgis.MapLibTests;
@@ -427,6 +435,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = MapLibTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.nextgis.MapLibTests;

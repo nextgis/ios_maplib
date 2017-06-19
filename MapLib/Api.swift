@@ -36,6 +36,7 @@ public class NGApi {
         let cacheDir = NSHomeDirectory() + "/Library/Caches"
         let settingsDir = NSHomeDirectory() + "/Library/Preferences"
         let gdalData = NSHomeDirectory() + "/Library/Frameworks/ngstore.framework/Resources/gdal"
+        let certFile = NSHomeDirectory() + "/Library/Frameworks/ngstore.framework/Resources/ssl/certs/cert.pem"
 //        let mapStore = NSHomeDirectory() + "/Library/Application Support/maps"
 //        let dataStore = NSHomeDirectory() + "/Library/Application Support/geodata"
 //        let projectionsDir = NSHomeDirectory() + "/Library/Application Support/projections"
@@ -44,6 +45,7 @@ public class NGApi {
             "GDAL_DATA=" + gdalData,
             "CACHE_DIR=" + cacheDir,
             "SETTINGS_DIR=" + settingsDir,
+            "CAINFO" + certFile,
             "NUM_THREADS=ALL_CPUS",
             "DEBUG_MODE=OFF"
         ]
