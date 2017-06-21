@@ -3,8 +3,8 @@
 //  Project: NextGIS Mobile SDK
 //  Author:  Dmitry Baryshnikov, dmitry.baryshnikov@nextgis.com
 //
-//  Created by Дмитрий Барышников on 13.06.17.
-//  Copyright © 2017 NextGIS, info@nextgis.co
+//  Created by Dmitry Baryshnikov on 13.06.17.
+//  Copyright © 2017 NextGIS, info@nextgis.com
 //
 //
 //  This program is free software: you can redistribute it and/or modify

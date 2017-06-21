@@ -55,6 +55,14 @@ class MapLibTests: XCTestCase {
     }
     
     func testCatalog() {
+        let catalog = API.instance.getCatalog()
+        let children = catalog.children()
+        XCTAssertFalse(children.isEmpty, "Catalog must have at least one children")
+        
+        for child in children {
+            print("Catalog child name: \(child.name), type: \(child.type)")
+        }
+        
 //        CatalogObjectH catalog = ngsCatalogObjectGet("ngc://");
 //        ngsCatalogObjectInfo* pathInfo = ngsCatalogObjectQuery(catalog, 0);
 //        ASSERT_NE(pathInfo, nullptr);

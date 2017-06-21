@@ -3,8 +3,8 @@
 //  Project: NextGIS Mobile SDK
 //  Author:  Dmitry Baryshnikov, dmitry.baryshnikov@nextgis.com
 //
-//  Created by Дмитрий Барышников on 13.06.17.
-//  Copyright © 2017 NextGIS, info@nextgis.co
+//  Created by Dmitry Baryshnikov on 13.06.17.
+//  Copyright © 2017 NextGIS, info@nextgis.com
 //
 //
 //  This program is free software: you can redistribute it and/or modify
@@ -26,6 +26,7 @@ import ngstore
 
 public class API {
     static let instance = API()
+    private let catalog: Catalog
     
     init() {
         // Init library
@@ -47,6 +48,8 @@ public class API {
         ]
         
         ngsInit(toArrayOfCStrings(options))
+        
+        catalog = Catalog(catalog: ngsCatalogObjectGet("ngc://"))
     }
     
     deinit {
@@ -90,6 +93,10 @@ public class API {
             return (status, buffer)
         }
         return (543, nil)
+    }
+    
+    public func getCatalog() -> Catalog {
+        return catalog
     }
     
    
