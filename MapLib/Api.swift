@@ -24,12 +24,8 @@
 import Foundation
 import ngstore
 
-public class HTTPResponse {
-    
-}
-
-public class NGApi {
-    static let instance = NGApi()
+public class API {
+    static let instance = API()
     
     init() {
         // Init library
@@ -42,12 +38,12 @@ public class NGApi {
 //        let projectionsDir = NSHomeDirectory() + "/Library/Application Support/projections"
         
         let options = [
-            "GDAL_DATA=" + gdalData,
-            "CACHE_DIR=" + cacheDir,
-            "SETTINGS_DIR=" + settingsDir,
-            "CAINFO" + certFile,
-            "NUM_THREADS=ALL_CPUS",
-            "DEBUG_MODE=OFF"
+            "GDAL_DATA": gdalData,
+            "CACHE_DIR": cacheDir,
+            "SETTINGS_DIR": settingsDir,
+            "CAINFO": certFile,
+            "NUM_THREADS": "ALL_CPUS",
+            "DEBUG_MODE": "OFF"
         ]
         
         ngsInit(toArrayOfCStrings(options))
@@ -75,35 +71,30 @@ public class NGApi {
         return String(cString: ngsGetLastErrorMessage())
     }
     
-    // https://stackoverflow.com/a/40189217/2901140
-    private func toArrayOfCStrings(_ values: [String]) -> UnsafeMutablePointer<UnsafeMutablePointer<Int8>?> {
-        let buffer = UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>.allocate(capacity: values.count + 1)
-        for (index, value) in values.enumerated() {
-            buffer[index] = UnsafeMutablePointer<Int8>(mutating: (value as NSString).utf8String!)
+    func URLRequest(method: ngsURLRequestType, url: String, options: [String: String]? = nil) ->
+        (status: Int, data: [UInt8]?){
+            if let requestResultPtr = ngsURLRequest(method, url, options == nil ||
+                (options?.isEmpty)! ? nil : toArrayOfCStrings(options)) {
+            let requestResult = requestResultPtr.pointee
+            let status = Int(requestResult.status)
+            
+            if requestResult.dataLen == 0 {
+                return (543, nil)
+            }
+               
+            let buffer = [UInt8](repeating: 0, count: Int(requestResult.dataLen + 1))
+            memcpy(UnsafeMutableRawPointer(mutating: buffer), requestResult.data, Int(requestResult.dataLen))
+                
+            ngsURLRequestDestroyResult(requestResultPtr)
+                
+            return (status, buffer)
         }
-        buffer[values.count] = nil
-        return buffer
-
+        return (543, nil)
     }
     
+   
     /*
-    func HTTPGet(url: String) -> HTTPResponse {
-        
-    }
-
-    func HTTPDelete(url: String) -> HTTPResponse {
-        
-    }
-    
-    func HTTPPost(url: String, payload: String) -> HTTPResponse {
-        
-    }
-    
-    func HTTPPut(url: String, payload: String) -> HTTPResponse {
-        
-    }
-    
     func getMap(name: String) -> Map {
-        
+     
     }*/
 }
