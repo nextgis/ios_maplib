@@ -27,15 +27,36 @@ import ngstore
 public class Object {
     public let type: Int
     public let name: String
+    private let object: CatalogObjectH!
     
-    init(name: String, type: Int) {
+    init(name: String, type: Int, object: CatalogObjectH) {
         self.name = name
         self.type = type
+        self.object = object
+    }
+    
+    func children() -> [Object] {
+        let queryResult = ngsCatalogObjectQuery(object, 0)
+        var out: [Object] = []
+        if (queryResult != nil) {
+            var count: Int = 0
+            while (queryResult![count].name != nil) {
+                out.append(Object(name: String(cString: queryResult![count].name),
+                                  type: Int(queryResult![count].type),
+                                  object: queryResult![count].object))
+                count += 1
+            }
+            
+            ngsFree(queryResult)
+        }
+        
+        return out
     }
 }
 
 public class Catalog {
     private let catalog: CatalogObjectH
+    public let separator = "/"
     
     init(catalog: CatalogObjectH!) {
         self.catalog = catalog
@@ -52,7 +73,8 @@ public class Catalog {
             var count: Int = 0
             while (queryResult![count].name != nil) {
                 out.append(Object(name: String(cString: queryResult![count].name),
-                                  type: Int(queryResult![count].type)))
+                                  type: Int(queryResult![count].type),
+                                  object: queryResult![count].object))
                 count += 1
             }
             
@@ -61,5 +83,6 @@ public class Catalog {
         
         return out
     }
+    
     
 }

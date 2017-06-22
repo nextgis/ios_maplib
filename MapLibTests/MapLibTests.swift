@@ -63,6 +63,24 @@ class MapLibTests: XCTestCase {
             print("Catalog child name: \(child.name), type: \(child.type)")
         }
         
+        if(!children.isEmpty) {
+            let subChildren = children[0].children()
+            XCTAssertFalse(children.isEmpty, "Child must have at least one children")
+        
+            for child in subChildren {
+                print("Catalog child name: ngc://\(child.name), type: \(child.type)")
+            }
+            
+            if(!subChildren.isEmpty) {
+                let homeChildren = subChildren[0].children()
+                XCTAssertFalse(homeChildren.isEmpty, "Child must have at least one children")
+                
+                for child in homeChildren {
+                    print("Catalog child name: ngc://\(subChildren[0].name)/\(child.name), type: \(child.type)")
+                }
+            }
+        }
+        
 //        CatalogObjectH catalog = ngsCatalogObjectGet("ngc://");
 //        ngsCatalogObjectInfo* pathInfo = ngsCatalogObjectQuery(catalog, 0);
 //        ASSERT_NE(pathInfo, nullptr);
