@@ -30,26 +30,44 @@ public class API {
     
     init() {
         // Init library
-        let cacheDir = NSHomeDirectory() + "/Library/Caches"
-        let settingsDir = NSHomeDirectory() + "/Library/Preferences"
-        let gdalData = NSHomeDirectory() + "/Library/Frameworks/ngstore.framework/Resources/gdal"
-        let certFile = NSHomeDirectory() + "/Library/Frameworks/ngstore.framework/Resources/ssl/certs/cert.pem"
-//        let mapStore = NSHomeDirectory() + "/Library/Application Support/maps"
-//        let dataStore = NSHomeDirectory() + "/Library/Application Support/geodata"
-//        let projectionsDir = NSHomeDirectory() + "/Library/Application Support/projections"
+        let homeDir = NSHomeDirectory()
+        let cacheDir = homeDir + "/Library/Caches/ngstore"
+        let settingsDir = homeDir + "/Library/Preferences/ngstore"
+        
+        var gdalData: String = ""
+        var certFile: String = ""
+//        let gdalData = homeDir + "/Library/Frameworks/ngstore.framework/Resources/gdal"
+//        let certFile = homeDir + "/Library/Frameworks/ngstore.framework/Resources/ssl/certs/cert.pem"        
+        for bundle in Bundle.allFrameworks {
+            if let gdal = bundle.url(forResource: "gdal", withExtension: "") {
+                gdalData = gdal.path
+            }
+            
+            if let ssl = bundle.url(forResource: "cert", withExtension: "pem", subdirectory: "ssl/certs") {
+                certFile = ssl.path
+            }
+        }
+        
+
+//        let mapStore = homeDir + "/Library/Application Support/ngstore/maps"
+//        let dataStore = homeDir + "/Library/Application Support/ngstore/geodata"
+//        let projectionsDir = homeDir + "/Library/Application Support/ngstore/projections"
         
         let options = [
+            "HOME": homeDir,
             "GDAL_DATA": gdalData,
             "CACHE_DIR": cacheDir,
             "SETTINGS_DIR": settingsDir,
-            "CAINFO": certFile,
+            "SSL_CERT_FILE": certFile,
             "NUM_THREADS": "ALL_CPUS",
             "DEBUG_MODE": "OFF"
         ]
         
-        ngsInit(toArrayOfCStrings(options))
-        
+        if ngsInit(toArrayOfCStrings(options)) != Int32(COD_SUCCESS.rawValue) {
+            print("Init ngstore failed: " + String(cString: ngsGetLastErrorMessage()))
+        }
         catalog = Catalog(catalog: ngsCatalogObjectGet("ngc://"))
+
     }
     
     deinit {

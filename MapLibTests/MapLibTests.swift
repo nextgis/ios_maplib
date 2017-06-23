@@ -126,9 +126,9 @@ class MapLibTests: XCTestCase {
         
         XCTAssertTrue(ngwVersion >= 3.0, "Error parse version number")
         
-        let options = [
-            "UNSAFESSL": "ON"
-        ]
+        let options: [String: String] = [
+            //"UNSAFESSL": "ON"
+        :]
         let httpsResponse = Request.get(url: "https://ya.ru", options: options)
         XCTAssertTrue(httpsResponse.status > 100 && httpsResponse.status < 400, "HTTPS Not supported. Return code \(httpsResponse.status)")
     }

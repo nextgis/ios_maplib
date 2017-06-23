@@ -28,7 +28,7 @@ func toArrayOfCStrings(_ values: [String:String]!) -> UnsafeMutablePointer<Unsaf
     
     for (index, value) in values.enumerated() {
         let keyValue = value.key + "=" + value.value
-        buffer[index] = UnsafeMutablePointer<Int8>(mutating: keyValue)
+        buffer[index] = UnsafeMutablePointer<Int8>(mutating: (keyValue as NSString).utf8String!)
     }
     buffer[values.count] = nil
     return buffer
