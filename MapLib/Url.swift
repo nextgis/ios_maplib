@@ -25,11 +25,11 @@ import ngstore
 
 public class Request {
     
-    enum requestType : UInt32 {
+    public enum requestType : UInt32 {
         case GET = 1, POST, PUT, DELETE
     }
     
-    static func get(url: String, options: [String: String]? = nil) -> (status: Int, value: String) {
+    public static func get(url: String, options: [String: String]? = nil) -> (status: Int, value: String) {
         let result = API.instance.URLRequest(
             method: ngsURLRequestType(requestType.GET.rawValue),
             url: url, options: options)
@@ -39,7 +39,7 @@ public class Request {
         return (result.status, outStr)
     }
     
-    static func getJson(url: String, options: [String: String]? = nil) -> (status: Int, value: [String: Any]?) {
+    public static func getJson(url: String, options: [String: String]? = nil) -> (status: Int, value: [String: Any]?) {
         let result = API.instance.URLRequest(
             method: ngsURLRequestType(requestType.GET.rawValue),
             url: url, options: options)
@@ -55,8 +55,32 @@ public class Request {
         catch {
             print("Error deserializing JSON: \(error)")
         }
-        return (result.status, nil)
+        return (543, nil)
     }
+    
+    public static func postJson(url: String, payload: String, options: [String: String]? = nil) -> (status: Int, value: [String: Any]?) {
+        
+        var fullOptions = options ?? [:]
+        fullOptions["POSTFIELDS"] = payload
+        let result = API.instance.URLRequest(
+            method: ngsURLRequestType(requestType.POST.rawValue),
+            url: url, options: fullOptions)
+        
+        do {
+            let outStr = String(cString: result.data ?? [0])
+            if !outStr.isEmpty {
+                if let json = try JSONSerialization.jsonObject(with: outStr.data(using: .utf8)!, options: []) as? [String: Any] {
+                    return (result.status, json)
+                }
+            }
+        }
+        catch {
+            print("Error deserializing JSON: \(error)")
+        }
+        return (543, nil)
+    }
+    
+    
     
     // TODO: get image, get file
 }

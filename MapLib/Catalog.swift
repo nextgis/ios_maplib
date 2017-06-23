@@ -35,7 +35,7 @@ public class Object {
         self.object = object
     }
     
-    func children() -> [Object] {
+    public func children() -> [Object] {
         let queryResult = ngsCatalogObjectQuery(object, 0)
         var out: [Object] = []
         if (queryResult != nil) {
@@ -62,11 +62,11 @@ public class Catalog {
         self.catalog = catalog
     }
     
-    func getCurrentDirectory() -> String {
+    public func getCurrentDirectory() -> String {
         return String(cString: ngsGetCurrentDirectory())
     }
     
-    func children() -> [Object] {
+    public func children() -> [Object] {
         let queryResult = ngsCatalogObjectQuery(catalog, 0) // TODO: Add filter support
         var out: [Object] = []
         if (queryResult != nil) {
