@@ -133,7 +133,7 @@ class MapLibTests: XCTestCase {
         XCTAssertTrue(httpsResponse.status > 100 && httpsResponse.status < 400, "HTTPS Not supported. Return code \(httpsResponse.status)")
         
         let httpsResponse2 = Request.get(url: "https://nextgis.com", options: options)
-        XCTAssertTrue(httpsResponse2.status > 100 && httpsResponse2.status < 400, "HTTPS Not supported. Return code \(httpsResponse2.status)")   
+        XCTAssertTrue(httpsResponse2.status > 100 && httpsResponse2.status < 400, "HTTPS Not supported. Return code \(httpsResponse2.status)")
     }
     
 //    func testPerformanceExample() {
