@@ -21,7 +21,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import XCTest
-@testable import MapLib
+@testable import ngmaplib
 
 class MapLibTests: XCTestCase {
     
@@ -129,8 +129,11 @@ class MapLibTests: XCTestCase {
         let options: [String: String] = [
             //"UNSAFESSL": "ON"
         :]
-        let httpsResponse = Request.get(url: "https://ya.ru", options: options)
+        let httpsResponse = Request.get(url: "https://nextgis.com", options: options)
         XCTAssertTrue(httpsResponse.status > 100 && httpsResponse.status < 400, "HTTPS Not supported. Return code \(httpsResponse.status)")
+        
+        let httpsResponse2 = Request.get(url: "https://nextgis.com", options: options)
+        XCTAssertTrue(httpsResponse2.status > 100 && httpsResponse2.status < 400, "HTTPS Not supported. Return code \(httpsResponse2.status)")   
     }
     
 //    func testPerformanceExample() {

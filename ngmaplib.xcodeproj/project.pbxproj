@@ -11,7 +11,7 @@
 		353676011EF9277500C7B846 /* Url.swift in Sources */ = {isa = PBXBuildFile; fileRef = 353676001EF9277500C7B846 /* Url.swift */; };
 		3536760C1EFB30CA00C7B846 /* Catalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3536760B1EFB30CA00C7B846 /* Catalog.swift */; };
 		35C1A8D51EF6EE5F00C2CF67 /* ngstore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35C1A8D41EF6EE5F00C2CF67 /* ngstore.framework */; };
-		35D46B781EEF568E00024E7E /* MapLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D46B6E1EEF568E00024E7E /* MapLib.framework */; };
+		35D46B781EEF568E00024E7E /* ngmaplib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D46B6E1EEF568E00024E7E /* ngmaplib.framework */; };
 		35D46B7D1EEF568E00024E7E /* MapLibTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D46B7C1EEF568E00024E7E /* MapLibTests.swift */; };
 		35D46B7F1EEF568E00024E7E /* MapLib.h in Headers */ = {isa = PBXBuildFile; fileRef = 35D46B711EEF568E00024E7E /* MapLib.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		35D46B891EEF594C00024E7E /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D46B881EEF594C00024E7E /* Map.swift */; };
@@ -34,10 +34,10 @@
 		353676001EF9277500C7B846 /* Url.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Url.swift; sourceTree = "<group>"; };
 		3536760B1EFB30CA00C7B846 /* Catalog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Catalog.swift; sourceTree = "<group>"; };
 		35C1A8D41EF6EE5F00C2CF67 /* ngstore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ngstore.framework; path = Carthage/Build/iOS/ngstore.framework; sourceTree = "<group>"; };
-		35D46B6E1EEF568E00024E7E /* MapLib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MapLib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		35D46B6E1EEF568E00024E7E /* ngmaplib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ngmaplib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		35D46B711EEF568E00024E7E /* MapLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MapLib.h; sourceTree = "<group>"; };
 		35D46B721EEF568E00024E7E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		35D46B771EEF568E00024E7E /* MapLibTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MapLibTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		35D46B771EEF568E00024E7E /* ngmaplibTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ngmaplibTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		35D46B7C1EEF568E00024E7E /* MapLibTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapLibTests.swift; sourceTree = "<group>"; };
 		35D46B7E1EEF568E00024E7E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		35D46B881EEF594C00024E7E /* Map.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Map.swift; sourceTree = "<group>"; };
@@ -58,7 +58,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				35D46B781EEF568E00024E7E /* MapLib.framework in Frameworks */,
+				35D46B781EEF568E00024E7E /* ngmaplib.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -95,8 +95,8 @@
 		35D46B6F1EEF568E00024E7E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				35D46B6E1EEF568E00024E7E /* MapLib.framework */,
-				35D46B771EEF568E00024E7E /* MapLibTests.xctest */,
+				35D46B6E1EEF568E00024E7E /* ngmaplib.framework */,
+				35D46B771EEF568E00024E7E /* ngmaplibTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -138,9 +138,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		35D46B6D1EEF568E00024E7E /* MapLib */ = {
+		35D46B6D1EEF568E00024E7E /* ngmaplib */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 35D46B821EEF568E00024E7E /* Build configuration list for PBXNativeTarget "MapLib" */;
+			buildConfigurationList = 35D46B821EEF568E00024E7E /* Build configuration list for PBXNativeTarget "ngmaplib" */;
 			buildPhases = (
 				35D46B691EEF568E00024E7E /* Sources */,
 				35D46B6A1EEF568E00024E7E /* Frameworks */,
@@ -152,14 +152,14 @@
 			);
 			dependencies = (
 			);
-			name = MapLib;
+			name = ngmaplib;
 			productName = MapLib;
-			productReference = 35D46B6E1EEF568E00024E7E /* MapLib.framework */;
+			productReference = 35D46B6E1EEF568E00024E7E /* ngmaplib.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		35D46B761EEF568E00024E7E /* MapLibTests */ = {
+		35D46B761EEF568E00024E7E /* ngmaplibTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 35D46B851EEF568E00024E7E /* Build configuration list for PBXNativeTarget "MapLibTests" */;
+			buildConfigurationList = 35D46B851EEF568E00024E7E /* Build configuration list for PBXNativeTarget "ngmaplibTests" */;
 			buildPhases = (
 				35D46B731EEF568E00024E7E /* Sources */,
 				35D46B741EEF568E00024E7E /* Frameworks */,
@@ -170,9 +170,9 @@
 			dependencies = (
 				35D46B7A1EEF568E00024E7E /* PBXTargetDependency */,
 			);
-			name = MapLibTests;
+			name = ngmaplibTests;
 			productName = MapLibTests;
-			productReference = 35D46B771EEF568E00024E7E /* MapLibTests.xctest */;
+			productReference = 35D46B771EEF568E00024E7E /* ngmaplibTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -196,7 +196,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 35D46B681EEF568E00024E7E /* Build configuration list for PBXProject "MapLib" */;
+			buildConfigurationList = 35D46B681EEF568E00024E7E /* Build configuration list for PBXProject "ngmaplib" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -208,8 +208,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				35D46B6D1EEF568E00024E7E /* MapLib */,
-				35D46B761EEF568E00024E7E /* MapLibTests */,
+				35D46B6D1EEF568E00024E7E /* ngmaplib */,
+				35D46B761EEF568E00024E7E /* ngmaplibTests */,
 			);
 		};
 /* End PBXProject section */
@@ -275,7 +275,7 @@
 /* Begin PBXTargetDependency section */
 		35D46B7A1EEF568E00024E7E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 35D46B6D1EEF568E00024E7E /* MapLib */;
+			target = 35D46B6D1EEF568E00024E7E /* ngmaplib */;
 			targetProxy = 35D46B791EEF568E00024E7E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -470,7 +470,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		35D46B681EEF568E00024E7E /* Build configuration list for PBXProject "MapLib" */ = {
+		35D46B681EEF568E00024E7E /* Build configuration list for PBXProject "ngmaplib" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				35D46B801EEF568E00024E7E /* Debug */,
@@ -479,7 +479,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		35D46B821EEF568E00024E7E /* Build configuration list for PBXNativeTarget "MapLib" */ = {
+		35D46B821EEF568E00024E7E /* Build configuration list for PBXNativeTarget "ngmaplib" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				35D46B831EEF568E00024E7E /* Debug */,
@@ -488,7 +488,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		35D46B851EEF568E00024E7E /* Build configuration list for PBXNativeTarget "MapLibTests" */ = {
+		35D46B851EEF568E00024E7E /* Build configuration list for PBXNativeTarget "ngmaplibTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				35D46B861EEF568E00024E7E /* Debug */,
