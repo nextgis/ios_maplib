@@ -28,7 +28,28 @@ public class Request {
     public enum requestType : UInt32 {
         case GET = 1, POST, PUT, DELETE
     }
-    
+
+    /// Executes get request
+    ///
+    /// # Request option values
+    ///
+    /// Request options are key-value array. The keys may be:
+    ///
+    /// - "**CONNECTTIMEOUT**": "val", where val is in seconds (possibly with decimals)
+    /// - "**TIMEOUT**": "val", where val is in seconds. This is the maximum delay for the whole request to complete before being aborted
+    /// - "**LOW_SPEED_TIME**": "val", where val is in seconds. This is the maximum time where the transfer speed should be below the LOW_SPEED_LIMIT (if not specified 1b/s), before the transfer to be considered too slow and aborted
+    /// - "**LOW_SPEED_LIMIT**": "val", where val is in bytes/second. See LOW_SPEED_TIME. Has only effect if LOW_SPEED_TIME is specified too
+    /// - "**HEADERS**": "val", where val is an extra header to use when getting a web page For example "Accept: application/x-ogcwkt"
+    /// - "**COOKIE**": "val", where val is formatted as COOKIE1=VALUE1; COOKIE2=VALUE2;
+    /// - "**MAX_RETRY**": "val", where val is the maximum number of retry attempts if a 502, 503 or 504 HTTP error occurs. Default is 0
+    /// - "**RETRY_DELAY**": "val", where val is the number of seconds between retry attempts. Default is 30
+    ///
+    /// - seealso: `Request option values`, for a description of the available options.
+    ///
+    /// - Parameters:
+    ///   - url: URL to execute
+    ///   - options: the array of key-value pairs - String:String
+    /// - Returns: structure with return status code and String data
     public static func get(url: String, options: [String: String]? = nil) -> (status: Int, value: String) {
         let result = API.instance.URLRequest(
             method: ngsURLRequestType(requestType.GET.rawValue),

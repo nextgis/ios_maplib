@@ -27,22 +27,26 @@ import ngstore
 public class Object {
     public let type: Int
     public let name: String
+    public let path: String
     private let object: CatalogObjectH!
     
-    init(name: String, type: Int, object: CatalogObjectH) {
+    init(name: String, type: Int, path: String, object: CatalogObjectH) {
         self.name = name
         self.type = type
+        self.path = path
         self.object = object
     }
     
     public func children() -> [Object] {
-        let queryResult = ngsCatalogObjectQuery(object, 0)
+        let queryResult = ngsCatalogObjectQuery(object, 0) // TODO: Add filter support
+
         var out: [Object] = []
         if (queryResult != nil) {
             var count: Int = 0
             while (queryResult![count].name != nil) {
                 out.append(Object(name: String(cString: queryResult![count].name),
                                   type: Int(queryResult![count].type),
+                                  path: path + Catalog.separator + String(cString: queryResult![count].name),
                                   object: queryResult![count].object))
                 count += 1
             }
@@ -52,37 +56,46 @@ public class Object {
         
         return out
     }
+    
+    public func child(name: String) -> Object? {
+        let childrenArray = children()
+        for childItem in childrenArray {
+            if childItem.name == name {
+                return childItem
+            }
+        }
+        return nil
+    }
+    
+    public func create(name: String, options: [String:String] = [:]) -> Object? {
+        if(ngsCatalogObjectCreate(object, name, options.isEmpty ? nil :
+            toArrayOfCStrings(options)) == Int32(COD_SUCCESS.rawValue)) {
+            return child(name: name)
+        }
+        return nil
+    }
 }
 
-public class Catalog {
-    private let catalog: CatalogObjectH
-    public let separator = "/"
+public class Catalog: Object {
+    static public let separator = "/"
     
     init(catalog: CatalogObjectH!) {
-        self.catalog = catalog
+        super.init(name: "Catalog", type: Int(CAT_CONTAINER_ROOT.rawValue),
+                   path: "ngc://", object: catalog)
     }
     
     public func getCurrentDirectory() -> String {
         return String(cString: ngsGetCurrentDirectory())
     }
     
-    public func children() -> [Object] {
-        let queryResult = ngsCatalogObjectQuery(catalog, 0) // TODO: Add filter support
-        var out: [Object] = []
-        if (queryResult != nil) {
-            var count: Int = 0
-            while (queryResult![count].name != nil) {
-                out.append(Object(name: String(cString: queryResult![count].name),
-                                  type: Int(queryResult![count].type),
-                                  object: queryResult![count].object))
-                count += 1
-            }
-            
-            ngsFree(queryResult)
+    public func childByPath(path: String) -> Object? {
+        if let objectHandler = ngsCatalogObjectGet(path) {
+            let objectType = Int(ngsCatalogObjectType(objectHandler).rawValue)
+            let objectName = String(cString: ngsCatalogObjectName(objectHandler))
+            return Object(name: objectName, type: objectType,
+                          path: path,
+                          object: objectHandler)
         }
-        
-        return out
+        return nil
     }
-    
-    
 }

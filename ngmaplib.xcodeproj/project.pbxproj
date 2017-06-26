@@ -17,6 +17,7 @@
 		35D46B891EEF594C00024E7E /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D46B881EEF594C00024E7E /* Map.swift */; };
 		35D46B8B1EEF596A00024E7E /* Layer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D46B8A1EEF596A00024E7E /* Layer.swift */; };
 		35D46B8D1EEF5D4D00024E7E /* Api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D46B8C1EEF5D4D00024E7E /* Api.swift */; };
+		35F1D34E1F015AC2005114E2 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F1D34D1F015AC2005114E2 /* MapView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,6 +44,7 @@
 		35D46B881EEF594C00024E7E /* Map.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Map.swift; sourceTree = "<group>"; };
 		35D46B8A1EEF596A00024E7E /* Layer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Layer.swift; sourceTree = "<group>"; };
 		35D46B8C1EEF5D4D00024E7E /* Api.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Api.swift; sourceTree = "<group>"; };
+		35F1D34D1F015AC2005114E2 /* MapView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +74,14 @@
 				353676001EF9277500C7B846 /* Url.swift */,
 			);
 			name = util;
+			sourceTree = "<group>";
+		};
+		353676111F010ECB00C7B846 /* view */ = {
+			isa = PBXGroup;
+			children = (
+				35F1D34D1F015AC2005114E2 /* MapView.swift */,
+			);
+			name = view;
 			sourceTree = "<group>";
 		};
 		359273051EF3E8CF005AB77B /* Frameworks */ = {
@@ -104,6 +114,7 @@
 		35D46B701EEF568E00024E7E /* MapLib */ = {
 			isa = PBXGroup;
 			children = (
+				353676111F010ECB00C7B846 /* view */,
 				353675FD1EF926A300C7B846 /* util */,
 				35D46B881EEF594C00024E7E /* Map.swift */,
 				35D46B711EEF568E00024E7E /* MapLib.h */,
@@ -253,6 +264,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35F1D34E1F015AC2005114E2 /* MapView.swift in Sources */,
 				353675FF1EF9270A00C7B846 /* Common.swift in Sources */,
 				35D46B8D1EEF5D4D00024E7E /* Api.swift in Sources */,
 				35D46B891EEF594C00024E7E /* Map.swift in Sources */,

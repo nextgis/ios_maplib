@@ -23,7 +23,27 @@
 
 
 import Foundation
+import ngstore
 
 public class Map {
+    static public let ext = ".ngmd"
+    let id: UInt8
+    let path: String
+    var bkColor: ngsRGBA
+    
+    init(id: UInt8, path: String) {
+        self.id = id
+        self.path = path
+        
+        bkColor = ngsMapGetBackgroundColor(id)
+    }
+    
+    public func setBackgroundColor(R: UInt8, G: UInt8, B: UInt8, A: UInt8) -> Bool {
+        bkColor.A = A
+        bkColor.R = R
+        bkColor.G = G
+        bkColor.B = B
+        return ngsMapSetBackgroundColor(id, bkColor) == Int32(COD_SUCCESS.rawValue)
+    }
     
 }

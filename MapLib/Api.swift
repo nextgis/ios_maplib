@@ -27,6 +27,8 @@ import ngstore
 public class API {
     static let instance = API()
     private let catalog: Catalog
+    private var mapsDir: Object?
+    private var geodataDir: Object?
     
     init() {
         // Init library
@@ -48,10 +50,6 @@ public class API {
             }
         }
         
-
-//        let mapStore = homeDir + "/Library/Application Support/ngstore/maps"
-//        let dataStore = homeDir + "/Library/Application Support/ngstore/geodata"
-//        let projectionsDir = homeDir + "/Library/Application Support/ngstore/projections"
         
         let options = [
             "HOME": homeDir,
@@ -67,7 +65,41 @@ public class API {
             print("Init ngstore failed: " + String(cString: ngsGetLastErrorMessage()))
         }
         catalog = Catalog(catalog: ngsCatalogObjectGet("ngc://"))
-
+        if let appSupportDir = catalog.childByPath(path: "ngc://Local connections/Home/Library/Application Support") {
+            let createOptions = [
+                "TYPE": "\(CAT_CONTAINER_DIR.rawValue)",
+                "CREATE_UNIQUE": "OFF"
+            ]
+            
+            var ngstoreDir = appSupportDir.child(name: "ngstore")
+            if ngstoreDir == nil {
+                ngstoreDir = appSupportDir.create(name: "ngstore", options: createOptions)
+            }
+            
+            if ngstoreDir == nil {
+                //thow error
+                return
+            }
+            
+            mapsDir = ngstoreDir?.child(name: "maps")
+            if mapsDir == nil {
+                mapsDir = ngstoreDir?.create(name: "maps", options: createOptions)
+            }
+            
+            geodataDir = ngstoreDir?.child(name: "geodata")
+            if geodataDir == nil {
+                geodataDir = ngstoreDir?.create(name: "geodata", options: createOptions)
+            }
+            
+        } else {
+            // thow error
+        }
+        
+        
+//        let mapStore = homeDir + "/Library/Application Support/ngstore/maps"
+//        let dataStore = homeDir + "/Library/Application Support/ngstore/geodata"
+//        let projectionsDir = homeDir + "/Library/Application Support/ngstore/projections"
+        
     }
     
     deinit {
@@ -75,11 +107,20 @@ public class API {
         ngsUnInit()
     }
     
+    
+    /// Returns library version as number
+    ///
+    /// - Parameter component: May be self, gdal, sqlite, tiff, jpeg, png, jsonc, proj, geotiff, expat, iconv, zlib, openssl
+    /// - Returns: version number
     public func version(component: String) -> Int {
         return Int(ngsGetVersion(component))
     }
     
     
+    /// Returns library version as string
+    ///
+    /// - Parameter component: May be self, gdal, sqlite, tiff, jpeg, png, jsonc, proj, geotiff, expat, iconv, zlib, openssl
+    /// - Returns: version string
     public func versionString(component: String) -> String {
         return String(cString: ngsGetVersionString(component))
     }
@@ -88,10 +129,22 @@ public class API {
         ngsFreeResources(full ? 1 : 0)
     }
     
+    
+    /// Returns last error message
+    ///
+    /// - Returns: message string
     public func lastError() -> String {
         return String(cString: ngsGetLastErrorMessage())
     }
     
+    
+    /// Executes URL request
+    ///
+    /// - Parameters:
+    ///   - method: request type (GET, POST, PUT, DELETE)
+    ///   - url: URL to request
+    ///   - options: request options (POST payload or etc.)
+    /// - Returns: result structure with return code and raw data buffer
     func URLRequest(method: ngsURLRequestType, url: String, options: [String: String]? = nil) ->
         (status: Int, data: [UInt8]?){
             if let requestResultPtr = ngsURLRequest(method, url, options == nil ||
@@ -117,9 +170,19 @@ public class API {
         return catalog
     }
     
-   
-    /*
-    func getMap(name: String) -> Map {
-     
-    }*/
+    public func getMap(_ name: String) -> Map? {
+        if mapsDir == nil {
+            return nil
+        }
+        let mapPath = (mapsDir?.path)! + Catalog.separator + name + Map.ext
+        var mapId = ngsMapOpen(mapPath)
+        if mapId == 0 {
+            mapId = ngsMapCreate(name, "default map", 3857,
+                                 -20037508.34, -20037508.34,
+                                 20037508.34, 20037508.34)
+            if mapId == 0 { return nil }
+        }
+        
+        return Map(id: mapId, path: mapPath)
+    }
 }

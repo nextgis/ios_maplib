@@ -68,7 +68,7 @@ class MapLibTests: XCTestCase {
             XCTAssertFalse(children.isEmpty, "Child must have at least one children")
         
             for child in subChildren {
-                print("Catalog child name: ngc://\(child.name), type: \(child.type)")
+                print("Catalog child name: ngc://Local connections/\(child.name), type: \(child.type)")
             }
             
             if(!subChildren.isEmpty) {
@@ -76,44 +76,29 @@ class MapLibTests: XCTestCase {
                 XCTAssertFalse(homeChildren.isEmpty, "Child must have at least one children")
                 
                 for child in homeChildren {
-                    print("Catalog child name: ngc://\(subChildren[0].name)/\(child.name), type: \(child.type)")
+                    print("Catalog child name: ngc://Local connections/\(subChildren[0].name)/\(child.name), type: \(child.type)")
                 }
             }
         }
-        
-//        CatalogObjectH catalog = ngsCatalogObjectGet("ngc://");
-//        ngsCatalogObjectInfo* pathInfo = ngsCatalogObjectQuery(catalog, 0);
-//        ASSERT_NE(pathInfo, nullptr);
-//        size_t count = 0;
-//        while(pathInfo[count].name) {
-//            count++;
-//        }
-//        ASSERT_GE(count, 1);
-//        CPLString path2test = CPLSPrintf("ngc://%s", pathInfo[0].name);
-//        ngsFree(pathInfo);
-//        
-//        CatalogObjectH path2testObject = ngsCatalogObjectGet(path2test);
-//        pathInfo = ngsCatalogObjectQuery(path2testObject, 0);
-//        ASSERT_NE(pathInfo, nullptr);
-//        count = 0;
-//        while(pathInfo[count].name) {
-//            std::cout << count << ". " << path2test << "/" <<  pathInfo[count].name << '\n';
-//            count++;
-//        }
-//        EXPECT_GE(count, 1);
-//        path2test = CPLSPrintf("%s/%s", path2test.c_str(), pathInfo[0].name);
-//        ngsFree(pathInfo);
+    }
+    
+    func testMap() {
+        let map = API.instance.getMap("default")
+        XCTAssertTrue(map != nil, "Map mast be openned or created")
     }
     
     func testURL() {
         let testUrl = "http://demo.nextgis.com"
         let versionUrl = testUrl + "/api/component/pyramid/pkg_version"
-        let versionRequest = Request.get(url: versionUrl)
+        let options = [
+            "MAX_RETRY": "3"
+        ]
+        let versionRequest = Request.get(url: versionUrl, options: options)
         XCTAssertTrue(versionRequest.status > 100 && versionRequest.status < 400, "Get HTTP Status \(versionRequest.status)")
         XCTAssertFalse(versionRequest.value.isEmpty ||
             versionRequest.value == "", "Request result must be not empty")
         
-        let versionJSONRequest = Request.getJson(url: versionUrl)
+        let versionJSONRequest = Request.getJson(url: versionUrl, options: options)
         XCTAssertTrue(versionRequest.status > 100 && versionJSONRequest.status < 400, "Get HTTP Status \(versionJSONRequest.status)")
         
         let ngwVersion: Double
@@ -126,14 +111,9 @@ class MapLibTests: XCTestCase {
         
         XCTAssertTrue(ngwVersion >= 3.0, "Error parse version number")
         
-        let options: [String: String] = [
-            //"UNSAFESSL": "ON"
-        :]
         let httpsResponse = Request.get(url: "https://nextgis.com", options: options)
         XCTAssertTrue(httpsResponse.status > 100 && httpsResponse.status < 400, "HTTPS Not supported. Return code \(httpsResponse.status)")
         
-        let httpsResponse2 = Request.get(url: "https://nextgis.com", options: options)
-        XCTAssertTrue(httpsResponse2.status > 100 && httpsResponse2.status < 400, "HTTPS Not supported. Return code \(httpsResponse2.status)")
     }
     
 //    func testPerformanceExample() {
