@@ -23,6 +23,7 @@
 
 
 import Foundation
+import UIKit
 import ngstore
 
 public class Map {
@@ -38,12 +39,34 @@ public class Map {
         bkColor = ngsMapGetBackgroundColor(id)
     }
     
-    public func setBackgroundColor(R: UInt8, G: UInt8, B: UInt8, A: UInt8) -> Bool {
+    public func setBackgroundColor(R: UInt8, G: UInt8, B: UInt8, A: UInt8) {
         bkColor.A = A
         bkColor.R = R
         bkColor.G = G
         bkColor.B = B
-        return ngsMapSetBackgroundColor(id, bkColor) == Int32(COD_SUCCESS.rawValue)
+        
+        let result = ngsMapSetBackgroundColor(id, bkColor)
+        if UInt32(result) != COD_SUCCESS.rawValue {
+            print("Failed set map background [\(R), \(G), \(B), \(A)]: error code \(result)")
+        }
+    }
+    
+    public func setSize(width: CGFloat, height: CGFloat) {
+        let result = ngsMapSetSize(id, Int32(width), Int32(height), 0)
+        if UInt32(result) != COD_SUCCESS.rawValue {
+            print("Failed set map size \(width) x \(height): error code \(result)")
+        }
+    }
+    
+    public func save() -> Bool {
+        return ngsMapSave(id, path) == Int32(COD_SUCCESS.rawValue)
+    }
+    
+    func draw(state: ngsDrawState, _ callback: ngstore.ngsProgressFunc!, _ callbackData: UnsafeMutableRawPointer!) {
+        let result = ngsMapDraw(id, state, callback, callbackData)
+        if UInt32(result) != COD_SUCCESS.rawValue {
+            print("Failed draw map: error code \(result)")
+        }
     }
     
 }

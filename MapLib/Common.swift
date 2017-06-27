@@ -33,3 +33,25 @@ func toArrayOfCStrings(_ values: [String:String]!) -> UnsafeMutablePointer<Unsaf
     buffer[values.count] = nil
     return buffer
 }
+
+func bridge<T : AnyObject>(obj : T) -> UnsafeMutableRawPointer {
+    return Unmanaged.passUnretained(obj).toOpaque()
+    // return unsafeAddressOf(obj) // ***
+}
+
+func bridge<T : AnyObject>(ptr : UnsafeMutableRawPointer) -> T {
+    return Unmanaged<T>.fromOpaque(ptr).takeUnretainedValue()
+    // return unsafeBitCast(ptr, T.self) // ***
+}
+
+func printError(_ message: String) {
+    print("ngmobile error: \(message)")
+}
+
+func printMessage(_ message: String) {
+    print("ngmobile: \(message)")
+}
+
+func printWarning(_ message: String) {
+    print("ngmobile warning: \(message)")
+}

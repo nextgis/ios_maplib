@@ -91,7 +91,8 @@ class MapLibTests: XCTestCase {
         let testUrl = "http://demo.nextgis.com"
         let versionUrl = testUrl + "/api/component/pyramid/pkg_version"
         let options = [
-            "MAX_RETRY": "3"
+            "MAX_RETRY": "5",
+            "RETRY_DELAY": "5"
         ]
         let versionRequest = Request.get(url: versionUrl, options: options)
         XCTAssertTrue(versionRequest.status > 100 && versionRequest.status < 400, "Get HTTP Status \(versionRequest.status)")
