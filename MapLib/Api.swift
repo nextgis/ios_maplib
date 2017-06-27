@@ -24,8 +24,12 @@
 import Foundation
 import ngstore
 
+public func getAPI() -> API {
+    return API.instance
+}
+
 public class API {
-    static let instance = API()
+    public static let instance = API()
     private let catalog: Catalog
     private var mapsDir: Object?
     private var geodataDir: Object?
@@ -62,37 +66,33 @@ public class API {
         ]
         
         if ngsInit(toArrayOfCStrings(options)) != Int32(COD_SUCCESS.rawValue) {
-            print("Init ngstore failed: " + String(cString: ngsGetLastErrorMessage()))
+            printError("Init ngstore failed: " + String(cString: ngsGetLastErrorMessage()))
         }
         catalog = Catalog(catalog: ngsCatalogObjectGet("ngc://"))
-        if let appSupportDir = catalog.childByPath(path: "ngc://Local connections/Home/Library/Application Support") {
-            let createOptions = [
-                "TYPE": "\(CAT_CONTAINER_DIR.rawValue)",
-                "CREATE_UNIQUE": "OFF"
-            ]
-            
-            var ngstoreDir = appSupportDir.child(name: "ngstore")
-            if ngstoreDir == nil {
-                ngstoreDir = appSupportDir.create(name: "ngstore", options: createOptions)
-            }
-            
-            if ngstoreDir == nil {
+        
+        printMessage("\nhome dir: \(homeDir)\n, settings: \(settingsDir)\n, cache dir: \(cacheDir)")
+        
+        if let libDir = catalog.childByPath(path: "ngc://Local connections/Home/Library") {
+            let appSupportDir = getOrCreateFolder(libDir, "Application Support")
+            if appSupportDir == nil {
                 //thow error
+                printError("Application Support directory not found")
                 return
             }
             
-            mapsDir = ngstoreDir?.child(name: "maps")
-            if mapsDir == nil {
-                mapsDir = ngstoreDir?.create(name: "maps", options: createOptions)
+            let ngstoreDir = getOrCreateFolder(appSupportDir, "ngstore")
+            if ngstoreDir == nil {
+                //thow error
+                printError("ngstore directory not found")
+                return
             }
             
-            geodataDir = ngstoreDir?.child(name: "geodata")
-            if geodataDir == nil {
-                geodataDir = ngstoreDir?.create(name: "geodata", options: createOptions)
-            }
+            mapsDir = getOrCreateFolder(ngstoreDir, "maps")
+            geodataDir = getOrCreateFolder(ngstoreDir, "geodata")
             
         } else {
             // thow error
+            printError("Library directory not found")
         }
         
         
@@ -102,11 +102,23 @@ public class API {
         
     }
     
+    private func getOrCreateFolder(_ parent: Object!, _ name: String) -> Object? {
+        if let dir = parent.child(name: name) {
+            return dir
+        }
+        
+        let createOptions = [
+            "TYPE": "\(CAT_CONTAINER_DIR.rawValue)",
+            "CREATE_UNIQUE": "OFF"
+        ]
+        
+        return parent.create(name: name, options: createOptions)
+    }
+    
     deinit {
         // Deinit library
         ngsUnInit()
     }
-    
     
     /// Returns library version as number
     ///
@@ -181,7 +193,7 @@ public class API {
                                  -20037508.34, -20037508.34,
                                  20037508.34, 20037508.34)
             if mapId == 0 { return nil }
-        }
+        } 
         
         return Map(id: mapId, path: mapPath)
     }
