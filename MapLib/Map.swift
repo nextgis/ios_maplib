@@ -62,6 +62,15 @@ public class Map {
         return ngsMapSave(id, path) == Int32(COD_SUCCESS.rawValue)
     }
     
+    public func layerCount() -> UInt8 {
+        return UInt8(ngsMapLayerCount(id))
+    }
+    
+    // TODO: Return layer or null
+    public func addLayer(name: String, source: Object!) -> Bool {
+        return ngsMapCreateLayer(id, name, source.path) > -1
+    }
+    
     func draw(state: ngsDrawState, _ callback: ngstore.ngsProgressFunc!, _ callbackData: UnsafeMutableRawPointer!) {
         let result = ngsMapDraw(id, state, callback, callbackData)
         if UInt32(result) != COD_SUCCESS.rawValue {

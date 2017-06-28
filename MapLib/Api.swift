@@ -107,12 +107,7 @@ public class API {
             return dir
         }
         
-        let createOptions = [
-            "TYPE": "\(CAT_CONTAINER_DIR.rawValue)",
-            "CREATE_UNIQUE": "OFF"
-        ]
-        
-        return parent.create(name: name, options: createOptions)
+        return parent.createDirectory(name: name)
     }
     
     deinit {
@@ -196,5 +191,9 @@ public class API {
         } 
         
         return Map(id: mapId, path: mapPath)
+    }
+    
+    public func getDataDirectory() -> Object? {
+        return geodataDir
     }
 }

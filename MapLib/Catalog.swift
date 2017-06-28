@@ -38,16 +38,15 @@ public class Object {
     }
     
     public func children() -> [Object] {
-        let queryResult = ngsCatalogObjectQuery(object, 0) // TODO: Add filter support
-
         var out: [Object] = []
-        if (queryResult != nil) {
+        
+        if let queryResult = ngsCatalogObjectQuery(object, 0) { // TODO: Add filter support
             var count: Int = 0
-            while (queryResult![count].name != nil) {
-                out.append(Object(name: String(cString: queryResult![count].name),
-                                  type: Int(queryResult![count].type),
-                                  path: path + Catalog.separator + String(cString: queryResult![count].name),
-                                  object: queryResult![count].object))
+            while (queryResult[count].name != nil) {
+                out.append(Object(name: String(cString: queryResult[count].name),
+                                  type: Int(queryResult[count].type),
+                                  path: path + Catalog.separator + String(cString: queryResult[count].name),
+                                  object: queryResult[count].object))
                 count += 1
             }
             
@@ -70,9 +69,29 @@ public class Object {
     public func create(name: String, options: [String:String] = [:]) -> Object? {
         if(ngsCatalogObjectCreate(object, name, options.isEmpty ? nil :
             toArrayOfCStrings(options)) == Int32(COD_SUCCESS.rawValue)) {
-            return child(name: name)
+            return child(name: name) //TODO: Return catalog handler and create Object in place
         }
         return nil
+    }
+    
+    public func createTMS(name: String, url: String, epsg: Int, z_min: UInt8, z_max: UInt8) -> Object? {
+        let options = [
+            "TYPE": "\(CAT_RASTER_TMS.rawValue)",
+            "CREATE_UNIQUE": "OFF",
+            "url": url,
+            "epsg": "\(epsg)",
+            "z_min": "\(z_min)",
+            "z_max": "\(z_max)"
+        ]
+        return create(name: name, options: options)
+    }
+    
+    public func createDirectory(name: String) -> Object? {
+        let options = [
+            "TYPE": "\(CAT_CONTAINER_DIR.rawValue)",
+            "CREATE_UNIQUE": "OFF"
+        ]
+        return create(name: name, options: options)
     }
 }
 
