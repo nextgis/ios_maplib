@@ -41,6 +41,10 @@ class MapLibTests: XCTestCase {
         
         let versionStr = API.instance.versionString(component: "self")
         XCTAssertFalse(versionStr.isEmpty, "Invalid version string")
+        
+        let formatsStr = API.instance.versionString(component: "formats")
+        print(formatsStr)
+        XCTAssertFalse(formatsStr.isEmpty, "Invalid formats string")
     }
     
     func testJson() {
@@ -92,7 +96,8 @@ class MapLibTests: XCTestCase {
         let versionUrl = testUrl + "/api/component/pyramid/pkg_version"
         let options = [
             "MAX_RETRY": "5",
-            "RETRY_DELAY": "5"
+            "RETRY_DELAY": "5",
+            "TIMEOUT": "10"
         ]
         let versionRequest = Request.get(url: versionUrl, options: options)
         XCTAssertTrue(versionRequest.status > 100 && versionRequest.status < 400, "Get HTTP Status \(versionRequest.status)")
