@@ -39,6 +39,12 @@ public class Map {
         bkColor = ngsMapGetBackgroundColor(id)
     }
     
+    public func close() {
+        if ngsMapClose(id) != Int32(COD_SUCCESS.rawValue) {
+            printError("Close map failed. Error message: \(String(cString: ngsGetLastErrorMessage()))")
+        }
+    }
+    
     public func setBackgroundColor(R: UInt8, G: UInt8, B: UInt8, A: UInt8) {
         bkColor.A = A
         bkColor.R = R
@@ -69,6 +75,19 @@ public class Map {
     // TODO: Return layer or null
     public func addLayer(name: String, source: Object!) -> Bool {
         return ngsMapCreateLayer(id, name, source.path) > -1
+    }
+    
+    public func setZoom(increment zoomIncrement: Int8) {
+        if ngsMapSetZoomIncrement(id, zoomIncrement) != Int32(COD_SUCCESS.rawValue) {
+            printError("Set zoom increment \(zoomIncrement) failed")
+        }
+    }
+    
+    public func setExtentLimits(minX: Double, minY: Double, maxX: Double, maxY: Double) {
+        if ngsMapSetExtentLimits(id, minX, minY, maxX, maxY) != Int32(COD_SUCCESS.rawValue) {
+            printError("Set extent limits failed")
+        }
+
     }
     
     func draw(state: ngsDrawState, _ callback: ngstore.ngsProgressFunc!, _ callbackData: UnsafeMutableRawPointer!) {

@@ -26,6 +26,7 @@ import ngstore
 
 public class MapView: GLKView {
     var map: Map?
+    var drawState: ngsDrawState = DS_PRESERVED
     
     override init(frame: CGRect)
     {
@@ -49,15 +50,42 @@ public class MapView: GLKView {
     public func setMap(map: Map) {
         self.map = map
         map.setSize(width: bounds.width, height: bounds.height)
+        
+        printMessage("Map set size w: \(bounds.width) h:\(bounds.height)")
+        
+        draw(DS_REDRAW)
     }
     
     override public func layoutSubviews() {
         super.layoutSubviews()
         map?.setSize(width: bounds.width, height: bounds.height)
+        
+        printMessage("Map set size w: \(bounds.width) h:\(bounds.height)")
+        
+        draw(DS_REDRAW)
+    }
+    
+    func draw(_ state: ngsDrawState) {
+        drawState = state
+        display()
+    }
+    
+    public func cancelDraw() -> Bool {
+        return false
     }
 }
 
 func drawingProgressFunc(code: ngsCode, percent: Double, message: UnsafePointer<Int8>?, progressArguments: UnsafeMutableRawPointer?) -> Int32 {
+    if(code == COD_FINISHED) {
+        return 1
+    }
+    
+    if (progressArguments != nil) {
+        let view: MapView = bridge(ptr: progressArguments!)
+        view.display()
+        return view.cancelDraw() ? 0 : 1
+    }
+    
     return 1
 }
 
@@ -65,13 +93,10 @@ func drawingProgressFunc(code: ngsCode, percent: Double, message: UnsafePointer<
 extension MapView: GLKViewDelegate {
     public func glkView(_ view: GLKView, drawIn rect: CGRect) {
         let processFunc: ngstore.ngsProgressFunc = drawingProgressFunc
-        map?.draw(state: DS_NORMAL, processFunc, bridge(obj: self))
+        map?.draw(state: drawState, processFunc, bridge(obj: self))
         
-        if map == nil {
-            printError("Map is nil")
-        }
-        else {
-            printMessage("Draw map")
-        }
+        printMessage("Map draw!")
+
+        drawState = DS_PRESERVED
     }
 }
