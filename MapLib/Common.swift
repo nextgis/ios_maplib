@@ -34,12 +34,12 @@ func toArrayOfCStrings(_ values: [String:String]!) -> UnsafeMutablePointer<Unsaf
     return buffer
 }
 
-func bridge<T : AnyObject>(obj : T) -> UnsafeMutableRawPointer {
+func bridge<T: AnyObject>(obj: T) -> UnsafeMutableRawPointer {
     return Unmanaged.passUnretained(obj).toOpaque()
     // return unsafeAddressOf(obj) // ***
 }
 
-func bridge<T : AnyObject>(ptr : UnsafeMutableRawPointer) -> T {
+func bridge<T: AnyObject>(ptr: UnsafeMutableRawPointer) -> T {
     return Unmanaged<T>.fromOpaque(ptr).takeUnretainedValue()
     // return unsafeBitCast(ptr, T.self) // ***
 }
@@ -49,9 +49,17 @@ func printError(_ message: String) {
 }
 
 func printMessage(_ message: String) {
-    print("ngmobile: \(message)")
+    if Constants.debugMode {
+        print("ngmobile: \(message)")
+    }
 }
 
 func printWarning(_ message: String) {
-    print("ngmobile warning: \(message)")
+    if Constants.debugMode {
+        print("ngmobile warning: \(message)")
+    }
+}
+
+struct Constants {
+    static let debugMode = true
 }

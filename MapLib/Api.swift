@@ -52,8 +52,7 @@ public class API {
             if let ssl = bundle.url(forResource: "cert", withExtension: "pem", subdirectory: "ssl/certs") {
                 certFile = ssl.path
             }
-        }
-        
+        }        
         
         let options = [
             "HOME": homeDir,
@@ -62,7 +61,7 @@ public class API {
             "SETTINGS_DIR": settingsDir,
             "SSL_CERT_FILE": certFile,
             "NUM_THREADS": "ALL_CPUS",
-            "DEBUG_MODE": "OFF"
+            "DEBUG_MODE": Constants.debugMode ? "ON" : "OFF"
         ]
         
         if ngsInit(toArrayOfCStrings(options)) != Int32(COD_SUCCESS.rawValue) {
@@ -70,7 +69,7 @@ public class API {
         }
         catalog = Catalog(catalog: ngsCatalogObjectGet("ngc://"))
         
-        printMessage("\nhome dir: \(homeDir)\n, settings: \(settingsDir)\n, cache dir: \(cacheDir)")
+        printMessage("\n home dir: \(homeDir)\n settings: \(settingsDir)\n cache dir: \(cacheDir)")
         
         if let libDir = catalog.childByPath(path: "ngc://Local connections/Home/Library") {
             let appSupportDir = getOrCreateFolder(libDir, "Application Support")
