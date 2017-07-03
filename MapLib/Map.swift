@@ -111,6 +111,10 @@ public class Map {
 
     }
     
+    public func reorder(before: Layer?, moved: Layer!) {
+        ngsMapLayerReorder(id, before == nil ? nil : before?.getHandler(), moved.getHandler())
+    }
+    
     func draw(state: ngsDrawState, _ callback: ngstore.ngsProgressFunc!, _ callbackData: UnsafeMutableRawPointer!) {
         let result = ngsMapDraw(id, state, callback, callbackData)
         if UInt32(result) != COD_SUCCESS.rawValue {

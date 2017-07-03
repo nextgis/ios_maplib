@@ -214,10 +214,6 @@ public class API {
         return geodataDir
     }
     
-    public func getCacheDirectoryPath() -> String {
-        return cacheDir
-    }
-    
     public func md5(string: String) -> String {
         return String(cString: ngsMD5(string))
     }
