@@ -93,6 +93,17 @@ public class Object {
         ]
         return create(name: name, options: options)
     }
+    
+    public func delete() -> Bool {
+        return ngsCatalogObjectDelete(object) == Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func delete(name: String) -> Bool {
+        if let deleteObject = child(name: name) {
+            return deleteObject.delete()
+        }
+        return false
+    }
 }
 
 public class Catalog: Object {
@@ -116,5 +127,13 @@ public class Catalog: Object {
                           object: objectHandler)
         }
         return nil
+    }
+    
+    static func getOrCreateFolder(_ parent: Object!, _ name: String) -> Object? {
+        if let dir = parent.child(name: name) {
+            return dir
+        }
+        
+        return parent.createDirectory(name: name)
     }
 }
