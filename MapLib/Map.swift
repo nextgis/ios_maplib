@@ -72,9 +72,30 @@ public class Map {
         return UInt8(ngsMapLayerCount(id))
     }
     
-    // TODO: Return layer or null
-    public func addLayer(name: String, source: Object!) -> Bool {
-        return ngsMapCreateLayer(id, name, source.path) > -1
+    public func addLayer(name: String, source: Object!) -> Layer? {
+        let position = ngsMapCreateLayer(id, name, source.path)
+        if position == -1 {
+            return nil
+        }
+        return getLayer(position: position)
+    }
+    
+    public func deleteLayer(layer: Layer) -> Bool {
+        return ngsMapLayerDelete(id, layer.getHandler()) == Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func deleteLayer(position: Int32) -> Bool {
+        if let deleteLayer = getLayer(position: position) {
+            return ngsMapLayerDelete(id, deleteLayer.getHandler()) == Int32(COD_SUCCESS.rawValue)
+        }
+        return false
+    }
+    
+    public func getLayer(position: Int32) -> Layer? {
+        if let layerHandler = ngsMapLayerGet(id, position) {
+            return Layer(layerH: layerHandler)
+        }
+        return nil
     }
     
     public func setZoom(increment zoomIncrement: Int8) {

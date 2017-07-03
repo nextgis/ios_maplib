@@ -22,7 +22,16 @@
 //
 
 import Foundation
+import ngstore
 
 public class Layer {
+    let layerH: LayerH!
     
+    init(layerH: LayerH!) {
+        self.layerH = layerH
+    }
+    
+    func getHandler() -> LayerH {
+        return layerH
+    }
 }
