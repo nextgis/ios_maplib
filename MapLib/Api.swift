@@ -28,16 +28,31 @@ public func getAPI() -> API {
     return API.instance
 }
 
+func notifyFunction(uri: UnsafePointer<Int8>?, code: ngsChangeCode) -> Swift.Void {
+    switch code {
+    case CC_TOKEN_EXPIRED:
+        API.instance.onAuthNotify(url: String(cString: uri!))
+        return
+    default:
+        return
+    }
+}
+
+
 public class API {
     public static let instance = API()
+    
     private let catalog: Catalog
+    private let cacheDir: String
+
     private var mapsDir: Object?
     private var geodataDir: Object?
+    private var authArray: [Auth] = []
     
     init() {
         // Init library
         let homeDir = NSHomeDirectory()
-        let cacheDir = homeDir + "/Library/Caches/ngstore"
+        cacheDir = homeDir + "/Library/Caches/ngstore"
         let settingsDir = homeDir + "/Library/Preferences/ngstore"
         
         var gdalData: String = ""
@@ -72,24 +87,26 @@ public class API {
         printMessage("\n home dir: \(homeDir)\n settings: \(settingsDir)\n cache dir: \(cacheDir)")
         
         if let libDir = catalog.childByPath(path: "ngc://Local connections/Home/Library") {
-            let appSupportDir = getOrCreateFolder(libDir, "Application Support")
+            let appSupportDir = Catalog.getOrCreateFolder(libDir, "Application Support")
             if appSupportDir == nil {
                 //thow error
                 printError("Application Support directory not found")
                 return
             }
             
-            let ngstoreDir = getOrCreateFolder(appSupportDir, "ngstore")
+            let ngstoreDir = Catalog.getOrCreateFolder(appSupportDir, "ngstore")
             if ngstoreDir == nil {
                 //thow error
                 printError("ngstore directory not found")
                 return
             }
             
-            mapsDir = getOrCreateFolder(ngstoreDir, "maps")
-            geodataDir = getOrCreateFolder(ngstoreDir, "geodata")
+            mapsDir = Catalog.getOrCreateFolder(ngstoreDir, "maps")
+            geodataDir = Catalog.getOrCreateFolder(ngstoreDir, "geodata")
             
         } else {
+            mapsDir = nil
+            geodataDir = nil
             // thow error
             printError("Library directory not found")
         }
@@ -99,19 +116,20 @@ public class API {
 //        let dataStore = homeDir + "/Library/Application Support/ngstore/geodata"
 //        let projectionsDir = homeDir + "/Library/Application Support/ngstore/projections"
         
-    }
-    
-    private func getOrCreateFolder(_ parent: Object!, _ name: String) -> Object? {
-        if let dir = parent.child(name: name) {
-            return dir
-        }
-        
-        return parent.createDirectory(name: name)
+        ngsAddNotifyFunction(notifyFunction, Int32(CC_ALL.rawValue))
     }
     
     deinit {
         // Deinit library
         ngsUnInit()
+    }
+    
+    private static func getOrCreateFolder(_ parent: Object!, _ name: String) -> Object? {
+        if let dir = parent.child(name: name) {
+            return dir
+        }
+        
+        return parent.createDirectory(name: name)
     }
     
     /// Returns library version as number
@@ -194,5 +212,36 @@ public class API {
     
     public func getDataDirectory() -> Object? {
         return geodataDir
+    }
+    
+    public func getCacheDirectoryPath() -> String {
+        return cacheDir
+    }
+    
+    public func md5(string: String) -> String {
+        return String(cString: ngsMD5(string))
+    }
+    
+    public func addAuth(auth: Auth) -> Bool {
+        if ngsURLAuthAdd(auth.getURL(), toArrayOfCStrings(auth.options())) ==
+            Int32(COD_SUCCESS.rawValue) {
+            authArray.append(auth)
+            return true
+        }
+        return false
+    }
+    
+    public func removeAuth(auth: Auth) {
+        if ngsURLAuthDelete(auth.getURL()) == Int32(COD_SUCCESS.rawValue) {
+            if let index = authArray.index(of: auth) {
+                authArray.remove(at: index)
+            }
+        }
+    }
+    
+    public func onAuthNotify(url: String) {
+        for auth in authArray {
+            auth.onRefreshTokenFailed(url: url)
+        }
     }
 }
