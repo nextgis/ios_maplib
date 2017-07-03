@@ -60,7 +60,7 @@ public class Request {
         return (result.status, outStr)
     }
     
-    public static func getJson(url: String, options: [String: String]? = nil) -> (status: Int, value: [String: Any]?) {
+    public static func getJson(url: String, options: [String: String]? = nil) -> (status: Int, value: Any?) {
         let result = API.instance.URLRequest(
             method: ngsURLRequestType(requestType.GET.rawValue),
             url: url, options: options)
@@ -68,9 +68,8 @@ public class Request {
         do {
             let outStr = String(cString: result.data ?? [0])
             if !outStr.isEmpty {
-                if let json = try JSONSerialization.jsonObject(with: outStr.data(using: .utf8)!, options: []) as? [String: Any] {
-                    return (result.status, json)
-                }
+                let json = try JSONSerialization.jsonObject(with: outStr.data(using: .utf8)!, options: [])
+                return (result.status, json)
             }
         }
         catch {
@@ -79,7 +78,7 @@ public class Request {
         return (543, nil)
     }
     
-    public static func postJson(url: String, payload: String, options: [String: String]? = nil) -> (status: Int, value: [String: Any]?) {
+    public static func postJson(url: String, payload: String, options: [String: String]? = nil) -> (status: Int, value: Any?) {
         
         var fullOptions = options ?? [:]
         fullOptions["POSTFIELDS"] = payload
@@ -90,9 +89,8 @@ public class Request {
         do {
             let outStr = String(cString: result.data ?? [0])
             if !outStr.isEmpty {
-                if let json = try JSONSerialization.jsonObject(with: outStr.data(using: .utf8)!, options: []) as? [String: Any] {
-                    return (result.status, json)
-                }
+                let json = try JSONSerialization.jsonObject(with: outStr.data(using: .utf8)!, options: [])
+                return (result.status, json)
             }
         }
         catch {
