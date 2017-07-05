@@ -22,6 +22,7 @@
 //
 
 import Foundation
+import UIKit
 import ngstore
 
 public func getAPI() -> API {
@@ -182,8 +183,10 @@ public class API {
                
             let buffer = [UInt8](repeating: 0, count: Int(requestResult.dataLen + 1))
             memcpy(UnsafeMutableRawPointer(mutating: buffer), requestResult.data, Int(requestResult.dataLen))
+            printMessage("Get \(requestResult.dataLen) data")
                 
             ngsURLRequestDestroyResult(requestResultPtr)
+                
                 
             return (status, buffer)
         }

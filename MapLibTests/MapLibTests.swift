@@ -108,7 +108,9 @@ class MapLibTests: XCTestCase {
         XCTAssertTrue(versionRequest.status > 100 && versionJSONRequest.status < 400, "Get HTTP Status \(versionJSONRequest.status)")
         
         let ngwVersion: Double
-        if let ngwVersionStr = versionJSONRequest.value?["nextgisweb"] as? String {
+        
+        let versionJSONRequestValue = versionJSONRequest.value as! [String:Any]
+        if let ngwVersionStr = versionJSONRequestValue["nextgisweb"] as? String {
             ngwVersion = Double(ngwVersionStr)!
         }
         else {
@@ -120,6 +122,8 @@ class MapLibTests: XCTestCase {
         let httpsResponse = Request.get(url: "https://nextgis.com", options: options)
         XCTAssertTrue(httpsResponse.status > 100 && httpsResponse.status < 400, "HTTPS Not supported. Return code \(httpsResponse.status)")
         
+        let imageRequest = Request.getRaw(url: "http://tile.openstreetmap.org/9/309/160.png", options: options)
+        XCTAssertTrue(imageRequest.status > 100 && imageRequest.status < 400, "HTTPS Not supported. Return code \(imageRequest.status)")
     }
     
 //    func testPerformanceExample() {

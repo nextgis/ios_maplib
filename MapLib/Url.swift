@@ -99,7 +99,12 @@ public class Request {
         return (543, nil)
     }
     
-    
+    public static func getRaw(url: String, options: [String: String]? = nil) -> (status: Int, value: [UInt8]?) {
+        let result = API.instance.URLRequest(
+            method: ngsURLRequestType(requestType.GET.rawValue),
+            url: url, options: options)
+        return (status: result.status, value: result.data)
+    }
     
     // TODO: get image, get file
 }
