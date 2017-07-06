@@ -53,14 +53,14 @@ public class Map {
         
         let result = ngsMapSetBackgroundColor(id, bkColor)
         if UInt32(result) != COD_SUCCESS.rawValue {
-            print("Failed set map background [\(R), \(G), \(B), \(A)]: error code \(result)")
+            printError("Failed set map background [\(R), \(G), \(B), \(A)]: error code \(result)")
         }
     }
     
     public func setSize(width: CGFloat, height: CGFloat) {
         let result = ngsMapSetSize(id, Int32(width), Int32(height), 0)
         if UInt32(result) != COD_SUCCESS.rawValue {
-            print("Failed set map size \(width) x \(height): error code \(result)")
+            printError("Failed set map size \(width) x \(height): error code \(result)")
         }
     }
     
@@ -114,11 +114,11 @@ public class Map {
     public func reorder(before: Layer?, moved: Layer!) {
         ngsMapLayerReorder(id, before == nil ? nil : before?.getHandler(), moved.getHandler())
     }
-    
+        
     func draw(state: ngsDrawState, _ callback: ngstore.ngsProgressFunc!, _ callbackData: UnsafeMutableRawPointer!) {
         let result = ngsMapDraw(id, state, callback, callbackData)
         if UInt32(result) != COD_SUCCESS.rawValue {
-            print("Failed draw map: error code \(result)")
+            printError("Failed draw map: error code \(result)")
         }
     }
     

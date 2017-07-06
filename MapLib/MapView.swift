@@ -73,6 +73,10 @@ public class MapView: GLKView {
     public func cancelDraw() -> Bool {
         return false
     }
+    
+    public func refresh() {
+        draw(DS_REDRAW)
+    }
 }
 
 func drawingProgressFunc(code: ngsCode, percent: Double, message: UnsafePointer<Int8>?, progressArguments: UnsafeMutableRawPointer?) -> Int32 {
@@ -94,8 +98,6 @@ extension MapView: GLKViewDelegate {
     public func glkView(_ view: GLKView, drawIn rect: CGRect) {
         let processFunc: ngstore.ngsProgressFunc = drawingProgressFunc
         map?.draw(state: drawState, processFunc, bridge(obj: self))
-        
-        printMessage("Map draw!")
 
         drawState = DS_PRESERVED
     }

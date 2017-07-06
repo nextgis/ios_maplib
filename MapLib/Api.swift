@@ -201,14 +201,19 @@ public class API {
         if mapsDir == nil {
             return nil
         }
+        
         let mapPath = (mapsDir?.path)! + Catalog.separator + name + Map.ext
         var mapId = ngsMapOpen(mapPath)
         if mapId == 0 {
+            printWarning("Map \(mapPath) is not exists. Create it")
             mapId = ngsMapCreate(name, "default map", 3857,
                                  -20037508.34, -20037508.34,
                                  20037508.34, 20037508.34)
             if mapId == 0 { return nil }
-        } 
+        }
+        else {
+            printMessage("Get map with ID: \(mapId)")
+        }
         
         return Map(id: mapId, path: mapPath)
     }
