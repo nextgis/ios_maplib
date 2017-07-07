@@ -89,6 +89,11 @@ public class MapView: GLKView {
         draw(DS_PRESERVED)
         draw(DS_NORMAL)
     }
+    
+    public func pan(w: Double, h: Double) {
+        map?.pan(w, h)
+        draw(DS_NORMAL)
+    }
 }
 
 func drawingProgressFunc(code: ngsCode, percent: Double, message: UnsafePointer<Int8>?, progressArguments: UnsafeMutableRawPointer?) -> Int32 {
