@@ -77,6 +77,18 @@ public class MapView: GLKView {
     public func refresh() {
         draw(DS_REDRAW)
     }
+    
+    public func zoomIn(multiply: Double = 2.0) {
+        map?.zoomIn(multiply)
+        draw(DS_PRESERVED)
+        draw(DS_NORMAL)
+    }
+    
+    public func zoomOut(multiply: Double = 2.0) {
+        map?.zoomOut(multiply)
+        draw(DS_PRESERVED)
+        draw(DS_NORMAL)
+    }
 }
 
 func drawingProgressFunc(code: ngsCode, percent: Double, message: UnsafePointer<Int8>?, progressArguments: UnsafeMutableRawPointer?) -> Int32 {

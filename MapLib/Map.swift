@@ -122,4 +122,14 @@ public class Map {
         }
     }
     
+    public func zoomIn(_ multiply: Double = 2.0) {
+        let scale = ngsMapGetScale(id) * multiply
+        ngsMapSetScale(id, scale)
+    }
+
+    public func zoomOut(_ multiply: Double = 2.0) {
+        let scale = ngsMapGetScale(id) / multiply
+        ngsMapSetScale(id, scale)
+    }
+    
 }
