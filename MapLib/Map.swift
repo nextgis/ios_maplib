@@ -132,6 +132,22 @@ public class Map {
         ngsMapSetScale(id, scale)
     }
     
+    func scale() -> Double {
+        return ngsMapGetScale(id)
+    }
+    
+    func setScale(_ scale: Double) {
+        ngsMapSetScale(id, scale)
+    }
+    
+    func center() -> ngsCoordinate {
+        return ngsMapGetCenter(id)
+    }
+    
+    func setCenter(x: Double, y: Double) {
+        ngsMapSetCenter(id, x, y)
+    }
+    
     func pan(_ w: Double, _ h: Double) {
         
         let offset = ngsMapGetDistance(id, w, h)

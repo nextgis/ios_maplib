@@ -94,6 +94,23 @@ public class MapView: GLKView {
         map?.pan(w, h)
         draw(DS_NORMAL)
     }
+    
+    public func center() -> (x: Double, y: Double) {
+        let center = map?.center()
+        return (x: center?.X ?? 0.0, y: center?.Y ?? 0.0)
+    }
+    
+    public func setCenter(_ x: Double, _ y: Double) {
+        map?.setCenter(x: x, y: y)
+    }
+    
+    public func scale() -> Double {
+        return map?.scale() ?? 1.0
+    }
+    
+    public func setScale(_ scale: Double) {
+        map?.setScale(scale)
+    }
 }
 
 func drawingProgressFunc(code: ngsCode, percent: Double, message: UnsafePointer<Int8>?, progressArguments: UnsafeMutableRawPointer?) -> Int32 {

@@ -199,6 +199,7 @@ public class API {
     
     public func getMap(_ name: String) -> Map? {
         if mapsDir == nil {
+            printError("Maps dir undefined. Cannot find map.")
             return nil
         }
         
