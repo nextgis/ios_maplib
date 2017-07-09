@@ -136,7 +136,7 @@ public class Map {
         return ngsMapGetScale(id)
     }
     
-    func setScale(_ scale: Double) {
+    public func setScale(_ scale: Double) {
         ngsMapSetScale(id, scale)
     }
     
@@ -144,7 +144,7 @@ public class Map {
         return ngsMapGetCenter(id)
     }
     
-    func setCenter(x: Double, y: Double) {
+    public func setCenter(x: Double, y: Double) {
         ngsMapSetCenter(id, x, y)
     }
     

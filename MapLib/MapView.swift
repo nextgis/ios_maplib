@@ -105,7 +105,7 @@ public class MapView: GLKView {
     }
     
     public func scale() -> Double {
-        return map?.scale() ?? 1.0
+        return map?.scale() ?? 0.0000015
     }
     
     public func setScale(_ scale: Double) {
