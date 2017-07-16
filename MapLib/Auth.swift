@@ -67,12 +67,12 @@ public class Auth : Equatable {
     
     public func options() -> [String: String] {
         return [
-            "TYPE" : "bearer",
-            "TOKEN_SERVER" : authServerUrl,
-            "ACCESS_TOKEN" : accessToken,
-            "REFRESH_TOKEN" : updateToken,
-            "EXPIRES_IN" : expiresIn,
-            "CLIENT_ID" : clientId
+            "HTTPAUTH_TYPE" : "bearer",
+            "HTTPAUTH_TOKEN_SERVER" : authServerUrl,
+            "HTTPAUTH_ACCESS_TOKEN" : accessToken,
+            "HTTPAUTH_REFRESH_TOKEN" : updateToken,
+            "HTTPAUTH_EXPIRES_IN" : expiresIn,
+            "HTTPAUTH_CLIENT_ID" : clientId
         ]
     }
 }
