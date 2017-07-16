@@ -26,11 +26,47 @@ import Foundation
 import UIKit
 import ngstore
 
+public struct Point {
+    public var x = 0.0, y = 0.0
+    
+    public init(x: Double, y: Double) {
+        self.x = x
+        self.y = y
+    }
+    
+    public init() {
+        self.x = 0.0
+        self.y = 0.0
+    }
+}
+
 public class Map {
     static public let ext = ".ngmd"
     let id: UInt8
     let path: String
     var bkColor: ngsRGBA
+    
+    public var scale: Double {
+        get {
+            return ngsMapGetScale(id)
+        }
+        
+        set(newScale) {
+            ngsMapSetScale(id, newScale)
+        }
+    }
+    
+    public var center: Point {
+        get {
+            let coordinates = ngsMapGetCenter(id)
+            return Point(x: coordinates.X, y: coordinates.Y)
+        }
+        
+        set(newPoint) {
+            ngsMapSetCenter(id, newPoint.x, newPoint.y)
+        }
+    }
+    
     
     init(id: UInt8, path: String) {
         self.id = id
@@ -130,22 +166,6 @@ public class Map {
     func zoomOut(_ multiply: Double = 2.0) {
         let scale = ngsMapGetScale(id) / multiply
         ngsMapSetScale(id, scale)
-    }
-    
-    func scale() -> Double {
-        return ngsMapGetScale(id)
-    }
-    
-    public func setScale(_ scale: Double) {
-        ngsMapSetScale(id, scale)
-    }
-    
-    func center() -> ngsCoordinate {
-        return ngsMapGetCenter(id)
-    }
-    
-    public func setCenter(x: Double, y: Double) {
-        ngsMapSetCenter(id, x, y)
     }
     
     func pan(_ w: Double, _ h: Double) {

@@ -28,6 +28,26 @@ public class MapView: GLKView {
     var map: Map?
     var drawState: ngsDrawState = DS_PRESERVED
     
+    public var mapScale: Double {
+        get {
+            return map?.scale ?? 0.0000015
+        }
+        
+        set(newScale) {
+            map?.scale = newScale
+        }
+    }
+    
+    public var mapCenter: Point {
+        get {
+            return map?.center ?? Point()
+        }
+        
+        set(newPoint) {
+            map?.center = newPoint
+        }
+    }
+    
     override init(frame: CGRect)
     {
         super.init(frame: frame, context: EAGLContext(api: .openGLES2))
@@ -95,22 +115,6 @@ public class MapView: GLKView {
         draw(DS_NORMAL)
     }
     
-    public func center() -> (x: Double, y: Double) {
-        let center = map?.center()
-        return (x: center?.X ?? 0.0, y: center?.Y ?? 0.0)
-    }
-    
-    public func setCenter(_ x: Double, _ y: Double) {
-        map?.setCenter(x: x, y: y)
-    }
-    
-    public func scale() -> Double {
-        return map?.scale() ?? 0.0000015
-    }
-    
-    public func setScale(_ scale: Double) {
-        map?.setScale(scale)
-    }
 }
 
 func drawingProgressFunc(code: ngsCode, percent: Double, message: UnsafePointer<Int8>?, progressArguments: UnsafeMutableRawPointer?) -> Int32 {
