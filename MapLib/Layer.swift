@@ -27,6 +27,26 @@ import ngstore
 public class Layer {
     let layerH: LayerH!
     
+    public var name: String {
+        get {
+            return String(cString: ngsLayerGetName(layerH))
+        }
+        
+        set(newName) {
+            ngsLayerSetName(layerH, newName)
+        }
+    }
+    
+    public var visible: Bool {
+        get {
+            return ngsLayerGetVisible(layerH) == 1 ? true : false
+        }
+        
+        set(newVisibility) {
+            ngsLayerSetVisible(layerH, newVisibility == true ? 1 : 0)
+        }
+    }
+    
     init(layerH: LayerH!) {
         self.layerH = layerH
     }
@@ -34,4 +54,5 @@ public class Layer {
     func getHandler() -> LayerH {
         return layerH
     }
+    
 }
