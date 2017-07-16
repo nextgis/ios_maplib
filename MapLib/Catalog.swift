@@ -23,6 +23,24 @@
 import Foundation
 import ngstore
 
+public struct BBox {
+    public var minx, miny, maxx, maxy: Double
+    
+    public init() {
+        minx = 0.0
+        miny = 0.0
+        maxx = 0.0
+        maxy = 0.0
+    }
+    
+    public init(minx: Double, miny: Double, maxx: Double, maxy: Double) {
+        self.minx = minx
+        self.miny = miny
+        self.maxx = maxx
+        self.maxy = maxy
+    }
+}
+
 
 public class Object {
     public let type: Int
@@ -74,16 +92,31 @@ public class Object {
         return nil
     }
     
-    public func createTMS(name: String, url: String, epsg: Int, z_min: UInt8, z_max: UInt8) -> Object? {
-        let options = [
+    public func createTMS(name: String, url: String, epsg: Int,
+                          z_min: UInt8, z_max: UInt8, bbox: BBox,
+                          cacheExpires: Int,
+                          options: [String: String]? = nil) -> Object? {
+        var createOptions = [
             "TYPE": "\(CAT_RASTER_TMS.rawValue)",
             "CREATE_UNIQUE": "OFF",
             "url": url,
             "epsg": "\(epsg)",
             "z_min": "\(z_min)",
-            "z_max": "\(z_max)"
+            "z_max": "\(z_max)",
+            "x_min": "\(bbox.minx)",
+            "y_min": "\(bbox.miny)",
+            "x_max": "\(bbox.maxx)",
+            "y_max": "\(bbox.maxy)",
+            "cache_expires": "\(cacheExpires)"
         ]
-        return create(name: name, options: options)
+        
+        if options != nil {
+            for option in options! {
+                createOptions[option.key] = option.value
+            }
+        }
+        
+        return create(name: name, options: createOptions)
     }
     
     public func createDirectory(name: String) -> Object? {
