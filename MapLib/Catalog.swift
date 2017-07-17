@@ -92,9 +92,23 @@ public class Object {
         return nil
     }
     
+    
+    /// Create TMS datasource
+    ///
+    /// - Parameters:
+    ///   - name: TMS connection name
+    ///   - url: TMS url. {x}, {y} and {z} must be present in url string
+    ///   - epsg: EPSG code of TMS
+    ///   - z_min: Minimum zoom. Default is 0
+    ///   - z_max: Maximum zoom. Default is 18
+    ///   - fullExtent: Full extent of TMS datasource. Depends on tile schema and projection
+    ///   - limitExtent: Data extent. Maybe equal or less of fullExtent
+    ///   - cacheExpires: Time in seconds to remove cahced tiles
+    ///   - options: Addtional options as key: value array
+    /// - Returns: Catalog object or nil
     public func createTMS(name: String, url: String, epsg: Int,
-                          z_min: UInt8, z_max: UInt8, bbox: BBox,
-                          cacheExpires: Int,
+                          z_min: UInt8, z_max: UInt8, fullExtent: BBox,
+                          limitExtent: BBox, cacheExpires: Int,
                           options: [String: String]? = nil) -> Object? {
         var createOptions = [
             "TYPE": "\(CAT_RASTER_TMS.rawValue)",
@@ -103,11 +117,15 @@ public class Object {
             "epsg": "\(epsg)",
             "z_min": "\(z_min)",
             "z_max": "\(z_max)",
-            "x_min": "\(bbox.minx)",
-            "y_min": "\(bbox.miny)",
-            "x_max": "\(bbox.maxx)",
-            "y_max": "\(bbox.maxy)",
-            "cache_expires": "\(cacheExpires)"
+            "x_min": "\(fullExtent.minx)",
+            "y_min": "\(fullExtent.miny)",
+            "x_max": "\(fullExtent.maxx)",
+            "y_max": "\(fullExtent.maxy)",
+            "cache_expires": "\(cacheExpires)",
+            "limit_x_min": "\(limitExtent.minx)",
+            "limit_y_min": "\(limitExtent.miny)",
+            "limit_x_max": "\(limitExtent.maxx)",
+            "limit_y_max": "\(limitExtent.maxy)"
         ]
         
         if options != nil {

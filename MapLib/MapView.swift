@@ -27,6 +27,16 @@ import ngstore
 public class MapView: GLKView {
     var map: Map?
     var drawState: ngsDrawState = DS_PRESERVED
+    weak var globalTimer: Timer?
+    public var freeze: Bool {
+        get {
+            return self.freeze
+        }
+        
+        set(newValue) {
+            self.freeze = newValue
+        }
+    }
     
     public var mapScale: Double {
         get {
@@ -52,12 +62,14 @@ public class MapView: GLKView {
     {
         super.init(frame: frame, context: EAGLContext(api: .openGLES2))
         delegate = self
+        freeze = true
     }
     
     override init(frame: CGRect, context: EAGLContext)
     {
         super.init(frame: frame, context: context)
         delegate = self
+        freeze = true
     }
     
     required public init?(coder aDecoder: NSCoder)
@@ -65,6 +77,7 @@ public class MapView: GLKView {
         super.init(coder: aDecoder)
         context = EAGLContext(api: .openGLES2)
         delegate = self
+        freeze = true
     }
     
     public func setMap(map: Map) {
@@ -73,7 +86,7 @@ public class MapView: GLKView {
         
         printMessage("Map set size w: \(bounds.width) h:\(bounds.height)")
         
-        draw(DS_REDRAW)
+        refresh()
     }
     
     override public func layoutSubviews() {
@@ -82,7 +95,7 @@ public class MapView: GLKView {
         
         printMessage("Map set size w: \(bounds.width) h:\(bounds.height)")
         
-        draw(DS_REDRAW)
+        refresh()
     }
     
     func draw(_ state: ngsDrawState) {
@@ -95,24 +108,45 @@ public class MapView: GLKView {
     }
     
     public func refresh() {
-        draw(DS_REDRAW)
+        if !freeze {
+            draw(DS_REDRAW)
+        }
     }
     
     public func zoomIn(multiply: Double = 2.0) {
         map?.zoomIn(multiply)
         draw(DS_PRESERVED)
-        draw(DS_NORMAL)
+        scheduleDraw()
     }
     
     public func zoomOut(multiply: Double = 2.0) {
         map?.zoomOut(multiply)
         draw(DS_PRESERVED)
-        draw(DS_NORMAL)
+        scheduleDraw()
     }
     
     public func pan(w: Double, h: Double) {
         map?.pan(w, h)
+        draw(DS_PRESERVED)
+        scheduleDraw()
+    }
+    
+    func onTimer(timer: Timer) {
+        globalTimer = nil
         draw(DS_NORMAL)
+    }
+    
+    func scheduleDraw() {
+        // timer?.invalidate()
+        if globalTimer != nil {
+            return
+        }
+        
+        globalTimer = Timer.scheduledTimer(timeInterval: Constants.refreshTime,
+                                     target: self,
+                                     selector: #selector(onTimer(timer:)),
+                                     userInfo: nil,
+                                     repeats: false)
     }
     
 }
@@ -124,7 +158,7 @@ func drawingProgressFunc(code: ngsCode, percent: Double, message: UnsafePointer<
     
     if (progressArguments != nil) {
         let view: MapView = bridge(ptr: progressArguments!)
-        view.display()
+        view.scheduleDraw() //display()
         return view.cancelDraw() ? 0 : 1
     }
     
@@ -134,6 +168,7 @@ func drawingProgressFunc(code: ngsCode, percent: Double, message: UnsafePointer<
 
 extension MapView: GLKViewDelegate {
     public func glkView(_ view: GLKView, drawIn rect: CGRect) {
+        
         let processFunc: ngstore.ngsProgressFunc = drawingProgressFunc
         map?.draw(state: drawState, processFunc, bridge(obj: self))
 

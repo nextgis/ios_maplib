@@ -62,4 +62,5 @@ func printWarning(_ message: String) {
 
 struct Constants {
     static let debugMode = true
+    static let refreshTime = 0.45
 }
