@@ -1,9 +1,9 @@
 //
-//  Layer.swift
+//  Store.swift
 //  Project: NextGIS Mobile SDK
 //  Author:  Dmitry Baryshnikov, dmitry.baryshnikov@nextgis.com
 //
-//  Created by Dmitry Baryshnikov on 13.06.17.
+//  Created by Dmitry Baryshnikov on 19.07.17.
 //  Copyright © 2017 NextGIS, info@nextgis.com
 //
 //
@@ -19,44 +19,11 @@
 //
 //  You should have received a copy of the GNU Lesser Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
 
 import Foundation
 import ngstore
 
-public class Layer {
-    let layerH: LayerH!
-    
-    public var name: String {
-        get {
-            return String(cString: ngsLayerGetName(layerH))
-        }
-        
-        set(newName) {
-            ngsLayerSetName(layerH, newName)
-        }
-    }
-    
-    public var visible: Bool {
-        get {
-            return ngsLayerGetVisible(layerH) == 1 ? true : false
-        }
-        
-        set(newVisibility) {
-            ngsLayerSetVisible(layerH, newVisibility == true ? 1 : 0)
-        }
-    }
-    
-    public func dataSource() -> Object {
-        return Object(object: ngsLayerGetDataSource(layerH))
-    }
-    
-    init(layerH: LayerH!) {
-        self.layerH = layerH
-    }
-    
-    func getHandler() -> LayerH {
-        return layerH
-    }
-    
+public class Store: Object {
+    public static let ext = ".ngst"
+
 }

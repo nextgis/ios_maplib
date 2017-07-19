@@ -55,6 +55,20 @@ public class Object {
         self.object = object
     }
     
+    init(object: CatalogObjectH) {
+        self.object = object
+        self.name = String(cString: ngsCatalogObjectName(object))
+        self.type = Int(ngsCatalogObjectType(object).rawValue)
+        self.path = "" // TODO: Do we need path?
+    }
+    
+    init(copyFrom: Object) {
+        self.name = copyFrom.name
+        self.type = copyFrom.type
+        self.path = copyFrom.path
+        self.object = copyFrom.object
+    }
+    
     public func children() -> [Object] {
         var out: [Object] = []
         
@@ -87,7 +101,7 @@ public class Object {
     public func create(name: String, options: [String:String] = [:]) -> Object? {
         if(ngsCatalogObjectCreate(object, name, options.isEmpty ? nil :
             toArrayOfCStrings(options)) == Int32(COD_SUCCESS.rawValue)) {
-            return child(name: name) //TODO: Return catalog handler and create Object in place
+            return child(name: name)
         }
         return nil
     }

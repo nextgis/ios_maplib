@@ -219,6 +219,30 @@ public class API {
         return Map(id: mapId, path: mapPath)
     }
     
+    public func getStore(_ name: String) -> Store? {
+        if geodataDir == nil {
+            printError("GeoData dir undefined. Cannot find store.")
+            return nil
+        }
+        
+        let storePath = (geodataDir?.path)! + Catalog.separator + name + Store.ext
+        var store = geodataDir?.child(name: name)
+        if store == nil {
+            printWarning("Store \(storePath) is not exists. Create it")
+            let options = [
+                "TYPE" : "\(CAT_CONTAINER_NGS.rawValue)",
+                "CREATE_UNIQUE": "OFF"
+            ]
+            store = geodataDir?.create(name: name, options: options)
+        }
+        
+        if store == nil {
+            return nil
+        }
+        
+        return Store(copyFrom: store!)
+    }
+    
     public func getDataDirectory() -> Object? {
         return geodataDir
     }
