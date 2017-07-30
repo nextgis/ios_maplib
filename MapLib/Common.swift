@@ -34,12 +34,12 @@ func toArrayOfCStrings(_ values: [String:String]!) -> UnsafeMutablePointer<Unsaf
     return buffer
 }
 
-func bridge<T: AnyObject>(obj: T) -> UnsafeMutableRawPointer {
+public func bridge<T: AnyObject>(obj: T) -> UnsafeMutableRawPointer {
     return Unmanaged.passUnretained(obj).toOpaque()
     // return unsafeAddressOf(obj) // ***
 }
 
-func bridge<T: AnyObject>(ptr: UnsafeMutableRawPointer) -> T {
+public func bridge<T: AnyObject>(ptr: UnsafeMutableRawPointer) -> T {
     return Unmanaged<T>.fromOpaque(ptr).takeUnretainedValue()
     // return unsafeBitCast(ptr, T.self) // ***
 }

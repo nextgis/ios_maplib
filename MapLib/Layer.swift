@@ -25,7 +25,7 @@ import Foundation
 import ngstore
 
 public class Layer {
-    let layerH: LayerH!
+    private let layerH: LayerH!
     
     public var name: String {
         get {

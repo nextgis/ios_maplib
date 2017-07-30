@@ -172,8 +172,8 @@ public class API {
     /// - Returns: result structure with return code and raw data buffer
     func URLRequest(method: ngsURLRequestType, url: String, options: [String: String]? = nil) ->
         (status: Int, data: [UInt8]?){
-            if let requestResultPtr = ngsURLRequest(method, url, options == nil ||
-                (options?.isEmpty)! ? nil : toArrayOfCStrings(options)) {
+            if let requestResultPtr = ngsURLRequest(method, url,
+                                                    toArrayOfCStrings(options)) {
             let requestResult = requestResultPtr.pointee
             let status = Int(requestResult.status)
             
@@ -185,7 +185,7 @@ public class API {
             memcpy(UnsafeMutableRawPointer(mutating: buffer), requestResult.data, Int(requestResult.dataLen))
             printMessage("Get \(requestResult.dataLen) data")
                 
-            ngsURLRequestDestroyResult(requestResultPtr)
+            ngsURLRequestResultFree(requestResultPtr)
                 
                 
             return (status, buffer)
@@ -268,9 +268,13 @@ public class API {
         }
     }
     
-    public func onAuthNotify(url: String) {
+    func onAuthNotify(url: String) {
         for auth in authArray {
             auth.onRefreshTokenFailed(url: url)
         }
+    }
+    
+    func createJsonDocument() -> JsonDocumentH {
+        return ngsJsonDocumentCreate()
     }
 }

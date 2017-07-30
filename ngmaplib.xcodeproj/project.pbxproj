@@ -12,6 +12,7 @@
 		3536760C1EFB30CA00C7B846 /* Catalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3536760B1EFB30CA00C7B846 /* Catalog.swift */; };
 		354A8DC91F0869F800113CA5 /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 354A8DC81F0869F800113CA5 /* Auth.swift */; };
 		355FB9B01F1F8B1B008D26D7 /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 355FB9AF1F1F8B1B008D26D7 /* Store.swift */; };
+		356066BE1F2E6A6300D2EF59 /* Json.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356066BD1F2E6A6300D2EF59 /* Json.swift */; };
 		35C1A8D51EF6EE5F00C2CF67 /* ngstore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35C1A8D41EF6EE5F00C2CF67 /* ngstore.framework */; };
 		35D46B781EEF568E00024E7E /* ngmaplib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D46B6E1EEF568E00024E7E /* ngmaplib.framework */; };
 		35D46B7D1EEF568E00024E7E /* MapLibTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D46B7C1EEF568E00024E7E /* MapLibTests.swift */; };
@@ -38,6 +39,7 @@
 		3536760B1EFB30CA00C7B846 /* Catalog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Catalog.swift; sourceTree = "<group>"; };
 		354A8DC81F0869F800113CA5 /* Auth.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
 		355FB9AF1F1F8B1B008D26D7 /* Store.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
+		356066BD1F2E6A6300D2EF59 /* Json.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Json.swift; sourceTree = "<group>"; };
 		35C1A8D41EF6EE5F00C2CF67 /* ngstore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ngstore.framework; path = Carthage/Build/iOS/ngstore.framework; sourceTree = "<group>"; };
 		35D46B6E1EEF568E00024E7E /* ngmaplib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ngmaplib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		35D46B711EEF568E00024E7E /* MapLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MapLib.h; sourceTree = "<group>"; };
@@ -76,6 +78,7 @@
 			children = (
 				353675FE1EF9270A00C7B846 /* Common.swift */,
 				353676001EF9277500C7B846 /* Url.swift */,
+				356066BD1F2E6A6300D2EF59 /* Json.swift */,
 			);
 			name = util;
 			sourceTree = "<group>";
@@ -271,6 +274,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				35F1D34E1F015AC2005114E2 /* MapView.swift in Sources */,
+				356066BE1F2E6A6300D2EF59 /* Json.swift in Sources */,
 				353675FF1EF9270A00C7B846 /* Common.swift in Sources */,
 				35D46B8D1EEF5D4D00024E7E /* Api.swift in Sources */,
 				355FB9B01F1F8B1B008D26D7 /* Store.swift in Sources */,
