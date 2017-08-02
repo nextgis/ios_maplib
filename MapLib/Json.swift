@@ -25,86 +25,87 @@ import Foundation
 import ngstore
 
 public class JsonDocument {
-    private let document: JsonDocumentH!
+    let handle: JsonDocumentH!
     
     init() {
-        document = API.instance.createJsonDocument()
+        handle = API.instance.createJsonDocument()
     }
     
     deinit {
-        ngsJsonDocumentFree(document)
+        ngsJsonDocumentFree(handle)
     }
     
     public func load(url: String, options: [String: String]? = nil,
-                     callback: ngstore.ngsProgressFunc!,
-                     _ callbackData: UnsafeMutableRawPointer!) -> Bool {
-        return ngsJsonDocumentLoadUrl(document, url, toArrayOfCStrings(options),
-                                      callback, callbackData) ==
+                     callback: (func: ngstore.ngsProgressFunc,
+        data: UnsafeMutableRawPointer)? = nil ) -> Bool {
+        return ngsJsonDocumentLoadUrl(handle, url, toArrayOfCStrings(options),
+                                      callback == nil ? nil : callback!.func,
+                                      callback == nil ? nil : callback!.data) ==
             Int32(COD_SUCCESS.rawValue) ? true : false;
     }
     
     func getRoot() -> JsonObject {
-        return JsonObject(object: ngsJsonDocumentRoot(document))
+        return JsonObject(handle: ngsJsonDocumentRoot(handle))
     }
 }
 
 public class JsonObject {
-    fileprivate let object: JsonObjectH!
+    let handle: JsonObjectH!
     
     public enum jsonObjectType : Int32 {
         case NULL = 0, OBJECT, ARRAY, BOOLEAN, STRING, INTEGER, LONG, DOUBLE
     }
     
-    init(object: JsonObjectH!) {
-        self.object = object
+    init(handle: JsonObjectH!) {
+        self.handle = handle
     }
     
     deinit {
-        ngsJsonObjectFree(object)
+        ngsJsonObjectFree(handle)
     }
     
     public var name: String {
         get {
-            return String(cString: ngsJsonObjectName(object))
+            return String(cString: ngsJsonObjectName(handle))
         }
     }
     
     public var type: jsonObjectType {
         get {
-            return jsonObjectType(rawValue: ngsJsonObjectType(object))!
+            return jsonObjectType(rawValue: ngsJsonObjectType(handle))!
         }
     }
     
     public func getString(with defaultValue: String) -> String {
-        return String(cString: ngsJsonObjectGetString(object, defaultValue))
+        return String(cString: ngsJsonObjectGetString(handle, defaultValue))
     }
     
     public func getDouble(with defaultValue: Double) -> Double {
-        return ngsJsonObjectGetDouble(object, defaultValue)
+        return ngsJsonObjectGetDouble(handle, defaultValue)
     }
     
     public func getInteger(with defaultValue: Int32) -> Int32 {
-        return ngsJsonObjectGetInteger(object, defaultValue)
+        return ngsJsonObjectGetInteger(handle, defaultValue)
     }
     
     public func getLong(with defaultValue: Int) -> Int {
-        return ngsJsonObjectGetLong(object, defaultValue)
+        return ngsJsonObjectGetLong(handle, defaultValue)
     }
     
     public func getBool(with defaultValue: Bool) -> Bool {
-        return ngsJsonObjectGetBool(object, defaultValue ? 1 : 0) == 1 ? true : false
+        return ngsJsonObjectGetBool(handle, defaultValue ? 1 : 0) == 1 ? true : false
     }
     
     public func getObject(name: String) -> JsonObject {
-        return JsonObject(object: ngsJsonObjectGetObject(object, name))
+        return JsonObject(handle: ngsJsonObjectGetObject(handle, name))
     }
     
     public func children() -> [JsonObject] {
         var out: [JsonObject] = []
-        if let children = ngsJsonObjectChildren(object) {
+        if let children = ngsJsonObjectChildren(handle) {
             var count: Int = 0
             while (children[count] != nil) {
-                out.append(JsonObject(object: children[count]))
+                out.append(JsonObject(handle: children[count]))
                 count += 1
             }
             ngsJsonObjectChildrenListFree(children)
@@ -113,7 +114,7 @@ public class JsonObject {
     }
     
     public func getArray(name: String) -> JsonArray {
-        return JsonArray(object: ngsJsonObjectGetArray(object, name))
+        return JsonArray(handle: ngsJsonObjectGetArray(handle, name))
     }
     
 }
@@ -122,11 +123,11 @@ public class JsonArray : JsonObject {
     
     public var size: Int32 {
         get {
-            return ngsJsonArraySize(object)
+            return ngsJsonArraySize(handle)
         }
     }
     
     public func getItem(with index: Int32) -> JsonObject {
-        return JsonObject(object: ngsJsonArrayItem(object, index))
-    }    
+        return JsonObject(handle: ngsJsonArrayItem(handle, index))
+    }
 }

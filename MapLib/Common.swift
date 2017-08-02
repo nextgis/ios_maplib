@@ -23,14 +23,21 @@
 import Foundation
 
 // https://stackoverflow.com/a/40189217/2901140
-func toArrayOfCStrings(_ values: [String:String]!) -> UnsafeMutablePointer<UnsafeMutablePointer<Int8>?> {
-    let buffer = UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>.allocate(capacity: values.count + 1)
-    
-    for (index, value) in values.enumerated() {
-        let keyValue = value.key + "=" + value.value
-        buffer[index] = UnsafeMutablePointer<Int8>(mutating: (keyValue as NSString).utf8String!)
+func toArrayOfCStrings(_ values: [String:String]?) -> UnsafeMutablePointer<UnsafeMutablePointer<Int8>?> {
+    var buffer: UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>
+    if values == nil {
+        buffer = UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>.allocate(capacity: 1)
+        buffer[0] = nil
     }
-    buffer[values.count] = nil
+    else {
+        buffer = UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>.allocate(capacity: values!.count + 1)
+    
+        for (index, value) in values!.enumerated() {
+            let keyValue = value.key + "=" + value.value
+            buffer[index] = UnsafeMutablePointer<Int8>(mutating: (keyValue as NSString).utf8String!)
+        }
+        buffer[values!.count] = nil
+    }
     return buffer
 }
 
@@ -62,5 +69,5 @@ func printWarning(_ message: String) {
 
 struct Constants {
     static let debugMode = true
-    static let refreshTime = 0.45
+    static let refreshTime = 0.35
 }

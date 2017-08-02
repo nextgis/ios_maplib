@@ -46,7 +46,7 @@ public class Object {
     public let type: Int
     public let name: String
     public let path: String
-    fileprivate let object: CatalogObjectH!
+    let object: CatalogObjectH!
     
     init(name: String, type: Int, path: String, object: CatalogObjectH) {
         self.name = name

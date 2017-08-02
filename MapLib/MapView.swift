@@ -28,6 +28,8 @@ public class MapView: GLKView {
     var map: Map?
     var drawState: ngsDrawState = DS_PRESERVED
     weak var globalTimer: Timer?
+    var timerDrawState: ngsDrawState = DS_PRESERVED
+    
     public var freeze: Bool {
         get {
             return self.freeze
@@ -116,36 +118,44 @@ public class MapView: GLKView {
     public func zoomIn(multiply: Double = 2.0) {
         map?.zoomIn(multiply)
         draw(DS_PRESERVED)
-        scheduleDraw()
+        scheduleDraw(drawState: DS_NORMAL)
     }
     
     public func zoomOut(multiply: Double = 2.0) {
         map?.zoomOut(multiply)
         draw(DS_PRESERVED)
-        scheduleDraw()
+        scheduleDraw(drawState: DS_NORMAL)
     }
     
     public func pan(w: Double, h: Double) {
         map?.pan(w, h)
         draw(DS_PRESERVED)
-        scheduleDraw()
+        scheduleDraw(drawState: DS_NORMAL)
     }
     
     func onTimer(timer: Timer) {
         globalTimer = nil
-        draw(DS_NORMAL)
+        let drawState = timer.userInfo as! ngsDrawState
+        draw(drawState)
     }
     
-    func scheduleDraw() {
+    func scheduleDraw(drawState: ngsDrawState) {
         // timer?.invalidate()
+        if timerDrawState != drawState {
+            globalTimer?.invalidate()
+            globalTimer = nil
+        }
+        
         if globalTimer != nil {
             return
         }
         
+        timerDrawState = drawState
+        
         globalTimer = Timer.scheduledTimer(timeInterval: Constants.refreshTime,
                                      target: self,
                                      selector: #selector(onTimer(timer:)),
-                                     userInfo: nil,
+                                     userInfo: drawState,
                                      repeats: false)
     }
     
@@ -158,7 +168,7 @@ func drawingProgressFunc(code: ngsCode, percent: Double, message: UnsafePointer<
     
     if (progressArguments != nil) {
         let view: MapView = bridge(ptr: progressArguments!)
-        view.scheduleDraw() //display()
+        view.scheduleDraw(drawState: DS_PRESERVED) //display()
         return view.cancelDraw() ? 0 : 1
     }
     
