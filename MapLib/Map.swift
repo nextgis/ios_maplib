@@ -67,6 +67,12 @@ public class Map {
         }
     }
     
+    public var layerCount: Int32 {
+        get {
+            return ngsMapLayerCount(id)
+        }
+    }
+    
     
     init(id: UInt8, path: String) {
         self.id = id
@@ -102,10 +108,6 @@ public class Map {
     
     public func save() -> Bool {
         return ngsMapSave(id, path) == Int32(COD_SUCCESS.rawValue)
-    }
-    
-    public func layerCount() -> UInt8 {
-        return UInt8(ngsMapLayerCount(id))
     }
     
     public func addLayer(name: String, source: Object!) -> Layer? {
