@@ -225,8 +225,13 @@ public class API {
             return nil
         }
         
-        let storePath = (geodataDir?.path)! + Catalog.separator + name + Store.ext
-        var store = geodataDir?.child(name: name)
+        var newName = name
+        if !newName.hasSuffix(Store.ext) {
+            newName += Store.ext
+        }
+        
+        let storePath = (geodataDir?.path)! + Catalog.separator + newName
+        var store = geodataDir?.child(name: newName)
         if store == nil {
             printWarning("Store \(storePath) is not exists. Create it")
             let options = [

@@ -48,6 +48,26 @@ public class Object {
     public let path: String
     let object: CatalogObjectH!
     
+    public var metadata: [String: String] {
+        get {
+            if let rawArray = ngsCatalogObjectMetadata(object, "user") {
+                var count = 0
+                var out: [String: String] = [:]
+                while(rawArray[count] != nil) {
+                    let metadataItem = String(cString: rawArray[count]!)
+                    if let splitIndex = metadataItem.characters.index(of: "=") {
+                        let key = metadataItem.substring(to: splitIndex)
+                        let value = metadataItem.substring(from: splitIndex)
+                        out[key] = value
+                    }
+                    count += 1
+                }
+                return out
+            }
+            return [:]
+        }
+    }
+    
     init(name: String, type: Int, path: String, object: CatalogObjectH) {
         self.name = name
         self.type = type
@@ -168,6 +188,22 @@ public class Object {
             return deleteObject.delete()
         }
         return false
+    }
+
+    public static func isTable(_ type: Int) -> Bool {
+        return type >= 1500 && type <= 1999
+    }
+    
+    public static func isRaster(_ type: Int) -> Bool {
+        return type >= 1000 && type <= 1499
+    }
+    
+    public static func isFeatureClass(_ type: Int) -> Bool {
+        return type >= 500 && type <= 999
+    }
+    
+    public static func isContainer(_ type: Int) -> Bool {
+        return type >= 50 && type <= 499
     }
 }
 

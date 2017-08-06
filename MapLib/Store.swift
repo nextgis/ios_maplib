@@ -68,14 +68,14 @@ public class FeatureClass: Object {
         }
     }
     
-    var count: Int64 {
+    public var count: Int64 {
         get {
             return ngsFeatureClassCount(object)
         }
     }
     
     public enum geometryTypeEnum: Int32 {
-        case POINT = 1, LINESTRING, POLYGON, MULTIPOINT, MULTILINESTRING, MULTIPOLYGON
+        case NONE = 0, POINT, LINESTRING, POLYGON, MULTIPOINT, MULTILINESTRING, MULTIPOLYGON
     }
     
     override init(copyFrom: Object) {
@@ -99,6 +99,8 @@ public class FeatureClass: Object {
     
     static func geometryTypeToName(_ geometryType: geometryTypeEnum) -> String {
         switch geometryType {
+        case .NONE:
+            return "NONE"
         case .POINT:
             return "POINT"
         case .LINESTRING:
@@ -110,7 +112,8 @@ public class FeatureClass: Object {
         case .MULTILINESTRING:
             return "MULTILINESTRING"
         case .MULTIPOLYGON:
-            return "MULTIPOLYGON"        }
+            return "MULTIPOLYGON"
+        }
     }
     
     public func createFeature() -> Feature {
@@ -176,19 +179,19 @@ public class FeatureClass: Object {
 
 public class Feature {
     let handle: FeatureH!
-    var id: Int64 {
+    public var id: Int64 {
         get {
             return ngsFeatureGetId(handle)
         }
     }
     
-    var geometry: Geometry {
+    public var geometry: Geometry {
         get {
             return Geometry(handle: ngsFeatureGetGeometry(handle))
         }
     }
     
-    var remoteId: Int64 {
+    public var remoteId: Int64 {
         get {
             return ngsStoreFeatureGetRemoteId(handle)
         }
@@ -307,15 +310,15 @@ public class Geometry {
 }
 
 public class Field {
-    let name: String
-    let alias: String
-    let type: fieldType
+    public let name: String
+    public let alias: String
+    public let type: fieldType
     
     public enum fieldType: Int32 {
         case INTEGER = 0, REAL = 2, STRING = 4, DATE = 11
     }
     
-    init(name: String, alias: String, type: fieldType) {
+    public init(name: String, alias: String, type: fieldType) {
         self.name = name
         self.alias = alias
         self.type = type

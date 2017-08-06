@@ -47,8 +47,14 @@ public class Layer {
         }
     }
     
-    public func dataSource() -> Object {
-        return Object(object: ngsLayerGetDataSource(layerH))
+    public var dataSource: Object {
+        get {
+            let object = Object(object: ngsLayerGetDataSource(layerH))
+            if Catalog.isFeatureClass(object.type) {
+                return FeatureClass(copyFrom: object)
+            }
+            return object // TODO: Release other types of objects (Table and Raster)
+        }
     }
     
     init(layerH: LayerH!) {
