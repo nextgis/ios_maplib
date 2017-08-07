@@ -84,12 +84,14 @@ public class FeatureClass: Object {
         super.init(copyFrom: copyFrom)
         
         // Add fields
-        if let fieldsList = ngsFeatureClassFields(object) {
+        if let fieldsList = ngsFeatureClassFields(copyFrom.object) {
             var count: Int = 0
             while (fieldsList[count].name != nil) {
-                let fieldValue = Field(name: String(cString: fieldsList[count].name),
-                                       alias: String(cString: fieldsList[count].alias),
-                                       type: Field.fieldType(rawValue: fieldsList[count].type)!)
+                let name = String(cString: fieldsList[count].name)
+                let alias = String(cString: fieldsList[count].alias)
+                printMessage("Add layer '\(name)' field -- name: \(name), alias: \(alias), type: \(fieldsList[count].type)")
+                let type = Field.fieldType(rawValue: fieldsList[count].type)
+                let fieldValue = Field(name: name, alias: alias, type: type!)
                 fields.append(fieldValue)
                 count += 1
             }
