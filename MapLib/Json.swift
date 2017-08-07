@@ -27,7 +27,7 @@ import ngstore
 public class JsonDocument {
     let handle: JsonDocumentH!
     
-    init() {
+    public init() {
         handle = API.instance.createJsonDocument()
     }
     
@@ -44,8 +44,14 @@ public class JsonDocument {
             Int32(COD_SUCCESS.rawValue) ? true : false;
     }
     
-    func getRoot() -> JsonObject {
-        return JsonObject(handle: ngsJsonDocumentRoot(handle))
+    public func getRoot() -> JsonObject {
+        let handle = ngsJsonDocumentRoot(self.handle)
+        let type = ngsJsonObjectType(handle)
+        if type == JsonObject.jsonObjectType.ARRAY.rawValue {
+            return JsonArray(handle: handle)
+        } else {
+            return JsonObject(handle: ngsJsonDocumentRoot(handle))
+        }
     }
 }
 
@@ -54,6 +60,12 @@ public class JsonObject {
     
     public enum jsonObjectType : Int32 {
         case NULL = 0, OBJECT, ARRAY, BOOLEAN, STRING, INTEGER, LONG, DOUBLE
+    }
+    
+    public var valid: Bool {
+        get {
+            return ngsJsonObjectValid(handle) == 1 ? true : false
+        }
     }
     
     init(handle: JsonObjectH!) {
@@ -116,7 +128,6 @@ public class JsonObject {
     public func getArray(name: String) -> JsonArray {
         return JsonArray(handle: ngsJsonObjectGetArray(handle, name))
     }
-    
 }
 
 public class JsonArray : JsonObject {

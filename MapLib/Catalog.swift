@@ -140,7 +140,7 @@ public class Object {
     ///   - cacheExpires: Time in seconds to remove cahced tiles
     ///   - options: Addtional options as key: value array
     /// - Returns: Catalog object or nil
-    public func createTMS(name: String, url: String, epsg: Int,
+    public func createTMS(name: String, url: String, epsg: Int32,
                           z_min: UInt8, z_max: UInt8, fullExtent: BBox,
                           limitExtent: BBox, cacheExpires: Int,
                           options: [String: String]? = nil) -> Object? {

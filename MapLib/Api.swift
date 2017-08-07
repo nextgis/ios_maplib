@@ -39,7 +39,6 @@ func notifyFunction(uri: UnsafePointer<Int8>?, code: ngsChangeCode) -> Swift.Voi
     }
 }
 
-
 public class API {
     public static let instance = API()
     

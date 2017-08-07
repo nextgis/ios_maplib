@@ -21,6 +21,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import Foundation
+import ngstore
 
 // https://stackoverflow.com/a/40189217/2901140
 func toArrayOfCStrings(_ values: [String:String]?) -> UnsafeMutablePointer<UnsafeMutablePointer<Int8>?> {
@@ -65,6 +66,15 @@ func printWarning(_ message: String) {
     if Constants.debugMode {
         print("ngmobile warning: \(message)")
     }
+}
+
+public typealias funcReturnCode = ngstore.ngsCode
+
+public struct returnCodeEnum {
+    public static let SUCCESS = COD_SUCCESS
+    public static let FINISHED = COD_FINISHED
+    public static let IN_PROCESS = COD_IN_PROCESS
+    public static let CANCELED = COD_CANCELED
 }
 
 struct Constants {

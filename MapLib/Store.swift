@@ -160,6 +160,10 @@ public class FeatureClass: Object {
             Int32(COD_SUCCESS.rawValue)
     }
     
+    public func deleteFeatures() -> Bool {
+        return ngsFeatureClassDeleteFeatures(object) == Int32(COD_SUCCESS.rawValue)
+    }
+    
     public func reset() {
         ngsFeatureClassResetReading(object)
     }
@@ -175,6 +179,17 @@ public class FeatureClass: Object {
     public func getFeature(remoteId: Int64) -> Feature? {
         return Feature(handle: ngsStoreFeatureClassGetFeatureByRemoteId(object, remoteId))
     }
+    
+    public func fieldIndexAndType(by name: String) -> (index: Int32, type: Field.fieldType) {
+        var count: Int32 = 0
+        for field in fields {
+            if field.name == name {
+                return (count, field.type)
+            }
+            count += 1
+        }
+        return (-1, Field.fieldType.UNKNOWN)
+    }
 }
 
 public class Feature {
@@ -188,6 +203,9 @@ public class Feature {
     public var geometry: Geometry {
         get {
             return Geometry(handle: ngsFeatureGetGeometry(handle))
+        }
+        set(value) {
+            ngsFeatureSetGeometry(handle, value.handle)
         }
     }
     
@@ -249,6 +267,34 @@ public class Feature {
         return Calendar.current.date(from: dateComponents)!
     }
     
+    public func setField(for index: Int32, string value: String) {
+        ngsFeatureSetFieldString(handle, index, value)
+    }
+    
+    public func setField(for index: Int32, double value: Double) {
+        ngsFeatureSetFieldDouble(handle, index, value)
+    }
+    
+    public func setField(for index: Int32, int value: Int32) {
+        ngsFeatureSetFieldInteger(handle, index, value)
+    }
+    
+    public func setField(for index: Int32, date value: Date) {
+        let calendar = Calendar.current
+        
+        let year = calendar.component(.year, from: value)
+        let month = calendar.component(.month, from: value)
+        let day = calendar.component(.day, from: value)
+        let hour = calendar.component(.hour, from: value)
+        let minute = calendar.component(.minute, from: value)
+        let second = calendar.component(.second, from: value)
+        
+        
+        ngsFeatureSetFieldDateTime(handle, index, Int32(year), Int32(month),
+                                   Int32(day), Int32(hour), Int32(minute),
+                                   Float(second), 100) // 100 is UTC
+    }
+    
     static public func createGeometry(fromJson json: JsonObject) -> Geometry {
         return Geometry(handle: ngsFeatureCreateGeometryFromJson(json.handle))
     }
@@ -277,9 +323,10 @@ public class Feature {
     }
     
     public func addAttachment(name: String, description: String, path: String,
-                              move: Bool) -> Int64 {
+                              move: Bool, remoteId: Int64 = -1) -> Int64 {
         let options = [
-            "MOVE" : move ? "ON" :  "OFF"
+            "MOVE" : move ? "ON" :  "OFF",
+            "RID" : "\(remoteId)"
         ]
         
         return ngsFeatureAttachmentAdd(handle, name, description, path,
@@ -297,6 +344,23 @@ public class Feature {
     }
 }
 
+public class CoordinateTransformation {
+    let handle: CoordinateTransformationH!
+    
+    init(handle: CoordinateTransformationH) {
+        self.handle = handle
+    }
+    
+    deinit {
+        ngsCoordinateTransformationFree(handle)
+    }
+    
+    public static func new(fromEPSG: Int32, toEPSG: Int32) -> CoordinateTransformation {
+        return CoordinateTransformation(
+            handle: ngsCoordinateTransformationCreate(fromEPSG, toEPSG))
+    }
+}
+
 public class Geometry {
     let handle: GeometryH!
     
@@ -307,6 +371,15 @@ public class Geometry {
     static func freeGeometry(_ geom: Geometry) {
         ngsGeometryFree(geom.handle)
     }
+    
+    public func transform(to epsg: Int32) -> Bool {
+        return ngsGeometryTransformTo(handle, epsg) == Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func transform(_ transformation: CoordinateTransformation) -> Bool {
+        return ngsGeometryTransform(handle, transformation.handle) ==
+            Int32(COD_SUCCESS.rawValue)
+    }
 }
 
 public class Field {
@@ -315,7 +388,7 @@ public class Field {
     public let type: fieldType
     
     public enum fieldType: Int32 {
-        case INTEGER = 0, REAL = 2, STRING = 4, DATE = 11
+        case UNKNOWN = -1, INTEGER = 0, REAL = 2, STRING = 4, DATE = 11
     }
     
     public init(name: String, alias: String, type: fieldType) {
@@ -334,6 +407,8 @@ public class Field {
             return "STRING"
         case .DATE:
             return "DATE_TIME"
+        default:
+            return "STRING"
         }
     }
 }

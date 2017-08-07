@@ -22,7 +22,7 @@
 
 import Foundation
 
-public typealias tokenUpdateFailedCallback = ()  -> Void
+public typealias tokenUpdateFailedCallback = () -> Void
 
 public class Auth : Equatable {
     
