@@ -81,22 +81,25 @@ public class FeatureClass: Object {
     override init(copyFrom: Object) {
         geometryType = geometryTypeEnum(rawValue:
             Int32(ngsFeatureClassGeometryType(copyFrom.object)))!
-        super.init(copyFrom: copyFrom)
         
         // Add fields
         if let fieldsList = ngsFeatureClassFields(copyFrom.object) {
             var count: Int = 0
             while (fieldsList[count].name != nil) {
-                let name = String(cString: fieldsList[count].name)
-                let alias = String(cString: fieldsList[count].alias)
-                printMessage("Add layer '\(name)' field -- name: \(name), alias: \(alias), type: \(fieldsList[count].type)")
-                let type = Field.fieldType(rawValue: fieldsList[count].type)
-                let fieldValue = Field(name: name, alias: alias, type: type!)
+                let fName = String(cString: fieldsList[count].name)
+                let fAlias = String(cString: fieldsList[count].alias)
+                let fType = Field.fieldType(rawValue: fieldsList[count].type)
+                
+                printMessage("Add field - name: \(fName), alias: \(fAlias), type: \(fType ?? Field.fieldType.UNKNOWN) to '\(copyFrom.name)'")
+                
+                let fieldValue = Field(name: fName, alias: fAlias, type: fType!)
                 fields.append(fieldValue)
                 count += 1
             }
             ngsFree(fieldsList)
         }
+        
+        super.init(copyFrom: copyFrom)
     }
     
     static func geometryTypeToName(_ geometryType: geometryTypeEnum) -> String {
