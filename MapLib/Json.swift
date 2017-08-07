@@ -50,13 +50,13 @@ public class JsonDocument {
         if type == JsonObject.jsonObjectType.ARRAY.rawValue {
             return JsonArray(handle: handle)
         } else {
-            return JsonObject(handle: ngsJsonDocumentRoot(handle))
+            return JsonObject(handle: handle)
         }
     }
 }
 
 public class JsonObject {
-    let handle: JsonObjectH!
+    let handle: JsonObjectH?
     
     public enum jsonObjectType : Int32 {
         case NULL = 0, OBJECT, ARRAY, BOOLEAN, STRING, INTEGER, LONG, DOUBLE
@@ -68,7 +68,7 @@ public class JsonObject {
         }
     }
     
-    init(handle: JsonObjectH!) {
+    init(handle: JsonObjectH?) {
         self.handle = handle
     }
     
@@ -120,7 +120,7 @@ public class JsonObject {
                 out.append(JsonObject(handle: children[count]))
                 count += 1
             }
-            ngsJsonObjectChildrenListFree(children)
+            ngsFree(children) // Don't free pointers inside list
         }
         return out
     }
