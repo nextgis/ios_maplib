@@ -211,7 +211,7 @@ public class Map {
         let offset = ngsMapGetDistance(id, w, h)
         var center = ngsMapGetCenter(id)
         center.X -= offset.X
-        center.Y += offset.Y
+        center.Y -= offset.Y
         
         ngsMapSetCenter(id, center.X, center.Y)
     }
