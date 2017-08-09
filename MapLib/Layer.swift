@@ -79,6 +79,7 @@ public class Layer {
                     }
                     count += 1
                 }
+                _ = fc.clearFilters()
             }
         }
         return out
