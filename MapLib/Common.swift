@@ -80,4 +80,8 @@ public struct returnCodeEnum {
 struct Constants {
     static let debugMode = true
     static let refreshTime = 0.35
+    
+    struct Map {
+        static let tolerance = 7.0
+    }
 }

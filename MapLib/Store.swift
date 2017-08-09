@@ -174,15 +174,24 @@ public class FeatureClass: Object {
     }
     
     public func nextFeature() -> Feature? {
-        return Feature(handle: ngsFeatureClassNextFeature(object))
+        if let handle = ngsFeatureClassNextFeature(object) {
+            return Feature(handle: handle)
+        }
+        return nil
     }
     
     public func getFeature(index: Int64) -> Feature? {
-        return Feature(handle: ngsFeatureClassGetFeature(object, index))
+        if let handle = ngsFeatureClassGetFeature(object, index) {
+            return Feature(handle: handle)
+        }
+        return nil
     }
     
     public func getFeature(remoteId: Int64) -> Feature? {
-        return Feature(handle: ngsStoreFeatureClassGetFeatureByRemoteId(object, remoteId))
+        if let handle = ngsStoreFeatureClassGetFeatureByRemoteId(object, remoteId) {
+            return Feature(handle: handle)
+        }
+        return nil
     }
     
     public func fieldIndexAndType(by name: String) -> (index: Int32, type: Field.fieldType) {
@@ -194,6 +203,29 @@ public class FeatureClass: Object {
             count += 1
         }
         return (-1, Field.fieldType.UNKNOWN)
+    }
+    
+    public func clearFilters() -> Bool {
+        let result = ngsFeatureClassSetFilter(object, nil, nil) ==
+            Int32(COD_SUCCESS.rawValue)
+        reset()
+        return result
+    }
+    
+    public func setSpatialFilter(envelope: Envelope) -> Bool {
+        let result = ngsFeatureClassSetSpatialFilter(object,
+                                               envelope.minX, envelope.minY,
+                                               envelope.maxX, envelope.maxY) ==
+            Int32(COD_SUCCESS.rawValue)
+        reset()
+        return result
+    }
+    
+    public func setFilters(geometry: Geometry, query: String) -> Bool {
+        let result = ngsFeatureClassSetFilter(object, geometry.handle, query) ==
+            Int32(COD_SUCCESS.rawValue)
+        reset()
+        return result
     }
 }
 
@@ -363,6 +395,20 @@ public class CoordinateTransformation {
     public static func new(fromEPSG: Int32, toEPSG: Int32) -> CoordinateTransformation {
         return CoordinateTransformation(
             handle: ngsCoordinateTransformationCreate(fromEPSG, toEPSG))
+    }
+}
+
+public struct Envelope {
+    public let minX: Double
+    public let maxX: Double
+    public let minY: Double
+    public let maxY: Double
+    
+    public init(minX: Double, minY: Double, maxX: Double, maxY: Double) {
+        self.minX = minX
+        self.maxX = maxX
+        self.minY = minY
+        self.maxY = maxY
     }
 }
 

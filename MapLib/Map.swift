@@ -41,6 +41,8 @@ public struct Point {
 }
 
 public class Map {
+    
+    // MARK: Properties
     static public let ext = ".ngmd"
     let id: UInt8
     let path: String
@@ -73,13 +75,15 @@ public class Map {
         }
     }
     
-    
+    // MARK: Constructor & destructor
     init(id: UInt8, path: String) {
         self.id = id
         self.path = path
         
         bkColor = ngsMapGetBackgroundColor(id)
     }
+    
+    // MARK: Public
     
     public func close() {
         if ngsMapClose(id) != Int32(COD_SUCCESS.rawValue) {
@@ -100,7 +104,7 @@ public class Map {
     }
     
     public func setSize(width: CGFloat, height: CGFloat) {
-        let result = ngsMapSetSize(id, Int32(width), Int32(height), 0)
+        let result = ngsMapSetSize(id, Int32(width), Int32(height), 1)
         if UInt32(result) != COD_SUCCESS.rawValue {
             printError("Failed set map size \(width) x \(height): error code \(result)")
         }
@@ -152,6 +156,38 @@ public class Map {
     public func reorder(before: Layer?, moved: Layer!) {
         ngsMapLayerReorder(id, before == nil ? nil : before?.getHandler(), moved.getHandler())
     }
+    
+    
+    /// Search features in buffer around click/tap postition
+    ///
+    /// - Parameters:
+    ///   - x: x position
+    ///   - y: y position
+    ///   - limit: max count return features
+    /// - Returns: array of Feature
+    public func identify(x: Float, y: Float, limit: Int = 0) -> [Feature] {
+        var out: [Feature] = []
+        
+        let coordinate = ngsMapGetCoordinate(id, Double(x), Double(y))
+        let distance = ngsMapGetDistance(id, Constants.Map.tolerance, Constants.Map.tolerance)
+        let envelope = Envelope(minX: coordinate.X - distance.X,
+                                minY: coordinate.Y - distance.Y,
+                                maxX: coordinate.X + distance.X,
+                                maxY: coordinate.Y + distance.Y)
+        
+        for index in 0..<layerCount {
+            if let layer = getLayer(position: index) {
+                if layer.visible {
+                    let layerFeatures = layer.identify(envelope: envelope,
+                                                       limit: limit)
+                    out.append(contentsOf: layerFeatures)
+                }
+            }
+        }
+        return out
+    }
+    
+    // MARK: Private
         
     func draw(state: ngsDrawState, _ callback: ngstore.ngsProgressFunc!, _ callbackData: UnsafeMutableRawPointer!) {
         let result = ngsMapDraw(id, state, callback, callbackData)

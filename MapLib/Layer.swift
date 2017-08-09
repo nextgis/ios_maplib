@@ -65,4 +65,23 @@ public class Layer {
         return layerH
     }
     
+    public func identify(envelope: Envelope, limit: Int = 0) -> [Feature] {
+        var out: [Feature] = []
+        let source = dataSource
+        var count = 0
+        if Catalog.isFeatureClass(source.type) {
+            if let fc = source as? FeatureClass {
+                _ = fc.setSpatialFilter(envelope: envelope)
+                while let f = fc.nextFeature() {
+                    out.append(f)
+                    if limit != 0 && count >= limit {
+                        break
+                    }
+                    count += 1
+                }
+            }
+        }
+        return out
+    }
+    
 }
