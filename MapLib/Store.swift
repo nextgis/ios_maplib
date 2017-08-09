@@ -175,21 +175,21 @@ public class FeatureClass: Object {
     
     public func nextFeature() -> Feature? {
         if let handle = ngsFeatureClassNextFeature(object) {
-            return Feature(handle: handle)
+            return Feature(handle: handle, featureClass: self)
         }
         return nil
     }
     
     public func getFeature(index: Int64) -> Feature? {
         if let handle = ngsFeatureClassGetFeature(object, index) {
-            return Feature(handle: handle)
+            return Feature(handle: handle, featureClass: self)
         }
         return nil
     }
     
     public func getFeature(remoteId: Int64) -> Feature? {
         if let handle = ngsStoreFeatureClassGetFeatureByRemoteId(object, remoteId) {
-            return Feature(handle: handle)
+            return Feature(handle: handle, featureClass: self)
         }
         return nil
     }
@@ -231,6 +231,7 @@ public class FeatureClass: Object {
 
 public class Feature {
     let handle: FeatureH!
+    public let featureClass: FeatureClass?
     public var id: Int64 {
         get {
             return ngsFeatureGetId(handle)
@@ -255,8 +256,9 @@ public class Feature {
         }
     }
     
-    init(handle: FeatureH) {
+    init(handle: FeatureH, featureClass: FeatureClass? = nil) {
         self.handle = handle
+        self.featureClass = featureClass
     }
     
     deinit {
@@ -378,6 +380,10 @@ public class Feature {
     public func deleteAttachment(attachment: Attachment) -> Bool {
         return ngsFeatureAttachmentDelete(handle, attachment.id) ==
             Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func delete() -> Bool {
+        return featureClass?.deleteFeature(id: id) ?? false
     }
 }
 
