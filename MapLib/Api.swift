@@ -34,6 +34,9 @@ func notifyFunction(uri: UnsafePointer<Int8>?, code: ngsChangeCode) -> Swift.Voi
     case CC_TOKEN_EXPIRED:
         API.instance.onAuthNotify(url: String(cString: uri!))
         return
+    case CC_CREATE_FEATURE, CC_CHANGE_FEATURE, CC_DELETE_FEATURE, CC_DELETEALL_FEATURES:
+        API.instance.onMapViewNotify(url: String(cString: uri!))
+        return
     default:
         return
     }
@@ -48,6 +51,7 @@ public class API {
     private var mapsDir: Object?
     private var geodataDir: Object?
     private var authArray: [Auth] = []
+    private var mapViewArray: [MapView] = []
     
     init() {
         // Init library
@@ -255,7 +259,7 @@ public class API {
         return String(cString: ngsMD5(string))
     }
     
-    public func addAuth(auth: Auth) -> Bool {
+    func addAuth(auth: Auth) -> Bool {
         if ngsURLAuthAdd(auth.getURL(), toArrayOfCStrings(auth.options())) ==
             Int32(COD_SUCCESS.rawValue) {
             authArray.append(auth)
@@ -264,7 +268,7 @@ public class API {
         return false
     }
     
-    public func removeAuth(auth: Auth) {
+    func removeAuth(auth: Auth) {
         if ngsURLAuthDelete(auth.getURL()) == Int32(COD_SUCCESS.rawValue) {
             if let index = authArray.index(of: auth) {
                 authArray.remove(at: index)
@@ -275,6 +279,23 @@ public class API {
     func onAuthNotify(url: String) {
         for auth in authArray {
             auth.onRefreshTokenFailed(url: url)
+        }
+    }
+    
+    func addMapView(_ view: MapView) {
+        mapViewArray.append(view)
+    }
+
+    func removeMapView(_ view: MapView) {
+        if let index = mapViewArray.index(of: view) {
+            mapViewArray.remove(at: index)
+        }
+
+    }
+    
+    func onMapViewNotify(url: String) {
+        for view in mapViewArray {
+            view.scheduleDraw(drawState: DS_NORMAL)
         }
     }
     

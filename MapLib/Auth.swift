@@ -43,14 +43,18 @@ public class Auth : Equatable {
         self.updateToken = updateToken
         self.expiresIn = expiresIn
         self.clientId = clientId
+        
+        _ = API.instance.addAuth(auth: self)
     }
     
     deinit {
-
+        API.instance.removeAuth(auth: self)
     }
     
     func onRefreshTokenFailed(url: String) {
-        tokenUpdateFailed!()
+        if url == self.url {
+            tokenUpdateFailed!()
+        }
     }
     
     public func getURL() -> String {

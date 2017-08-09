@@ -65,6 +65,7 @@ public class MapView: GLKView {
         super.init(frame: frame, context: EAGLContext(api: .openGLES2))
         delegate = self
         freeze = true
+        
     }
     
     override init(frame: CGRect, context: EAGLContext)
@@ -80,6 +81,10 @@ public class MapView: GLKView {
         context = EAGLContext(api: .openGLES2)
         delegate = self
         freeze = true
+    }
+    
+    deinit {
+
     }
     
     public func setMap(map: Map) {
