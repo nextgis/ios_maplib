@@ -84,4 +84,8 @@ struct Constants {
     struct Map {
         static let tolerance = 7.0
     }
+    
+    struct Sizes {
+        static let minPanPix: Double = 4.0
+    }
 }

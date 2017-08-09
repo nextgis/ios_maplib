@@ -24,11 +24,18 @@ import UIKit
 import GLKit
 import ngstore
 
+public protocol GestureDelegate: class {
+    func onSingleTap(sender: UIGestureRecognizer)
+    func onDoubleTap(sender: UIGestureRecognizer)
+    func onPanGesture(sender: UIPanGestureRecognizer)
+}
+
 public class MapView: GLKView {
     var map: Map?
     var drawState: ngsDrawState = DS_PRESERVED
     weak var globalTimer: Timer?
     var timerDrawState: ngsDrawState = DS_PRESERVED
+    weak var gestureDelegate: GestureDelegate?
     
     public var freeze: Bool {
         get {
@@ -116,7 +123,7 @@ public class MapView: GLKView {
     
     public func refresh() {
         if !freeze {
-            draw(DS_REDRAW)
+            draw(DS_NORMAL)
         }
     }
     
@@ -164,6 +171,52 @@ public class MapView: GLKView {
                                      repeats: false)
     }
     
+    public func registerGestureRecognizers(delegate: GestureDelegate) {
+        isUserInteractionEnabled = true
+        
+        let singleTap = UITapGestureRecognizer(target: self, action: #selector(onSingleTap(sender:)))
+        singleTap.numberOfTapsRequired = 1
+        addGestureRecognizer(singleTap)
+        
+        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(onDoubleTap(sender:)))
+        doubleTap.numberOfTapsRequired = 2
+        addGestureRecognizer(doubleTap)
+        
+        singleTap.require(toFail: doubleTap)
+        
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(onPanGesture(sender:)))
+        addGestureRecognizer(panGesture)
+        
+        gestureDelegate = delegate
+    }
+    
+    func onDoubleTap(sender: UIGestureRecognizer) {
+        if sender.state == UIGestureRecognizerState.ended {
+            zoomIn()
+            gestureDelegate?.onDoubleTap(sender: sender)
+        }
+    }
+    
+    func onSingleTap(sender: UIGestureRecognizer) {
+        // Iterate through visible map layers and return found features
+        if sender.state == UIGestureRecognizerState.ended {
+            gestureDelegate?.onSingleTap(sender: sender)
+        }
+    }
+    
+    func onPanGesture(sender: UIPanGestureRecognizer) {
+        let translation = sender.translation(in: self)
+        
+        let x = Double(translation.x)
+        let y = Double(translation.y)
+        
+        if(abs(x) > Constants.Sizes.minPanPix || abs(y) > Constants.Sizes.minPanPix) {
+            pan(w: x, h: y)
+            sender.setTranslation(CGPoint(x: 0.0, y: 0.0), in: self)
+        }
+        
+        gestureDelegate?.onPanGesture(sender: sender)
+    }
 }
 
 func drawingProgressFunc(code: ngsCode, percent: Double, message: UnsafePointer<Int8>?, progressArguments: UnsafeMutableRawPointer?) -> Int32 {
