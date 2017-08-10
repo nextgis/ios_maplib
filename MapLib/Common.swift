@@ -68,6 +68,12 @@ func printWarning(_ message: String) {
     }
 }
 
+extension String {
+    var localized: String {
+        return NSLocalizedString(self, tableName: nil, bundle: Bundle.main, value: "", comment: "")
+    }
+}
+
 public typealias funcReturnCode = ngstore.ngsCode
 
 public struct returnCodeEnum {

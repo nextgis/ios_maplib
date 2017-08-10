@@ -66,6 +66,9 @@ public class Layer {
     }
     
     public func identify(envelope: Envelope, limit: Int = 0) -> [Feature] {
+        
+        printMessage("Layer identify")
+        
         var out: [Feature] = []
         let source = dataSource
         var count = 0

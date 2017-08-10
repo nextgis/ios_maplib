@@ -121,9 +121,13 @@ public class MapView: GLKView {
         return false
     }
     
-    public func refresh() {
+    public func refresh(normal: Bool = true) {
         if !freeze {
-            draw(DS_NORMAL)
+            if normal {
+                draw(DS_NORMAL)
+            } else {
+                draw(DS_REFILL)
+            }
         }
     }
     
@@ -171,7 +175,7 @@ public class MapView: GLKView {
                                      repeats: false)
     }
     
-    public func registerGestureRecognizers(delegate: GestureDelegate) {
+    public func registerGestureRecognizers(_ delegate: GestureDelegate) {
         isUserInteractionEnabled = true
         
         let singleTap = UITapGestureRecognizer(target: self, action: #selector(onSingleTap(sender:)))

@@ -295,7 +295,7 @@ public class API {
     
     func onMapViewNotify(url: String) {
         for view in mapViewArray {
-            view.scheduleDraw(drawState: DS_NORMAL)
+            view.scheduleDraw(drawState: DS_REFILL)
         }
     }
     
