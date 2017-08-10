@@ -119,8 +119,8 @@ public class Object {
     }
     
     public func create(name: String, options: [String:String] = [:]) -> Object? {
-        if(ngsCatalogObjectCreate(object, name, options.isEmpty ? nil :
-            toArrayOfCStrings(options)) == Int32(COD_SUCCESS.rawValue)) {
+        if(ngsCatalogObjectCreate(object, name, toArrayOfCStrings(options)) ==
+            Int32(COD_SUCCESS.rawValue)) {
             return child(name: name)
         }
         return nil
@@ -143,7 +143,7 @@ public class Object {
     public func createTMS(name: String, url: String, epsg: Int32,
                           z_min: UInt8, z_max: UInt8, fullExtent: BBox,
                           limitExtent: BBox, cacheExpires: Int,
-                          options: [String: String]? = nil) -> Object? {
+                          options: [String: String] = [:]) -> Object? {
         var createOptions = [
             "TYPE": "\(CAT_RASTER_TMS.rawValue)",
             "CREATE_UNIQUE": "OFF",
@@ -162,10 +162,8 @@ public class Object {
             "limit_y_max": "\(limitExtent.maxy)"
         ]
         
-        if options != nil {
-            for option in options! {
-                createOptions[option.key] = option.value
-            }
+        for option in options {
+            createOptions[option.key] = option.value
         }
         
         return create(name: name, options: createOptions)
@@ -188,6 +186,22 @@ public class Object {
             return deleteObject.delete()
         }
         return false
+    }
+    
+    public func copyAsGeoJSON(to destination: Object, move: Bool,
+                     with options: [String: String] = [:]) -> Bool {
+        var createOptions = [
+            "TYPE": "\(CAT_FC_GEOJSON.rawValue)",
+            "MOVE": move ? "ON" : "OFF"
+        ]
+        
+        for option in options {
+            createOptions[option.key] = option.value
+        }
+
+        return ngsCatalogObjectCopy(object, destination.object,
+                                    toArrayOfCStrings(createOptions), nil, nil) ==
+        Int32(COD_SUCCESS.rawValue)
     }
 
     public static func isTable(_ type: Int) -> Bool {

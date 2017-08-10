@@ -255,6 +255,10 @@ public class API {
         return geodataDir
     }
     
+    public func getTmpDirectory() -> Object? {
+        return catalog.childByPath(path: "ngc://Local connections/Home/tmp")
+    }
+    
     public func md5(string: String) -> String {
         return String(cString: ngsMD5(string))
     }
