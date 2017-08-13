@@ -23,7 +23,7 @@ import UIKit
 
 public class AttributesView: UIScrollView {
     
-    var prevView: UIView? = nil
+    weak var prevView: UIView? = nil
 
     public var showUnsetFields: Bool = false
     public var isSectionUppercased = true

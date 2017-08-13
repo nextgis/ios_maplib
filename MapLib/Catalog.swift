@@ -48,6 +48,26 @@ public class Object {
     public let path: String
     let object: CatalogObjectH!
     
+    public enum ObjectType: UInt32 {
+        case UNKNOWN
+        case FOLDER
+        case GEOJSON
+        case TMS
+        
+        public var rawValue: UInt32 {
+            switch self {
+            case .UNKNOWN:
+                return 0
+            case .FOLDER:
+                return CAT_CONTAINER_DIR.rawValue
+            case .GEOJSON:
+                return CAT_FC_GEOJSON.rawValue
+            case .TMS:
+                return CAT_RASTER_TMS.rawValue
+            }
+        }
+    }
+    
     public var metadata: [String: String] {
         get {
             if let rawArray = ngsCatalogObjectMetadata(object, "user") {
@@ -145,7 +165,7 @@ public class Object {
                           limitExtent: BBox, cacheExpires: Int,
                           options: [String: String] = [:]) -> Object? {
         var createOptions = [
-            "TYPE": "\(CAT_RASTER_TMS.rawValue)",
+            "TYPE": "\(ObjectType.TMS.rawValue)",
             "CREATE_UNIQUE": "OFF",
             "url": url,
             "epsg": "\(epsg)",
@@ -171,7 +191,7 @@ public class Object {
     
     public func createDirectory(name: String) -> Object? {
         let options = [
-            "TYPE": "\(CAT_CONTAINER_DIR.rawValue)",
+            "TYPE": "\(ObjectType.FOLDER.rawValue)",
             "CREATE_UNIQUE": "OFF"
         ]
         return create(name: name, options: options)
@@ -188,10 +208,11 @@ public class Object {
         return false
     }
     
-    public func copyAsGeoJSON(to destination: Object, move: Bool,
+    public func copy(as type: ObjectType, in destination: Object, move: Bool,
                      with options: [String: String] = [:]) -> Bool {
+        
         var createOptions = [
-            "TYPE": "\(CAT_FC_GEOJSON.rawValue)",
+            "TYPE": "\(type.rawValue)",
             "MOVE": move ? "ON" : "OFF"
         ]
         

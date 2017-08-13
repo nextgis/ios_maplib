@@ -29,9 +29,9 @@ public class Store: Object {
     public func createFeatureClass(name: String,
                                    geometryType: FeatureClass.geometryTypeEnum,
                                    fields: [Field],
-                                   options: [String: String]? = nil) -> FeatureClass? {
+                                   options: [String: String]) -> FeatureClass? {
         
-        var fullOptions = options ?? [:]
+        var fullOptions = options
         fullOptions["GEOMETRY_TYPE"] = FeatureClass.geometryTypeToName(geometryType)
         fullOptions["TYPE"] = "\(CAT_FC_GPKG.rawValue)"
         fullOptions["FIELD_COUNT"] = "\(fields.count)"
