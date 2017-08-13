@@ -28,6 +28,7 @@ public protocol GestureDelegate: class {
     func onSingleTap(sender: UIGestureRecognizer)
     func onDoubleTap(sender: UIGestureRecognizer)
     func onPanGesture(sender: UIPanGestureRecognizer)
+    func onPinchGesture(sender: UIPinchGestureRecognizer)
 }
 
 public class MapView: GLKView {
@@ -191,6 +192,9 @@ public class MapView: GLKView {
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(onPanGesture(sender:)))
         addGestureRecognizer(panGesture)
         
+        let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(onPinchGesture(sender:)))
+        addGestureRecognizer(pinchGesture)
+        
         gestureDelegate = delegate
     }
     
@@ -220,6 +224,18 @@ public class MapView: GLKView {
         }
         
         gestureDelegate?.onPanGesture(sender: sender)
+    }
+    
+    func onPinchGesture(sender: UIPinchGestureRecognizer) {
+        let scale = sender.scale
+        
+        map?.zoomIn(Double(scale))
+        draw(DS_PRESERVED)
+        scheduleDraw(drawState: DS_NORMAL)
+        
+        sender.scale = 1.0
+        
+        gestureDelegate?.onPinchGesture(sender: sender)
     }
 }
 
