@@ -200,7 +200,15 @@ public class MapView: GLKView {
     
     func onDoubleTap(sender: UIGestureRecognizer) {
         if sender.state == UIGestureRecognizerState.ended {
-            zoomIn()
+            
+            let position = sender.location(in: sender.view)
+            let x = Double(position.x)
+            let y = Double(position.y)
+            
+            map?.setCenterAndZoom(x, y)
+            draw(DS_PRESERVED)
+            scheduleDraw(drawState: DS_NORMAL)
+            
             gestureDelegate?.onDoubleTap(sender: sender)
         }
     }

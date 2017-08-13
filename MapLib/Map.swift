@@ -216,4 +216,12 @@ public class Map {
         ngsMapSetCenter(id, center.X, center.Y)
     }
     
+    func setCenterAndZoom(_ w: Double, _ h: Double, _ multiply: Double = 2.0) {
+        let scale = ngsMapGetScale(id) * multiply
+        let pos = ngsMapGetCoordinate(id, w, h)
+        
+        ngsMapSetScale(id, scale)
+        ngsMapSetCenter(id, pos.X, pos.Y)
+    }
+    
 }
