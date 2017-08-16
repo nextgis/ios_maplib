@@ -245,6 +245,10 @@ public class MapView: GLKView {
         
         gestureDelegate?.onPinchGesture(sender: sender)
     }
+    
+    public func getExtent(srs: Int32) -> Envelope {
+        return map?.getExtent(srs: srs) ?? Envelope()
+    }
 }
 
 func drawingProgressFunc(code: ngsCode, percent: Double, message: UnsafePointer<Int8>?, progressArguments: UnsafeMutableRawPointer?) -> Int32 {

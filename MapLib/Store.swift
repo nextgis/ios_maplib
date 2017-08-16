@@ -416,6 +416,13 @@ public struct Envelope {
         self.minY = minY
         self.maxY = maxY
     }
+    
+    public init() {
+        self.minX = 0.0
+        self.maxX = 0.0
+        self.minY = 0.0
+        self.maxY = 0.0
+    }
 }
 
 public class Geometry {

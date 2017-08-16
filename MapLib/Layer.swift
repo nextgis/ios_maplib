@@ -53,7 +53,7 @@ public class Layer {
             if Catalog.isFeatureClass(object.type) {
                 return FeatureClass(copyFrom: object)
             }
-            return object // TODO: Release other types of objects (Table and Raster)
+            return object // TODO: Add support for other types of objects (Table and Raster)
         }
     }
     

@@ -224,4 +224,9 @@ public class Map {
         ngsMapSetCenter(id, pos.X, pos.Y)
     }
     
+    func getExtent(srs: Int32) -> Envelope {
+        let ext = ngsMapGetExtent(id, srs)
+        return Envelope(minX: ext.minX, minY: ext.minY, maxX: ext.maxX, maxY: ext.maxY)
+    }
+    
 }
