@@ -27,7 +27,7 @@ public class Store: Object {
     public static let ext = ".ngst"
     
     public func createFeatureClass(name: String,
-                                   geometryType: FeatureClass.geometryTypeEnum,
+                                   geometryType: FeatureClass.GeometryType,
                                    fields: [Field],
                                    options: [String: String]) -> FeatureClass? {
         
@@ -55,7 +55,7 @@ public class Store: Object {
 
 public class FeatureClass: Object {
     public var fields: [Field] = []
-    public let geometryType: geometryTypeEnum
+    public let geometryType: GeometryType
     
     var batchModeValue = false
     public var batchMode: Bool {
@@ -74,12 +74,12 @@ public class FeatureClass: Object {
         }
     }
     
-    public enum geometryTypeEnum: Int32 {
+    public enum GeometryType: Int32 {
         case NONE = 0, POINT, LINESTRING, POLYGON, MULTIPOINT, MULTILINESTRING, MULTIPOLYGON
     }
     
     override init(copyFrom: Object) {
-        geometryType = geometryTypeEnum(rawValue:
+        geometryType = GeometryType(rawValue:
             Int32(ngsFeatureClassGeometryType(copyFrom.object)))!
         
         // Add fields
@@ -88,9 +88,9 @@ public class FeatureClass: Object {
             while (fieldsList[count].name != nil) {
                 let fName = String(cString: fieldsList[count].name)
                 let fAlias = String(cString: fieldsList[count].alias)
-                let fType = Field.fieldType(rawValue: fieldsList[count].type)
+                let fType = Field.FieldType(rawValue: fieldsList[count].type)
                 
-                printMessage("Add field - name: \(fName), alias: \(fAlias), type: \(fType ?? Field.fieldType.UNKNOWN) to '\(copyFrom.name)'")
+                printMessage("Add field - name: \(fName), alias: \(fAlias), type: \(fType ?? Field.FieldType.UNKNOWN) to '\(copyFrom.name)'")
                 
                 let fieldValue = Field(name: fName, alias: fAlias, type: fType!)
                 fields.append(fieldValue)
@@ -102,7 +102,7 @@ public class FeatureClass: Object {
         super.init(copyFrom: copyFrom)
     }
     
-    static func geometryTypeToName(_ geometryType: geometryTypeEnum) -> String {
+    static func geometryTypeToName(_ geometryType: GeometryType) -> String {
         switch geometryType {
         case .NONE:
             return "NONE"
@@ -194,7 +194,7 @@ public class FeatureClass: Object {
         return nil
     }
     
-    public func fieldIndexAndType(by name: String) -> (index: Int32, type: Field.fieldType) {
+    public func fieldIndexAndType(by name: String) -> (index: Int32, type: Field.FieldType) {
         var count: Int32 = 0
         for field in fields {
             if field.name == name {
@@ -202,7 +202,7 @@ public class FeatureClass: Object {
             }
             count += 1
         }
-        return (-1, Field.fieldType.UNKNOWN)
+        return (-1, Field.FieldType.UNKNOWN)
     }
     
     public func clearFilters() -> Bool {
@@ -449,19 +449,19 @@ public class Geometry {
 public class Field {
     public let name: String
     public let alias: String
-    public let type: fieldType
+    public let type: FieldType
     
-    public enum fieldType: Int32 {
+    public enum FieldType: Int32 {
         case UNKNOWN = -1, INTEGER = 0, REAL = 2, STRING = 4, DATE = 11
     }
     
-    public init(name: String, alias: String, type: fieldType) {
+    public init(name: String, alias: String, type: FieldType) {
         self.name = name
         self.alias = alias
         self.type = type
     }
     
-    static func fieldTypeToName(_ fieldType: fieldType) -> String {
+    static func fieldTypeToName(_ fieldType: FieldType) -> String {
         switch fieldType {
         case .INTEGER:
             return "INTEGER"

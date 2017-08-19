@@ -53,6 +53,7 @@ public class Object {
         case FOLDER
         case GEOJSON
         case TMS
+        case FEATURE_CLASS
         
         public var rawValue: UInt32 {
             switch self {
@@ -64,6 +65,8 @@ public class Object {
                 return CAT_FC_GEOJSON.rawValue
             case .TMS:
                 return CAT_RASTER_TMS.rawValue
+            case .FEATURE_CLASS:
+                return CAT_FC_GPKG.rawValue
             }
         }
     }

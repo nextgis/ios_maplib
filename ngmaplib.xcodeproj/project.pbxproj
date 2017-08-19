@@ -14,6 +14,9 @@
 		355FB9B01F1F8B1B008D26D7 /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 355FB9AF1F1F8B1B008D26D7 /* Store.swift */; };
 		356066BE1F2E6A6300D2EF59 /* Json.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356066BD1F2E6A6300D2EF59 /* Json.swift */; };
 		356511BF1F3C471000AC46B2 /* AttributesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356511BE1F3C471000AC46B2 /* AttributesView.swift */; };
+		356511D71F488DCC00AC46B2 /* ComboBoxControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356511D61F488DCC00AC46B2 /* ComboBoxControl.swift */; };
+		356511D91F48910700AC46B2 /* SizeControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356511D81F48910700AC46B2 /* SizeControl.swift */; };
+		356511DB1F48946C00AC46B2 /* ColorControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356511DA1F48946C00AC46B2 /* ColorControl.swift */; };
 		35C1A8D51EF6EE5F00C2CF67 /* ngstore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35C1A8D41EF6EE5F00C2CF67 /* ngstore.framework */; };
 		35D46B781EEF568E00024E7E /* ngmaplib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D46B6E1EEF568E00024E7E /* ngmaplib.framework */; };
 		35D46B7D1EEF568E00024E7E /* MapLibTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D46B7C1EEF568E00024E7E /* MapLibTests.swift */; };
@@ -42,6 +45,9 @@
 		355FB9AF1F1F8B1B008D26D7 /* Store.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		356066BD1F2E6A6300D2EF59 /* Json.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Json.swift; sourceTree = "<group>"; };
 		356511BE1F3C471000AC46B2 /* AttributesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AttributesView.swift; sourceTree = "<group>"; };
+		356511D61F488DCC00AC46B2 /* ComboBoxControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComboBoxControl.swift; sourceTree = "<group>"; };
+		356511D81F48910700AC46B2 /* SizeControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SizeControl.swift; sourceTree = "<group>"; };
+		356511DA1F48946C00AC46B2 /* ColorControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorControl.swift; sourceTree = "<group>"; };
 		35C1A8D41EF6EE5F00C2CF67 /* ngstore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ngstore.framework; path = Carthage/Build/iOS/ngstore.framework; sourceTree = "<group>"; };
 		35D46B6E1EEF568E00024E7E /* ngmaplib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ngmaplib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		35D46B711EEF568E00024E7E /* MapLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MapLib.h; sourceTree = "<group>"; };
@@ -94,6 +100,16 @@
 			name = view;
 			sourceTree = "<group>";
 		};
+		356511CD1F45BF5C00AC46B2 /* control */ = {
+			isa = PBXGroup;
+			children = (
+				356511D61F488DCC00AC46B2 /* ComboBoxControl.swift */,
+				356511D81F48910700AC46B2 /* SizeControl.swift */,
+				356511DA1F48946C00AC46B2 /* ColorControl.swift */,
+			);
+			name = control;
+			sourceTree = "<group>";
+		};
 		359273051EF3E8CF005AB77B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -124,6 +140,7 @@
 		35D46B701EEF568E00024E7E /* MapLib */ = {
 			isa = PBXGroup;
 			children = (
+				356511CD1F45BF5C00AC46B2 /* control */,
 				353676111F010ECB00C7B846 /* view */,
 				353675FD1EF926A300C7B846 /* util */,
 				35D46B881EEF594C00024E7E /* Map.swift */,
@@ -282,7 +299,10 @@
 				35D46B8D1EEF5D4D00024E7E /* Api.swift in Sources */,
 				355FB9B01F1F8B1B008D26D7 /* Store.swift in Sources */,
 				35D46B891EEF594C00024E7E /* Map.swift in Sources */,
+				356511D91F48910700AC46B2 /* SizeControl.swift in Sources */,
+				356511D71F488DCC00AC46B2 /* ComboBoxControl.swift in Sources */,
 				3536760C1EFB30CA00C7B846 /* Catalog.swift in Sources */,
+				356511DB1F48946C00AC46B2 /* ColorControl.swift in Sources */,
 				35D46B8B1EEF596A00024E7E /* Layer.swift in Sources */,
 				356511BF1F3C471000AC46B2 /* AttributesView.swift in Sources */,
 				353676011EF9277500C7B846 /* Url.swift in Sources */,
