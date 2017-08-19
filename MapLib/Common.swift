@@ -20,7 +20,7 @@
 //  You should have received a copy of the GNU Lesser Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import Foundation
+import UIKit
 import ngstore
 
 // https://stackoverflow.com/a/40189217/2901140
@@ -74,6 +74,23 @@ extension String {
     }
 }
 
+extension UIView {
+    
+    var viewController: UIViewController? {
+        
+        var responder: UIResponder? = self
+        
+        while responder != nil {
+            
+            if let responder = responder as? UIViewController {
+                return responder
+            }
+            responder = responder?.next
+        }
+        return nil
+    }
+}
+
 public typealias funcReturnCode = ngstore.ngsCode
 
 public struct returnCodeEnum {
@@ -93,5 +110,7 @@ struct Constants {
     
     struct Sizes {
         static let minPanPix: Double = 4.0
+        static let dialogCornerRadius: CGFloat = 10.0
+        static let alertWidth: CGFloat = 270.0
     }
 }
