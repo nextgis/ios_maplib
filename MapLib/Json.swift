@@ -111,6 +111,46 @@ public class JsonObject {
     public func getObject(name: String) -> JsonObject {
         return JsonObject(handle: ngsJsonObjectGetObject(handle, name))
     }
+
+    public func getString(for key: String, with defaultValue: String) -> String {
+        return String(cString: ngsJsonObjectGetStringForKey(handle, key, defaultValue))
+    }
+    
+    public func getDouble(for key: String, with defaultValue: Double) -> Double {
+        return ngsJsonObjectGetDoubleForKey(handle, key, defaultValue)
+    }
+    
+    public func getInteger(for key: String, with defaultValue: Int32) -> Int32 {
+        return ngsJsonObjectGetIntegerForKey(handle, key, defaultValue)
+    }
+    
+    public func getLong(for key: String, with defaultValue: Int) -> Int {
+        return ngsJsonObjectGetLongForKey(handle, key, defaultValue)
+    }
+    
+    public func getBool(for key: String, with defaultValue: Bool) -> Bool {
+        return ngsJsonObjectGetBoolForKey(handle, key, defaultValue ? 1 : 0) == 1 ? true : false
+    }
+    
+    public func set(string value: String, for key: String) -> Bool {
+        return ngsJsonObjectSetStringForKey(handle, key, value) == Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func set(double value: Double, for key: String) -> Bool {
+        return ngsJsonObjectSetDoubleForKey(handle, key, value) == Int32(COD_SUCCESS.rawValue)
+    }
+
+    public func set(int value: Int32, for key: String) -> Bool {
+        return ngsJsonObjectSetIntegerForKey(handle, key, value) == Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func set(long value: Int, for key: String) -> Bool {
+        return ngsJsonObjectSetLongForKey(handle, key, value) == Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func set(bool value: Bool, for key: String) -> Bool {
+        return ngsJsonObjectSetBoolForKey(handle, key, value ? 1 : 0) == Int32(COD_SUCCESS.rawValue)
+    }
     
     public func children() -> [JsonObject] {
         var out: [JsonObject] = []

@@ -93,6 +93,28 @@ extension UIView {
 
 public typealias funcReturnCode = ngstore.ngsCode
 
+public func hexStringToUIColor (hex: String) -> UIColor {
+    var cString:String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+    
+    if (cString.hasPrefix("#")) {
+        cString.remove(at: cString.startIndex)
+    }
+    
+    if ((cString.characters.count) != 8) {
+        return UIColor.gray
+    }
+    
+    var rgbaValue:UInt32 = 0
+    Scanner(string: cString).scanHexInt32(&rgbaValue)
+    
+    return UIColor(
+        red:   CGFloat((rgbaValue & 0xFF000000) >> 24) / 255.0,
+        green: CGFloat((rgbaValue & 0x00FF0000) >> 16) / 255.0,
+        blue:  CGFloat((rgbaValue & 0x0000FF00) >> 8)  / 255.0,
+        alpha: CGFloat((rgbaValue & 0x000000FF) >> 0)  / 255.0
+    )
+}
+
 public struct returnCodeEnum {
     public static let SUCCESS = COD_SUCCESS
     public static let FINISHED = COD_FINISHED

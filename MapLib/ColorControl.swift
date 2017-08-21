@@ -59,7 +59,6 @@ extension UIColor {
         }
         return out
     }
-    
 }
 
 @IBDesignable open class ColorControl: UIControl {

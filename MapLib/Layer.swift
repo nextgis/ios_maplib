@@ -57,6 +57,24 @@ public class Layer {
         }
     }
     
+    public var style: JsonObject {
+        get {
+            return JsonObject(handle: ngsLayerGetStyle(layerH))
+        }
+        set {
+            _ = ngsLayerSetStyle(layerH, newValue.handle)
+        }
+    }
+    
+    public var styleName: String {
+        get {
+            return String(cString: ngsLayerGetStyleName(layerH))
+        }
+        set {
+            _ = ngsLayerSetStyleName(layerH, newValue)
+        }
+    }
+    
     init(layerH: LayerH!) {
         self.layerH = layerH
     }
