@@ -140,9 +140,9 @@ public class Map {
         return nil
     }
     
-    public func setZoom(increment zoomIncrement: Int8) {
-        if ngsMapSetZoomIncrement(id, zoomIncrement) != Int32(COD_SUCCESS.rawValue) {
-            printError("Set zoom increment \(zoomIncrement) failed")
+    public func setOptions(options: [String:String]) {
+        if ngsMapSetOptions(id, toArrayOfCStrings(options)) != Int32(COD_SUCCESS.rawValue) {
+            printError("Set map options failed")
         }
     }
     
