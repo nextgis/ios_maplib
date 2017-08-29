@@ -115,6 +115,17 @@ public func hexStringToUIColor (hex: String) -> UIColor {
     )
 }
 
+public func uiColorToHexString(color: UIColor) -> String {
+    var (red, green, blue, alpha) = (CGFloat(0.0), CGFloat(0.0),
+                                     CGFloat(0.0), CGFloat(0.0))
+    color.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+    return String(format: "#%02x%02x%02x%02x",
+                  Int(red * 255),
+                  Int(green * 255),
+                  Int(blue * 255),
+                  Int(alpha * 255))
+}
+
 public struct returnCodeEnum {
     public static let SUCCESS = COD_SUCCESS
     public static let FINISHED = COD_FINISHED

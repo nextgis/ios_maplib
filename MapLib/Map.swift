@@ -75,6 +75,26 @@ public class Map {
         }
     }
     
+    public enum SelectionStyleType: UInt32 {
+        case POINT
+        case LINE
+        case FILL
+        
+        public var rawValue: UInt32 {
+            switch self {
+            case .POINT:
+                return ST_POINT.rawValue
+            case .LINE:
+                return ST_LINE.rawValue
+            case .FILL:
+                return ST_FILL.rawValue
+//            default:
+//                return ST_IMAGE.rawValue
+            }
+        }
+    }
+
+    
     // MARK: Constructor & destructor
     init(id: UInt8, path: String) {
         self.id = id
@@ -123,12 +143,12 @@ public class Map {
     }
     
     public func deleteLayer(layer: Layer) -> Bool {
-        return ngsMapLayerDelete(id, layer.getHandler()) == Int32(COD_SUCCESS.rawValue)
+        return ngsMapLayerDelete(id, layer.layerH) == Int32(COD_SUCCESS.rawValue)
     }
     
     public func deleteLayer(position: Int32) -> Bool {
         if let deleteLayer = getLayer(position: position) {
-            return ngsMapLayerDelete(id, deleteLayer.getHandler()) == Int32(COD_SUCCESS.rawValue)
+            return ngsMapLayerDelete(id, deleteLayer.layerH) == Int32(COD_SUCCESS.rawValue)
         }
         return false
     }
@@ -154,7 +174,7 @@ public class Map {
     }
     
     public func reorder(before: Layer?, moved: Layer!) {
-        ngsMapLayerReorder(id, before == nil ? nil : before?.getHandler(), moved.getHandler())
+        ngsMapLayerReorder(id, before == nil ? nil : before?.layerH, moved.layerH)
     }
     
     
@@ -187,9 +207,57 @@ public class Map {
         return out
     }
     
+    public func select(features: [Feature]) {
+        var env = Envelope()
+        
+        for index in 0..<layerCount {
+            if let layer = getLayer(position: index) {
+                if layer.visible {
+                    if let ds = layer.dataSource as? FeatureClass {
+                        var lf: [Feature] = []
+                        for feature in features {
+                            if ds.path == feature.featureClass?.path {
+                                lf.append(feature)
+                                let geomEnvelope = feature.geometry.envelope
+                                env.merge(other: geomEnvelope)
+                            }
+                        }
+                        layer.select(features: lf)
+                    }
+                }
+            }
+        }
+        if env.isInit() {
+            ngsMapInvalidate(id, env.extent)
+        }
+    }
+    
+    public func selectionStyle(for type: SelectionStyleType) -> JsonObject {
+        return JsonObject(
+            handle: ngsMapGetSelectionStyle(id, ngsStyleType(type.rawValue)))
+    }
+
+    public func selectionStyleName(for type: SelectionStyleType) -> String {
+        return String(
+            cString: ngsMapGetSelectionStyleName(id, ngsStyleType(type.rawValue)))
+    }
+    
+    public func setSelectionStyle(style: JsonObject,
+                                  for type: SelectionStyleType) -> Bool {
+        return ngsMapSetSelectionsStyle(id, ngsStyleType(type.rawValue),
+                                        style.handle) == Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func setSelectionStyle(name: String,
+                                  for type: SelectionStyleType) -> Bool {
+        return ngsMapSetSelectionStyleName(id, ngsStyleType(type.rawValue),
+                                           name) == Int32(COD_SUCCESS.rawValue)
+    }
+    
     // MARK: Private
         
-    func draw(state: ngsDrawState, _ callback: ngstore.ngsProgressFunc!, _ callbackData: UnsafeMutableRawPointer!) {
+    func draw(state: ngsDrawState, _ callback: ngstore.ngsProgressFunc!,
+              _ callbackData: UnsafeMutableRawPointer!) {
         let result = ngsMapDraw(id, state, callback, callbackData)
         if UInt32(result) != COD_SUCCESS.rawValue {
             printError("Failed draw map: error code \(result)")

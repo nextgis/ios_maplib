@@ -405,10 +405,16 @@ public class CoordinateTransformation {
 }
 
 public struct Envelope {
-    public let minX: Double
-    public let maxX: Double
-    public let minY: Double
-    public let maxY: Double
+    public var minX: Double
+    public var maxX: Double
+    public var minY: Double
+    public var maxY: Double
+    
+    var extent: ngsExtent {
+        get {
+            return ngsExtent(minX: minX, minY: minY, maxX: maxX, maxY: maxY)
+        }
+    }
     
     public init(minX: Double, minY: Double, maxX: Double, maxY: Double) {
         self.minX = minX
@@ -423,10 +429,42 @@ public struct Envelope {
         self.minY = 0.0
         self.maxY = 0.0
     }
+    
+    init(envelope: ngsExtent) {
+        self.minX = envelope.minX
+        self.maxX = envelope.maxX
+        self.minY = envelope.minY
+        self.maxY = envelope.maxY
+    }
+    
+    public func isInit() -> Bool {
+        return minX != 0.0 && minY != 0.0 && maxX != 0.0 && maxY != 0.0
+    }
+    
+    public mutating func merge(other: Envelope) {
+        if isInit() {
+            self.minX = min(minX, other.minX)
+            self.minY = min(minY, other.minY)
+            self.maxX = max(maxX, other.maxX)
+            self.maxY = max(maxY, other.maxY)
+        }
+        else {
+            self.minX = other.minX
+            self.minY = other.minY
+            self.maxX = other.maxX
+            self.maxY = other.maxY
+        }
+    }
 }
 
 public class Geometry {
     let handle: GeometryH!
+    
+    public var envelope: Envelope {
+        get {
+            return Envelope(envelope: ngsGeometryGetEnvelope(handle))
+        }
+    }
     
     init(handle: GeometryH) {
         self.handle = handle

@@ -25,7 +25,7 @@ import Foundation
 import ngstore
 
 public class Layer {
-    private let layerH: LayerH!
+    let layerH: LayerH!
     
     public var name: String {
         get {
@@ -78,11 +78,7 @@ public class Layer {
     init(layerH: LayerH!) {
         self.layerH = layerH
     }
-    
-    func getHandler() -> LayerH {
-        return layerH
-    }
-    
+       
     public func identify(envelope: Envelope, limit: Int = 0) -> [Feature] {
         
         printMessage("Layer identify")
@@ -106,4 +102,12 @@ public class Layer {
         return out
     }
     
+    public func select(features: [Feature] = []) {
+        var ids: [Int64] = []
+        for feature in features {
+            ids.append(feature.id)
+        }
+        let pointer: UnsafeMutablePointer<Int64> = UnsafeMutablePointer(mutating: ids)
+        ngsLayerSetSelectionIds(layerH, pointer, Int32(features.count))
+    }
 }
