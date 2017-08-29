@@ -227,9 +227,10 @@ public class Map {
                 }
             }
         }
-        if env.isInit() {
-            ngsMapInvalidate(id, env.extent)
+        if !env.isInit() {
+            env = Envelope(minX: -1.0, minY: -1.0, maxX: 1.0, maxY: 1.0)
         }
+        ngsMapInvalidate(id, env.extent)
     }
     
     public func selectionStyle(for type: SelectionStyleType) -> JsonObject {

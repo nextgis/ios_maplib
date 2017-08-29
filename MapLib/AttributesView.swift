@@ -20,6 +20,11 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import UIKit
+import ngstore
+
+public protocol AttachmentTapDelegate: class {
+    func onAttachmentTap(attachment: Attachment?)
+}
 
 public class AttributesView: UIScrollView {
     
@@ -35,6 +40,7 @@ public class AttributesView: UIScrollView {
     public var sectionTextSize: CGFloat = 13.0
     public var attachmentImage: UIImage? = nil
     public var attachmentRemoteImage: UIImage? = nil
+    public var attachmentDelegate: AttachmentTapDelegate? = nil
 
     /*
     // Only override draw() if you perform custom drawing.
@@ -82,21 +88,41 @@ public class AttributesView: UIScrollView {
         }
     }
     
+    class UIButtonWithAttachment: UIButton {
+        var attachment: Attachment? = nil
+    }
+    
+    func onAttachmentTap(sender: UIButtonWithAttachment) {
+        attachmentDelegate?.onAttachmentTap(attachment: sender.attachment)
+    }
+    
+    
+    
     public func addAttachment(_ attachment: Attachment) {
         
-        if attachment.path.isEmpty {
+        let lb = UIButtonWithAttachment()
+        lb.translatesAutoresizingMaskIntoConstraints = false
+        lb.setTitle(attachment.name, for: .normal)
+        lb.setTitleColor(textColor, for: .normal)
+        
+        lb.titleLabel?.numberOfLines = 2
+        lb.titleLabel?.font = UIFont.systemFont(ofSize: textSize)
+        lb.backgroundColor = UIColor.clear
+        lb.contentHorizontalAlignment = .left
+        
+        
+        
+        if attachment.path.isEmpty ||
+            !FileManager.default.fileExists(atPath: attachment.path) {
             // Add download alert
+            lb.setImage(attachmentRemoteImage, for: .normal)
         } else {
             // Add preview
+            lb.setImage(attachmentImage, for: .normal)
         }
         
-        let lb = UILabel()
-        lb.translatesAutoresizingMaskIntoConstraints = false
-        lb.textAlignment = .left
-        lb.numberOfLines = 2
-        lb.textColor = textColor
-        lb.text = attachment.name
-        lb.font = UIFont.systemFont(ofSize: textSize)
+        lb.attachment = attachment
+        lb.addTarget(self, action: #selector(onAttachmentTap), for: .touchUpInside)
         
         addSubview(lb)
         
@@ -200,13 +226,36 @@ public class AttributesView: UIScrollView {
         
         prevView = lb
         
-        let vl = UILabel()
-        vl.translatesAutoresizingMaskIntoConstraints = false
-        vl.textAlignment = .left
-        vl.numberOfLines = 0
-        vl.textColor = textColor
-        vl.text = feature.getField(asString: pos)
-        vl.font = UIFont.systemFont(ofSize: textSize)
+        let vl: UIView
+        
+        let value = feature.getField(asString: pos)
+        if value.hasPrefix("http") {
+            let tv = UITextView()
+            tv.isEditable = false;
+            tv.dataDetectorTypes = UIDataDetectorTypes.all;
+            tv.translatesAutoresizingMaskIntoConstraints = false
+            tv.textAlignment = .left
+            tv.textColor = textColor
+            tv.text = feature.getField(asString: pos)
+            tv.font = UIFont.systemFont(ofSize: textSize)
+            tv.textContainerInset = UIEdgeInsets.zero
+            tv.contentInset = UIEdgeInsets.zero
+            tv.textContainer.lineFragmentPadding = 0
+            tv.isScrollEnabled = false
+            tv.backgroundColor = UIColor.clear
+            
+            vl = tv
+        } else {
+            let vl1 = UILabel()
+            vl1.translatesAutoresizingMaskIntoConstraints = false
+            vl1.textAlignment = .left
+            vl1.numberOfLines = 0
+            vl1.textColor = textColor
+            vl1.text = feature.getField(asString: pos)
+            vl1.font = UIFont.systemFont(ofSize: textSize)
+            
+            vl = vl1
+        }
         
         addSubview(vl)
         
