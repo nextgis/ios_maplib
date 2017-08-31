@@ -20,6 +20,8 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>The application uses this information to show your location on map</string>
 	<key>NSPrincipalClass</key>
 	<string></string>
 </dict>

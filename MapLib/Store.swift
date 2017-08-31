@@ -402,6 +402,12 @@ public class CoordinateTransformation {
         return CoordinateTransformation(
             handle: ngsCoordinateTransformationCreate(fromEPSG, toEPSG))
     }
+    
+    public func transform(_ point: Point) -> Point {
+        let coordIn: ngsCoordinate = ngsCoordinate(X: point.x, Y: point.y, Z: 0.0)
+        let coordOut = ngsCoordinateTransformationDo(handle, coordIn)
+        return Point(x: coordOut.X, y: coordOut.Y)
+    }
 }
 
 public struct Envelope {

@@ -23,6 +23,7 @@
 import UIKit
 import GLKit
 import ngstore
+import CoreLocation
 
 public protocol GestureDelegate: class {
     func onSingleTap(sender: UIGestureRecognizer)
@@ -31,12 +32,39 @@ public protocol GestureDelegate: class {
     func onPinchGesture(sender: UIPinchGestureRecognizer)
 }
 
+public protocol LocationDelegate: class {
+    func onLocationChanged(location: CLLocation)
+}
+
 public class MapView: GLKView {
     var map: Map?
     var drawState: ngsDrawState = DS_PRESERVED
     weak var globalTimer: Timer?
     var timerDrawState: ngsDrawState = DS_PRESERVED
     weak var gestureDelegate: GestureDelegate?
+    weak var locationDelegate: LocationDelegate?
+    let locationManager = CLLocationManager()
+    public var currentLocation: CLLocation? = nil
+    
+    var showLocationVal: Bool = false
+    public var showLocation: Bool {
+        get {
+            return showLocationVal
+        }
+        set {
+            showLocationVal = newValue
+            if showLocationVal {
+                locationManager.desiredAccuracy = kCLLocationAccuracyBest
+                locationManager.delegate = self
+                locationManager.requestWhenInUseAuthorization()
+                locationManager.pausesLocationUpdatesAutomatically = true
+                locationManager.startUpdatingLocation()
+            }
+            else {
+                locationManager.stopUpdatingLocation()
+            }
+        }
+    }
     
     public var freeze: Bool {
         get {
@@ -92,7 +120,7 @@ public class MapView: GLKView {
     }
     
     deinit {
-
+        
     }
     
     public func setMap(map: Map) {
@@ -142,6 +170,23 @@ public class MapView: GLKView {
         map?.zoomOut(multiply)
         draw(DS_PRESERVED)
         scheduleDraw(drawState: DS_NORMAL)
+    }
+    
+    public func centerMap(coordinate: Point) {
+        map?.center = coordinate
+        draw(DS_PRESERVED)
+        scheduleDraw(drawState: DS_NORMAL)
+    }
+    
+    public func centerInCurrentLocation() {
+        if currentLocation == nil {
+            return
+        }
+        let ct = CoordinateTransformation.new(fromEPSG: 4326, toEPSG: 3857)
+        let newCenter = ct.transform(
+            Point(x: currentLocation?.coordinate.longitude ?? 0.0,
+                  y: currentLocation?.coordinate.latitude ?? 0.0))
+        centerMap(coordinate: newCenter)
     }
     
     public func pan(w: Double, h: Double) {
@@ -198,6 +243,10 @@ public class MapView: GLKView {
         gestureDelegate = delegate
     }
     
+    public func registerLocation(_ delegate: LocationDelegate) {
+        locationDelegate = delegate
+    }
+    
     func onDoubleTap(sender: UIGestureRecognizer) {
         if sender.state == UIGestureRecognizerState.ended {
             
@@ -251,7 +300,9 @@ public class MapView: GLKView {
     }
 }
 
-func drawingProgressFunc(code: ngsCode, percent: Double, message: UnsafePointer<Int8>?, progressArguments: UnsafeMutableRawPointer?) -> Int32 {
+func drawingProgressFunc(code: ngsCode, percent: Double,
+                         message: UnsafePointer<Int8>?,
+                         progressArguments: UnsafeMutableRawPointer?) -> Int32 {
     if(code == COD_FINISHED) {
         return 1
     }
@@ -273,5 +324,26 @@ extension MapView: GLKViewDelegate {
         map?.draw(state: drawState, processFunc, bridge(obj: self))
 
         drawState = DS_PRESERVED
+    }
+}
+
+extension MapView: CLLocationManagerDelegate {
+    
+    
+    public func locationManager(_ manager: CLLocationManager,
+                         didUpdateLocations locations: [CLLocation])
+    {
+        currentLocation = locations[locations.count - 1]
+        
+        if currentLocation != nil {
+        
+            if showLocation {
+            
+            }
+        
+            printMessage("Location. Lat: \(currentLocation!.coordinate.latitude) Long:\(currentLocation!.coordinate.longitude) Alt:\(currentLocation!.altitude) Dir:\(currentLocation!.course)")
+        
+            locationDelegate?.onLocationChanged(location: currentLocation!)
+        }
     }
 }
