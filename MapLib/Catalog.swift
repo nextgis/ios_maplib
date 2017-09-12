@@ -141,6 +141,10 @@ public class Object {
         return nil
     }
     
+    public func refresh() {
+        ngsCatalogObjectRefresh(object)
+    }
+    
     public func create(name: String, options: [String:String] = [:]) -> Object? {
         if(ngsCatalogObjectCreate(object, name, toArrayOfCStrings(options)) ==
             Int32(COD_SUCCESS.rawValue)) {

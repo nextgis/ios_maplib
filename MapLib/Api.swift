@@ -79,7 +79,7 @@ public class API {
             "CACHE_DIR": cacheDir,
             "SETTINGS_DIR": settingsDir,
             "SSL_CERT_FILE": certFile,
-            "NUM_THREADS": "4", //"ALL_CPUS",
+            "NUM_THREADS": "ALL_CPUS", // "4", //
             "DEBUG_MODE": Constants.debugMode ? "ON" : "OFF"
         ]
         
@@ -88,7 +88,7 @@ public class API {
         }
         catalog = Catalog(catalog: ngsCatalogObjectGet("ngc://"))
         
-        printMessage("\n home dir: \(homeDir)\n settings: \(settingsDir)\n cache dir: \(cacheDir)")
+        printMessage("\n home dir: \(homeDir)\n settings: \(settingsDir)\n cache dir: \(cacheDir)\n GDAL data dir: \(gdalData)")
         
         if let libDir = catalog.childByPath(path: "ngc://Local connections/Home/Library") {
             let appSupportDir = Catalog.getOrCreateFolder(libDir, "Application Support")
@@ -299,7 +299,7 @@ public class API {
     
     func onMapViewNotify(url: String) {
         for view in mapViewArray {
-            view.scheduleDraw(drawState: DS_REFILL)
+            view.scheduleDraw(drawState: .REFILL)
         }
     }
     

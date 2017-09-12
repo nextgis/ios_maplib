@@ -47,6 +47,7 @@ public class Map {
     let id: UInt8
     let path: String
     var bkColor: ngsRGBA
+
     
     public var scale: Double {
         get {
@@ -75,6 +76,32 @@ public class Map {
         }
     }
     
+    public enum OverlayType: UInt32 {
+        case UNKNOWN
+        case LOCATION
+        case TRACK
+        case EDIT
+        case FIGURES
+        case ALL
+        
+        public var rawValue: UInt32 {
+            switch self {
+            case .UNKNOWN:
+                return MOT_UNKNOWN.rawValue
+            case .LOCATION:
+                return MOT_LOCATION.rawValue
+            case .TRACK:
+                return MOT_TRACK.rawValue
+            case .EDIT:
+                return MOT_EDIT.rawValue
+            case .FIGURES:
+                return MOT_FIGURES.rawValue
+            case .ALL:
+                return MOT_ALL.rawValue
+            }
+        }
+    }
+    
     public enum SelectionStyleType: UInt32 {
         case POINT
         case LINE
@@ -90,6 +117,29 @@ public class Map {
                 return ST_FILL.rawValue
 //            default:
 //                return ST_IMAGE.rawValue
+            }
+        }
+    }
+    
+    public enum DrawState: UInt32 {
+        case NORMAL
+        case REDRAW
+        case REFILL
+        case PRESERVED
+        case NOTHING
+        
+        public var rawValue: UInt32 {
+            switch self {
+            case .NORMAL:
+                return DS_NORMAL.rawValue
+            case .REDRAW:
+                return DS_REDRAW.rawValue
+            case .REFILL:
+                return DS_REFILL.rawValue
+            case .PRESERVED:
+                return DS_PRESERVED.rawValue
+            case .NOTHING:
+                return DS_NOTHING.rawValue
             }
         }
     }
@@ -233,6 +283,12 @@ public class Map {
         ngsMapInvalidate(id, env.extent)
     }
     
+    public func invalidate(extent: Envelope) {
+        let env = ngsExtent(minX: extent.minX, minY: extent.minX,
+                            maxX: extent.maxX, maxY: extent.maxY)
+        ngsMapInvalidate(id, env)
+    }
+    
     public func selectionStyle(for type: SelectionStyleType) -> JsonObject {
         return JsonObject(
             handle: ngsMapGetSelectionStyle(id, ngsStyleType(type.rawValue)))
@@ -255,11 +311,45 @@ public class Map {
                                            name) == Int32(COD_SUCCESS.rawValue)
     }
     
+    public func setOverlay(visible: Bool, mask: UInt32) {
+        ngsOverlaySetVisible(id, Int32(mask), visible ? 1 : 0)
+    }
+    
+    public func locationOverlayStyle() -> JsonObject {
+        return JsonObject(
+            handle: ngsLocationOverlayGetStyle(id))
+    }
+    
+    public func setLocationOverlayStyle(style: JsonObject) -> Bool {
+        return ngsLocationOverlaySetStyle(id, style.handle) ==
+            Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func setLocationOverlayStyle(name: String) -> Bool {
+        return ngsLocationOverlaySetStyleName(id, name) ==
+            Int32(COD_SUCCESS.rawValue)
+    }
+
+    
+    public func addIconSet(name: String, path: String, move: Bool) -> Bool {
+        return ngsMapIconSetAdd(id, name, path, move ? 1 : 0) ==
+            Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func removeIconSet(name: String) -> Bool {
+        return ngsMapIconSetRemove(id, name) ==
+            Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func isIconSetExists(name: String) -> Bool {
+        return ngsMapIconSetExists(id, name) == 2
+    }
+    
     // MARK: Private
         
-    func draw(state: ngsDrawState, _ callback: ngstore.ngsProgressFunc!,
+    func draw(state: DrawState, _ callback: ngstore.ngsProgressFunc!,
               _ callbackData: UnsafeMutableRawPointer!) {
-        let result = ngsMapDraw(id, state, callback, callbackData)
+        let result = ngsMapDraw(id, ngsDrawState(rawValue: state.rawValue), callback, callbackData)
         if UInt32(result) != COD_SUCCESS.rawValue {
             printError("Failed draw map: error code \(result)")
         }
@@ -298,4 +388,8 @@ public class Map {
         return Envelope(minX: ext.minX, minY: ext.minY, maxX: ext.maxX, maxY: ext.maxY)
     }
     
+    func location(update location: Point, direction: Float, accuracy: Float) {
+        let loc = ngsCoordinate(X: location.x, Y: location.y, Z: 0.0)
+        ngsLocationOverlayUpdate(id, loc, direction, accuracy)
+    }
 }

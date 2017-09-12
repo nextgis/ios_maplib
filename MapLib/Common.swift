@@ -135,7 +135,7 @@ public struct returnCodeEnum {
 
 struct Constants {
     static let debugMode = true
-    static let refreshTime = 0.35
+    static let refreshTime = 0.45
     
     struct Map {
         static let tolerance = 7.0

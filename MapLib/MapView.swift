@@ -37,15 +37,15 @@ public protocol LocationDelegate: class {
 }
 
 public class MapView: GLKView {
-    var map: Map?
-    var drawState: ngsDrawState = DS_PRESERVED
-    weak var globalTimer: Timer?
-    var timerDrawState: ngsDrawState = DS_PRESERVED
-    weak var gestureDelegate: GestureDelegate?
-    weak var locationDelegate: LocationDelegate?
+    var map: Map? = nil
+    var drawState: Map.DrawState = .PRESERVED
+    weak var globalTimer: Timer? = nil
+    var timerDrawState: Map.DrawState = .PRESERVED
+    weak var gestureDelegate: GestureDelegate? = nil
+    weak var locationDelegate: LocationDelegate? = nil
     let locationManager = CLLocationManager()
     public var currentLocation: CLLocation? = nil
-    
+        
     var showLocationVal: Bool = false
     public var showLocation: Bool {
         get {
@@ -141,7 +141,7 @@ public class MapView: GLKView {
         refresh()
     }
     
-    func draw(_ state: ngsDrawState) {
+    func draw(_ state: Map.DrawState) {
         drawState = state
         display()
     }
@@ -153,55 +153,63 @@ public class MapView: GLKView {
     public func refresh(normal: Bool = true) {
         if !freeze {
             if normal {
-                draw(DS_NORMAL)
+                draw(.NORMAL)
             } else {
-                draw(DS_REFILL)
+                draw(.REFILL)
             }
         }
     }
     
     public func zoomIn(multiply: Double = 2.0) {
         map?.zoomIn(multiply)
-        draw(DS_PRESERVED)
-        scheduleDraw(drawState: DS_NORMAL)
+        draw(.PRESERVED)
+        scheduleDraw(drawState: .NORMAL)
     }
     
     public func zoomOut(multiply: Double = 2.0) {
         map?.zoomOut(multiply)
-        draw(DS_PRESERVED)
-        scheduleDraw(drawState: DS_NORMAL)
+        draw(.PRESERVED)
+        scheduleDraw(drawState: .NORMAL)
     }
     
     public func centerMap(coordinate: Point) {
         map?.center = coordinate
-        draw(DS_PRESERVED)
-        scheduleDraw(drawState: DS_NORMAL)
+        draw(.PRESERVED)
+        scheduleDraw(drawState: .NORMAL)
     }
     
     public func centerInCurrentLocation() {
         if currentLocation == nil {
             return
         }
-        let ct = CoordinateTransformation.new(fromEPSG: 4326, toEPSG: 3857)
-        let newCenter = ct.transform(
-            Point(x: currentLocation?.coordinate.longitude ?? 0.0,
-                  y: currentLocation?.coordinate.latitude ?? 0.0))
+        let newCenter = transformFrom(gps: currentLocation?.coordinate.longitude ?? 0.0,
+                                       y: currentLocation?.coordinate.latitude ?? 0.0)
         centerMap(coordinate: newCenter)
+    }
+    
+    public func invalidate(envelope: Envelope) {
+        map?.invalidate(extent: envelope)
+        scheduleDraw(drawState: .PRESERVED, timeInterval: 0.70)
     }
     
     public func pan(w: Double, h: Double) {
         map?.pan(w, h)
-        draw(DS_PRESERVED)
-        scheduleDraw(drawState: DS_NORMAL)
+        draw(.PRESERVED)
+        scheduleDraw(drawState: .NORMAL)
+    }
+    
+    func transformFrom(gps x: Double, y: Double) -> Point {
+        let ct = CoordinateTransformation.new(fromEPSG: 4326, toEPSG: 3857)
+        return ct.transform(Point(x: x, y: y))
     }
     
     func onTimer(timer: Timer) {
         globalTimer = nil
-        let drawState = timer.userInfo as! ngsDrawState
+        let drawState = timer.userInfo as! Map.DrawState
         draw(drawState)
     }
     
-    func scheduleDraw(drawState: ngsDrawState) {
+    public func scheduleDraw(drawState: Map.DrawState, timeInterval: TimeInterval = Constants.refreshTime) {
         // timer?.invalidate()
         if timerDrawState != drawState {
             globalTimer?.invalidate()
@@ -214,7 +222,7 @@ public class MapView: GLKView {
         
         timerDrawState = drawState
         
-        globalTimer = Timer.scheduledTimer(timeInterval: Constants.refreshTime,
+        globalTimer = Timer.scheduledTimer(timeInterval: timeInterval,
                                      target: self,
                                      selector: #selector(onTimer(timer:)),
                                      userInfo: drawState,
@@ -255,8 +263,8 @@ public class MapView: GLKView {
             let y = Double(position.y)
             
             map?.setCenterAndZoom(x, y)
-            draw(DS_PRESERVED)
-            scheduleDraw(drawState: DS_NORMAL)
+            draw(.PRESERVED)
+            scheduleDraw(drawState: .NORMAL)
             
             gestureDelegate?.onDoubleTap(sender: sender)
         }
@@ -287,8 +295,8 @@ public class MapView: GLKView {
         let scale = sender.scale
         
         map?.zoomIn(Double(scale))
-        draw(DS_PRESERVED)
-        scheduleDraw(drawState: DS_NORMAL)
+        draw(.PRESERVED)
+        scheduleDraw(drawState: .NORMAL)
         
         sender.scale = 1.0
         
@@ -309,7 +317,7 @@ func drawingProgressFunc(code: ngsCode, percent: Double,
     
     if (progressArguments != nil) {
         let view: MapView = bridge(ptr: progressArguments!)
-        view.scheduleDraw(drawState: DS_PRESERVED) //display()
+        view.scheduleDraw(drawState: .PRESERVED) //display()
         return view.cancelDraw() ? 0 : 1
     }
     
@@ -323,7 +331,7 @@ extension MapView: GLKViewDelegate {
         let processFunc: ngstore.ngsProgressFunc = drawingProgressFunc
         map?.draw(state: drawState, processFunc, bridge(obj: self))
 
-        drawState = DS_PRESERVED
+        drawState = .PRESERVED
     }
 }
 
@@ -333,15 +341,27 @@ extension MapView: CLLocationManagerDelegate {
     public func locationManager(_ manager: CLLocationManager,
                          didUpdateLocations locations: [CLLocation])
     {
-        currentLocation = locations[locations.count - 1]
+        let location = locations[locations.count - 1]
+        if location.coordinate.latitude == currentLocation?.coordinate.latitude &&
+            location.coordinate.longitude == currentLocation?.coordinate.longitude &&
+            location.altitude == currentLocation?.altitude &&
+            location.course == currentLocation?.course &&
+            location.horizontalAccuracy == currentLocation?.horizontalAccuracy {
+            return // Nothing changed
+        }
         
+        currentLocation = location
         if currentLocation != nil {
         
             if showLocation {
-            
+                let position = transformFrom(gps: currentLocation!.coordinate.longitude,
+                                             y: currentLocation!.coordinate.latitude)
+                map?.location(update: position, direction: Float(currentLocation!.course),
+                              accuracy: Float(currentLocation!.horizontalAccuracy))
+                draw(.PRESERVED)
             }
         
-            printMessage("Location. Lat: \(currentLocation!.coordinate.latitude) Long:\(currentLocation!.coordinate.longitude) Alt:\(currentLocation!.altitude) Dir:\(currentLocation!.course)")
+            printMessage("Location. Lat: \(currentLocation!.coordinate.latitude) Long:\(currentLocation!.coordinate.longitude) Alt:\(currentLocation!.altitude) Dir:\(currentLocation!.course), Accuracy: \(currentLocation!.horizontalAccuracy)")
         
             locationDelegate?.onLocationChanged(location: currentLocation!)
         }
