@@ -535,7 +535,9 @@ public class Attachment {
             return remoteIdVal
         }
         set(rid) {
-            ngsStoreFeatureSetAttachmentRemoteId(handle, id, rid)
+            if handle != nil {
+                ngsStoreFeatureSetAttachmentRemoteId(handle, id, rid)
+            }
             remoteIdVal = rid
         }
     }
@@ -551,11 +553,24 @@ public class Attachment {
         self.remoteIdVal = remoteId
     }
     
+    init(name: String, description: String, path: String) {
+        self.handle = nil
+        self.id = -1
+        self.name = name
+        self.description = description
+        self.path = path
+        self.size = -1
+        self.remoteIdVal = -1
+    }
+    
     public func isFileAvailable() -> Bool {
         return path.isEmpty
     }
     
     public func update(name: String, description: String) -> Bool {
+        if handle == nil {
+            return false
+        }
         return ngsFeatureAttachmentUpdate(handle, id, name, description) ==
             Int32(COD_SUCCESS.rawValue)
     }

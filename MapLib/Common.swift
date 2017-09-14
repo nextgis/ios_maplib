@@ -145,5 +145,6 @@ struct Constants {
         static let minPanPix: Double = 4.0
         static let dialogCornerRadius: CGFloat = 10.0
         static let alertWidth: CGFloat = 270.0
+        static let defaultPopoverMargin: CGFloat = 8.0
     }
 }
