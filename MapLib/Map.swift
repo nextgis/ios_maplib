@@ -189,7 +189,7 @@ public class Map {
         if position == -1 {
             return nil
         }
-        return getLayer(position: position)
+        return getLayer(by: position)
     }
     
     public func deleteLayer(layer: Layer) -> Bool {
@@ -197,13 +197,13 @@ public class Map {
     }
     
     public func deleteLayer(position: Int32) -> Bool {
-        if let deleteLayer = getLayer(position: position) {
+        if let deleteLayer = getLayer(by: position) {
             return ngsMapLayerDelete(id, deleteLayer.layerH) == Int32(COD_SUCCESS.rawValue)
         }
         return false
     }
     
-    public func getLayer(position: Int32) -> Layer? {
+    public func getLayer(by position: Int32) -> Layer? {
         if let layerHandler = ngsMapLayerGet(id, position) {
             return Layer(layerH: layerHandler)
         }
@@ -246,7 +246,7 @@ public class Map {
                                 maxY: coordinate.Y + distance.Y)
         
         for index in 0..<layerCount {
-            if let layer = getLayer(position: index) {
+            if let layer = getLayer(by: index) {
                 if layer.visible {
                     let layerFeatures = layer.identify(envelope: envelope,
                                                        limit: limit)
@@ -261,7 +261,7 @@ public class Map {
         var env = Envelope()
         
         for index in 0..<layerCount {
-            if let layer = getLayer(position: index) {
+            if let layer = getLayer(by: index) {
                 if layer.visible {
                     if let ds = layer.dataSource as? FeatureClass {
                         var lf: [Feature] = []
@@ -281,6 +281,19 @@ public class Map {
             env = Envelope(minX: -1.0, minY: -1.0, maxX: 1.0, maxY: 1.0)
         }
         ngsMapInvalidate(id, env.extent)
+    }
+    
+    func getLayer(for feature: Feature) -> Layer? {
+        for index in 0..<layerCount {
+            if let layer = getLayer(by: index) {
+                if let ds = layer.dataSource as? FeatureClass {
+                    if ds.path == feature.featureClass?.path {
+                        return layer
+                    }
+                }
+            }
+        }
+        return nil
     }
     
     public func invalidate(extent: Envelope) {
@@ -311,25 +324,20 @@ public class Map {
                                            name) == Int32(COD_SUCCESS.rawValue)
     }
     
-    public func setOverlay(visible: Bool, mask: UInt32) {
-        ngsOverlaySetVisible(id, Int32(mask), visible ? 1 : 0)
+    public func getOverlay(type: OverlayType) -> Overlay? {
+        switch type {
+        case .EDIT:
+            return EditOverlay(map: self)
+        case .LOCATION:
+            return LocationOverlay(map: self)
+        case .TRACK:
+            return nil
+        case .FIGURES:
+            return nil
+        default:
+            return nil
+        }
     }
-    
-    public func locationOverlayStyle() -> JsonObject {
-        return JsonObject(
-            handle: ngsLocationOverlayGetStyle(id))
-    }
-    
-    public func setLocationOverlayStyle(style: JsonObject) -> Bool {
-        return ngsLocationOverlaySetStyle(id, style.handle) ==
-            Int32(COD_SUCCESS.rawValue)
-    }
-    
-    public func setLocationOverlayStyle(name: String) -> Bool {
-        return ngsLocationOverlaySetStyleName(id, name) ==
-            Int32(COD_SUCCESS.rawValue)
-    }
-
     
     public func addIconSet(name: String, path: String, move: Bool) -> Bool {
         return ngsMapIconSetAdd(id, name, path, move ? 1 : 0) ==
@@ -387,9 +395,144 @@ public class Map {
         let ext = ngsMapGetExtent(id, srs)
         return Envelope(minX: ext.minX, minY: ext.minY, maxX: ext.maxX, maxY: ext.maxY)
     }
+
+}
+
+public class Overlay {
+    
+    weak var map: Map!
+    let type: Map.OverlayType
+    
+    fileprivate init(map: Map, type: Map.OverlayType) {
+        self.map = map
+        self.type = type
+    }
+    
+    public var visible: Bool {
+        get {
+            return ngsOverlayGetVisible(map.id, ngsMapOverlayType(type.rawValue)) == 1
+        }
+        
+        set {
+            ngsOverlaySetVisible(map.id, Int32(type.rawValue), newValue ? 1 : 0)
+        }
+    }
+}
+
+public class LocationOverlay : Overlay {
+    
+    fileprivate init(map: Map) {
+        super.init(map: map, type: .LOCATION)
+    }
+    
+    public var style: JsonObject {
+        get {
+            return JsonObject(handle: ngsLocationOverlayGetStyle(map.id))
+        }
+        
+        set {
+            ngsLocationOverlaySetStyle(map.id, newValue.handle)
+        }
+    }
+    
+    public func setStyle(name: String) -> Bool {
+        return ngsLocationOverlaySetStyleName(map.id, name) ==
+            Int32(COD_SUCCESS.rawValue)
+    }
     
     func location(update location: Point, direction: Float, accuracy: Float) {
         let loc = ngsCoordinate(X: location.x, Y: location.y, Z: 0.0)
-        ngsLocationOverlayUpdate(id, loc, direction, accuracy)
+        ngsLocationOverlayUpdate(map.id, loc, direction, accuracy)
     }
+}
+
+public class EditOverlay : Overlay {
+    
+    public var editLayer: Layer? = nil
+    
+    fileprivate init(map: Map) {
+        super.init(map: map, type: .EDIT)
+    }
+    
+    public var pointStyle: JsonObject {
+        get {
+            return JsonObject(handle: ngsEditOverlayGetStyle(map.id, EST_POINT))
+        }
+        
+        set {
+            ngsEditOverlaySetStyle(map.id, EST_POINT, newValue.handle)
+        }
+    }
+    
+    public var lineStyle: JsonObject {
+        get {
+            return JsonObject(handle: ngsEditOverlayGetStyle(map.id, EST_LINE))
+        }
+        
+        set {
+            ngsEditOverlaySetStyle(map.id, EST_LINE, newValue.handle)
+        }
+    }
+    
+    public func setStyle(point name: String) -> Bool {
+        return ngsEditOverlaySetStyleName(map.id, EST_POINT, name) ==
+            Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func setStyle(line name: String) -> Bool {
+        return ngsEditOverlaySetStyleName(map.id, EST_POINT, name) ==
+            Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func canUndo() -> Bool {
+        return ngsEditOverlayCanUndo(map.id) == 1
+    }
+    
+    public func canRedo() -> Bool {
+        return ngsEditOverlayCanRedo(map.id) == 1
+    }
+    
+    public func undo() -> Bool {
+        return ngsEditOverlayUndo(map.id) == 1
+    }
+    
+    public func redo() -> Bool {
+        return ngsEditOverlayRedo(map.id) == 1
+    }
+    
+    public func save() -> Bool {
+        return ngsEditOverlaySave(map.id) == Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func cancel() -> Bool {
+        return ngsEditOverlayCancel(map.id) == Int32(COD_SUCCESS.rawValue)
+    }
+
+    public func createNewGeometry(in layer: Layer) -> Bool {
+        editLayer = layer
+        return ngsEditOverlayCreateGeometry(map.id, layer.layerH) ==
+            Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func editGeometry(of feature: Feature) -> Bool {
+        if let layer = map.getLayer(for: feature) {
+            editLayer = layer
+            return ngsEditOverlayEditGeometry(map.id, layer.layerH, feature.id) ==
+                Int32(COD_SUCCESS.rawValue)
+        }
+        return false
+    }
+
+    public func deleteEditedGeometry() -> Bool {
+        return ngsEditOverlayDeleteGeometry(map.id) == Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func addGeometryPart() -> Bool {
+        return ngsEditOverlayAddGeometryPart(map.id) == Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func deleteGeometryPart() -> Bool {
+        return ngsEditOverlayDeleteGeometryPart(map.id) == Int32(COD_SUCCESS.rawValue)
+    }
+
 }

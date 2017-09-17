@@ -337,7 +337,6 @@ extension MapView: GLKViewDelegate {
 
 extension MapView: CLLocationManagerDelegate {
     
-    
     public func locationManager(_ manager: CLLocationManager,
                          didUpdateLocations locations: [CLLocation])
     {
@@ -356,9 +355,14 @@ extension MapView: CLLocationManagerDelegate {
             if showLocation {
                 let position = transformFrom(gps: currentLocation!.coordinate.longitude,
                                              y: currentLocation!.coordinate.latitude)
-                map?.location(update: position, direction: Float(currentLocation!.course),
-                              accuracy: Float(currentLocation!.horizontalAccuracy))
-                draw(.PRESERVED)
+                
+                if let locationOverlay = map?.getOverlay(type: Map.OverlayType.LOCATION) as? LocationOverlay {
+                
+                    locationOverlay.location(update: position,
+                                             direction: Float(currentLocation!.course),
+                                             accuracy: Float(currentLocation!.horizontalAccuracy))
+                    draw(.PRESERVED)
+                }
             }
         
             printMessage("Location. Lat: \(currentLocation!.coordinate.latitude) Long:\(currentLocation!.coordinate.longitude) Alt:\(currentLocation!.altitude) Dir:\(currentLocation!.course), Accuracy: \(currentLocation!.horizontalAccuracy)")
