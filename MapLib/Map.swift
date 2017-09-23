@@ -531,8 +531,36 @@ public class EditOverlay : Overlay {
         return ngsEditOverlayAddGeometryPart(map.id) == Int32(COD_SUCCESS.rawValue)
     }
     
+    
+    /// Delete geometry part
+    ///
+    /// - Returns: true if last part was deleted, else false
     public func deleteGeometryPart() -> Bool {
-        return ngsEditOverlayDeleteGeometryPart(map.id) == Int32(COD_SUCCESS.rawValue)
+        return ngsEditOverlayDeleteGeometryPart(map.id) == 1
+    }
+    
+    public func touch(down x: Double, y: Double) -> (pointId: Int32, isHole: Bool) {
+        let touchPointStruct = ngsEditOverlayTouch(map.id, x, y, MTT_ON_DOWN)
+        let pointId = touchPointStruct.pointId
+        let isHole: Bool = touchPointStruct.isHole == 1
+        return (pointId: pointId, isHole: isHole)
     }
 
+    public func touch(up x: Double, y: Double) -> (pointId: Int32, isHole: Bool) {
+        let touchPointStruct = ngsEditOverlayTouch(map.id, x, y, MTT_ON_UP)
+        let pointId = touchPointStruct.pointId
+        let isHole: Bool = touchPointStruct.isHole == 1
+        return (pointId: pointId, isHole: isHole)
+    }
+    
+    public func touch(move x: Double, y: Double) -> (pointId: Int32, isHole: Bool) {
+        let touchPointStruct = ngsEditOverlayTouch(map.id, x, y, MTT_ON_MOVE)
+        let pointId = touchPointStruct.pointId
+        let isHole: Bool = touchPointStruct.isHole == 1
+        return (pointId: pointId, isHole: isHole)
+    }
+    
+    public func cross(visible: Bool) {
+        
+    }
 }

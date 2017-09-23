@@ -410,7 +410,7 @@ public class CoordinateTransformation {
     }
 }
 
-public struct Envelope {
+public struct Envelope : Equatable {
     public var minX: Double
     public var maxX: Double
     public var minY: Double
@@ -460,6 +460,11 @@ public struct Envelope {
             self.maxX = other.maxX
             self.maxY = other.maxY
         }
+    }
+    
+    public static func ==(lhs: Envelope, rhs: Envelope) -> Bool {
+        return lhs.maxX == rhs.maxX && lhs.maxY == rhs.maxY &&
+                lhs.minX == rhs.minX && lhs.minY == rhs.minY
     }
 }
 

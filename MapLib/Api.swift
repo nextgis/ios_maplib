@@ -79,7 +79,7 @@ public class API {
             "CACHE_DIR": cacheDir,
             "SETTINGS_DIR": settingsDir,
             "SSL_CERT_FILE": certFile,
-            "NUM_THREADS": "ALL_CPUS", // "4", //
+            "NUM_THREADS": "4", //"ALL_CPUS", // 
             "DEBUG_MODE": Constants.debugMode ? "ON" : "OFF"
         ]
         

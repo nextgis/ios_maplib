@@ -32,8 +32,18 @@ public protocol GestureDelegate: class {
     func onPinchGesture(sender: UIPinchGestureRecognizer)
 }
 
+
+/// To use location capabilities you need to add to the info.plist key 
+/// “Privacy - Location When In Use Usage Description” and value with description
+/// shown to end user in permissions dialog.
+
 public protocol LocationDelegate: class {
     func onLocationChanged(location: CLLocation)
+}
+
+public protocol MapViewDelegate: class {
+    func onMapDrawFinished()
+    func onMapDraw(percent: Double)
 }
 
 public class MapView: GLKView {
@@ -43,6 +53,7 @@ public class MapView: GLKView {
     var timerDrawState: Map.DrawState = .PRESERVED
     weak var gestureDelegate: GestureDelegate? = nil
     weak var locationDelegate: LocationDelegate? = nil
+    weak var mapViewDelegate: MapViewDelegate? = nil
     let locationManager = CLLocationManager()
     public var currentLocation: CLLocation? = nil
         
@@ -255,6 +266,10 @@ public class MapView: GLKView {
         locationDelegate = delegate
     }
     
+    public func registerView(_ delegate: MapViewDelegate) {
+        mapViewDelegate = delegate
+    }
+    
     func onDoubleTap(sender: UIGestureRecognizer) {
         if sender.state == UIGestureRecognizerState.ended {
             
@@ -311,13 +326,15 @@ public class MapView: GLKView {
 func drawingProgressFunc(code: ngsCode, percent: Double,
                          message: UnsafePointer<Int8>?,
                          progressArguments: UnsafeMutableRawPointer?) -> Int32 {
+    let view: MapView = bridge(ptr: progressArguments!)
     if(code == COD_FINISHED) {
+        view.mapViewDelegate?.onMapDrawFinished()
         return 1
     }
     
     if (progressArguments != nil) {
-        let view: MapView = bridge(ptr: progressArguments!)
         view.scheduleDraw(drawState: .PRESERVED) //display()
+        view.mapViewDelegate?.onMapDraw(percent: percent)
         return view.cancelDraw() ? 0 : 1
     }
     
