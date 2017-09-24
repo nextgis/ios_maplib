@@ -55,6 +55,7 @@ public class MapView: GLKView {
     weak var locationDelegate: LocationDelegate? = nil
     weak var mapViewDelegate: MapViewDelegate? = nil
     let locationManager = CLLocationManager()
+    
     public var currentLocation: CLLocation? = nil
         
     var showLocationVal: Bool = false
@@ -273,7 +274,7 @@ public class MapView: GLKView {
     func onDoubleTap(sender: UIGestureRecognizer) {
         if sender.state == UIGestureRecognizerState.ended {
             
-            let position = sender.location(in: sender.view)
+            let position = sender.location(in: self /*sender.view*/)
             let x = Double(position.x)
             let y = Double(position.y)
             
@@ -386,5 +387,95 @@ extension MapView: CLLocationManagerDelegate {
         
             locationDelegate?.onLocationChanged(location: currentLocation!)
         }
+    }
+}
+
+public class MapViewEdit : MapView {
+    
+    var editMode: Bool = false
+    var editOverlay: EditOverlay? = nil
+    var editMoveSelectedPoint: Bool = false
+    var beginTouchLocation: CGPoint? = nil
+    
+    public var isEditMode: Bool {
+        get {
+            return editMode
+        }
+        
+        set {
+            editMode = newValue
+            if(editMode) {
+                editOverlay?.visible = true
+            }
+            else {
+                editOverlay?.visible = false
+            }
+        }
+    }
+    
+    override public func setMap(map: Map) {
+        super.setMap(map: map)
+        editOverlay = map.getOverlay(type: .EDIT) as? EditOverlay
+    }
+    
+    override public func onPanGesture(sender: UIPanGestureRecognizer) {
+
+        if(editMode) {
+            if sender.state == .began {
+                let x = Double(beginTouchLocation?.x ?? 10000.0)
+                let y = Double(beginTouchLocation?.y ?? 10000.0)
+                printMessage("Edit mode begin pan x: \(x), y: \(y)")
+                if let touchResult = editOverlay?.touch(down: x, y: y) {
+                    editMoveSelectedPoint = touchResult.pointId != -1
+                }
+            } else if sender.state == .changed {
+                printMessage("Edit mode changed pan")
+                if editMoveSelectedPoint {
+                    let position = sender.location(in: self)
+                    let x = Double(position.x)
+                    let y = Double(position.y)
+                    
+                    _ = editOverlay?.touch(move: x, y: y)
+                    draw(.PRESERVED)
+                }
+            } else if sender.state == .ended {
+                printMessage("Edit mode ended pan")
+                if editMoveSelectedPoint {
+                    let position = sender.location(in: self)
+                    let x = Double(position.x)
+                    let y = Double(position.y)
+                    
+                    _ = editOverlay?.touch(up: x, y: y)
+                    draw(.PRESERVED)
+                    editMoveSelectedPoint = false
+                    
+                    gestureDelegate?.onPanGesture(sender: sender)
+                    return
+                }
+            }
+        }
+        
+        if !editMoveSelectedPoint {
+            printMessage("Not edit mode")
+            let translation = sender.translation(in: self)
+            
+            let x = Double(translation.x)
+            let y = Double(translation.y)
+            pan(w: x, h: y)
+            sender.setTranslation(CGPoint(x: 0.0, y: 0.0), in: self)
+        }
+        
+        gestureDelegate?.onPanGesture(sender: sender)
+    }
+    
+    override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if let touch: UITouch = touches.first {
+        
+            if (touch.view == self) {
+                beginTouchLocation = touch.location(in: self)
+            }
+        }
+        
+        super.touchesBegan(touches, with: event)
     }
 }

@@ -560,6 +560,13 @@ public class EditOverlay : Overlay {
         return (pointId: pointId, isHole: isHole)
     }
     
+    public func touch(single x: Double, y: Double) -> (pointId: Int32, isHole: Bool) {
+        let touchPointStruct = ngsEditOverlayTouch(map.id, x, y, MTT_SINGLE)
+        let pointId = touchPointStruct.pointId
+        let isHole: Bool = touchPointStruct.isHole == 1
+        return (pointId: pointId, isHole: isHole)
+    }
+    
     public func cross(visible: Bool) {
         
     }
