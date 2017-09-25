@@ -383,6 +383,7 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
     private var fieldControlMap: [Int32: UITextField] = [:]
     weak var attachments: UIView!
     weak var bottomAttribute: NSLayoutConstraint? = nil
+    public var hasEdits: Bool = false
     
     public override func fill(feature: Feature) {
         if let fc = feature.featureClass {
@@ -422,6 +423,10 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
         }
     }
     
+    func textFieldDidChange(_ textField: UITextField) {
+        hasEdits = true
+    }
+    
     public func addFieldEdit(_ feature: Feature, _ field: Field, _ pos: Int32) {
         addFieldNameLabel(field)
         
@@ -432,6 +437,7 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
         tv.textColor = textColor
         tv.font = UIFont.systemFont(ofSize: textSize)
         tv.borderStyle = .roundedRect
+        tv.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
         
         
         let value = feature.getField(asString: pos)

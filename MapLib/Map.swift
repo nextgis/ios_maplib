@@ -500,8 +500,12 @@ public class EditOverlay : Overlay {
         return ngsEditOverlayRedo(map.id) == 1
     }
     
-    public func save() -> Bool {
-        return ngsEditOverlaySave(map.id) == Int32(COD_SUCCESS.rawValue)
+    public func save() -> Feature? {
+        if let feature = ngsEditOverlaySave(map.id) {
+            return Feature(handle: feature,
+                           featureClass: editLayer?.dataSource as? FeatureClass)
+        }
+        return nil
     }
     
     public func cancel() -> Bool {
