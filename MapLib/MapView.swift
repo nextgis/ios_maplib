@@ -485,4 +485,33 @@ public class MapViewEdit : MapView {
             draw(.PRESERVED)
         }
     }
+    
+    public func addGeometryPart() {
+        if editOverlay?.addGeometryPart() ?? false {
+            draw(.PRESERVED)
+        }
+    }
+    
+    public func addGeometryPoint() {
+        if editOverlay?.addGeometryPoint() ?? false {
+            draw(.PRESERVED)
+        }
+    }
+    
+    /// Deletes selected geometry part
+    ///
+    /// - Returns: true if last part was deleted, else false
+    public func deleteGeometryPart() -> Bool {
+        let result = editOverlay?.deleteGeometryPart() ?? false
+        draw(.PRESERVED)
+        return result
+    }
+    
+    public func deleteGeometryPoint() {
+        if editOverlay?.deleteGeometryPoint() ?? false {
+            draw(.PRESERVED)
+        }
+    }
+    
+    
 }

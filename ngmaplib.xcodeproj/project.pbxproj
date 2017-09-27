@@ -13,6 +13,8 @@
 		354A8DC91F0869F800113CA5 /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 354A8DC81F0869F800113CA5 /* Auth.swift */; };
 		355FB9B01F1F8B1B008D26D7 /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 355FB9AF1F1F8B1B008D26D7 /* Store.swift */; };
 		356066BE1F2E6A6300D2EF59 /* Json.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356066BD1F2E6A6300D2EF59 /* Json.swift */; };
+		3560B1C61F7BB8FC0046EE85 /* TimeIntervalControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3560B1C51F7BB8FC0046EE85 /* TimeIntervalControl.swift */; };
+		3560B1C81F7BB9380046EE85 /* RadioGroupControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3560B1C71F7BB9380046EE85 /* RadioGroupControl.swift */; };
 		356511BF1F3C471000AC46B2 /* AttributesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356511BE1F3C471000AC46B2 /* AttributesView.swift */; };
 		356511D71F488DCC00AC46B2 /* ComboBoxControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356511D61F488DCC00AC46B2 /* ComboBoxControl.swift */; };
 		356511D91F48910700AC46B2 /* SizeControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356511D81F48910700AC46B2 /* SizeControl.swift */; };
@@ -44,6 +46,8 @@
 		354A8DC81F0869F800113CA5 /* Auth.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
 		355FB9AF1F1F8B1B008D26D7 /* Store.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		356066BD1F2E6A6300D2EF59 /* Json.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Json.swift; sourceTree = "<group>"; };
+		3560B1C51F7BB8FC0046EE85 /* TimeIntervalControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeIntervalControl.swift; sourceTree = "<group>"; };
+		3560B1C71F7BB9380046EE85 /* RadioGroupControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioGroupControl.swift; sourceTree = "<group>"; };
 		356511BE1F3C471000AC46B2 /* AttributesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AttributesView.swift; sourceTree = "<group>"; };
 		356511D61F488DCC00AC46B2 /* ComboBoxControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComboBoxControl.swift; sourceTree = "<group>"; };
 		356511D81F48910700AC46B2 /* SizeControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SizeControl.swift; sourceTree = "<group>"; };
@@ -106,6 +110,8 @@
 				356511D61F488DCC00AC46B2 /* ComboBoxControl.swift */,
 				356511D81F48910700AC46B2 /* SizeControl.swift */,
 				356511DA1F48946C00AC46B2 /* ColorControl.swift */,
+				3560B1C51F7BB8FC0046EE85 /* TimeIntervalControl.swift */,
+				3560B1C71F7BB9380046EE85 /* RadioGroupControl.swift */,
 			);
 			name = control;
 			sourceTree = "<group>";
@@ -294,6 +300,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				35F1D34E1F015AC2005114E2 /* MapView.swift in Sources */,
+				3560B1C61F7BB8FC0046EE85 /* TimeIntervalControl.swift in Sources */,
 				356066BE1F2E6A6300D2EF59 /* Json.swift in Sources */,
 				353675FF1EF9270A00C7B846 /* Common.swift in Sources */,
 				35D46B8D1EEF5D4D00024E7E /* Api.swift in Sources */,
@@ -307,6 +314,7 @@
 				356511BF1F3C471000AC46B2 /* AttributesView.swift in Sources */,
 				353676011EF9277500C7B846 /* Url.swift in Sources */,
 				354A8DC91F0869F800113CA5 /* Auth.swift in Sources */,
+				3560B1C81F7BB9380046EE85 /* RadioGroupControl.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -535,6 +535,13 @@ public class EditOverlay : Overlay {
         return ngsEditOverlayAddGeometryPart(map.id) == Int32(COD_SUCCESS.rawValue)
     }
     
+    public func addGeometryPoint() -> Bool {
+        return ngsEditOverlayAddPoint(map.id) == Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func deleteGeometryPoint() -> Bool {
+        return ngsEditOverlayDeletePoint(map.id) == Int32(COD_SUCCESS.rawValue)
+    }
     
     /// Delete geometry part
     ///
