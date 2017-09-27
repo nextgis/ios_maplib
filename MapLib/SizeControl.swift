@@ -149,7 +149,7 @@ import UIKit
         setupControls()
     }
     
-    func onValueChacnged(sender: UISlider) {
+    func onValueChanged(sender: UISlider) {
         value.text = "\(Int(slider.value))"
         sendActions(for: .valueChanged)
     }
@@ -176,7 +176,7 @@ import UIKit
         
         slider = UISlider()
         slider.translatesAutoresizingMaskIntoConstraints = false
-        slider.addTarget(self, action: #selector(onValueChacnged), for: .valueChanged)
+        slider.addTarget(self, action: #selector(onValueChanged), for: .valueChanged)
         
         addSubview(slider)
         
