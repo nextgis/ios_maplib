@@ -71,24 +71,26 @@ public class Object {
         }
     }
     
-    public var metadata: [String: String] {
-        get {
-            if let rawArray = ngsCatalogObjectMetadata(object, "user") {
-                var count = 0
-                var out: [String: String] = [:]
-                while(rawArray[count] != nil) {
-                    let metadataItem = String(cString: rawArray[count]!)
-                    if let splitIndex = metadataItem.characters.index(of: "=") {
-                        let key = metadataItem.substring(to: splitIndex)
-                        let value = metadataItem.substring(from: metadataItem.index(splitIndex, offsetBy: 1))
-                        out[key] = value
-                    }
-                    count += 1
+    public func getMetadata(for domain: String) -> [String: String] {
+        if let rawArray = ngsCatalogObjectMetadata(object, domain) {
+            var count = 0
+            var out: [String: String] = [:]
+            while(rawArray[count] != nil) {
+                let metadataItem = String(cString: rawArray[count]!)
+                if let splitIndex = metadataItem.characters.index(of: "=") {
+                    let key = metadataItem.substring(to: splitIndex)
+                    let value = metadataItem.substring(from: metadataItem.index(splitIndex, offsetBy: 1))
+                    out[key] = value
                 }
-                return out
+                count += 1
             }
-            return [:]
+            return out
         }
+        return [:]
+    }
+    
+    public func setMetadata(item name: String, value: String, domain: String) -> Bool {
+        return ngsCatalogObjectSetMetadataItem(object, name, value, domain) == Int32(COD_SUCCESS.rawValue)
     }
     
     init(name: String, type: Int, path: String, object: CatalogObjectH) {
