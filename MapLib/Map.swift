@@ -417,6 +417,30 @@ public class Overlay {
             ngsOverlaySetVisible(map.id, Int32(type.rawValue), newValue ? 1 : 0)
         }
     }
+    
+    public var options: [String:String] {
+        get {
+            if let rawOptions = ngsOverlayGetOptions(map.id, ngsMapOverlayType(type.rawValue)) {
+                var count = 0
+                var out: [String: String] = [:]
+                while(rawOptions[count] != nil) {
+                    let optionItem = String(cString: rawOptions[count]!)
+                    if let splitIndex = optionItem.characters.index(of: "=") {
+                        let key = optionItem.substring(to: splitIndex)
+                        let value = optionItem.substring(from: optionItem.index(splitIndex, offsetBy: 1))
+                        out[key] = value
+                    }
+                    count += 1
+                }
+                return out
+            }
+            return [:]
+        }
+        set {
+            _ = ngsOverlaySetOptions(map.id, ngsMapOverlayType(type.rawValue),
+                                     toArrayOfCStrings(newValue))
+        }
+    }
 }
 
 public class LocationOverlay : Overlay {
@@ -474,6 +498,16 @@ public class EditOverlay : Overlay {
         }
     }
     
+    public var crossStyle: JsonObject {
+        get {
+            return JsonObject(handle: ngsEditOverlayGetStyle(map.id, EST_CROSS))
+        }
+        
+        set {
+            ngsEditOverlaySetStyle(map.id, EST_CROSS, newValue.handle)
+        }
+    }
+    
     public func setStyle(point name: String) -> Bool {
         return ngsEditOverlaySetStyleName(map.id, EST_POINT, name) ==
             Int32(COD_SUCCESS.rawValue)
@@ -481,6 +515,11 @@ public class EditOverlay : Overlay {
     
     public func setStyle(line name: String) -> Bool {
         return ngsEditOverlaySetStyleName(map.id, EST_POINT, name) ==
+            Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func setStyle(cross name: String) -> Bool {
+        return ngsEditOverlaySetStyleName(map.id, EST_CROSS, name) ==
             Int32(COD_SUCCESS.rawValue)
     }
     
