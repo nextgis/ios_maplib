@@ -266,10 +266,11 @@ public class Map {
                     if let ds = layer.dataSource as? FeatureClass {
                         var lf: [Feature] = []
                         for feature in features {
-                            if ds.path == feature.featureClass?.path {
+                            if ds.path == feature.table?.path {
                                 lf.append(feature)
-                                let geomEnvelope = feature.geometry.envelope
-                                env.merge(other: geomEnvelope)
+                                if let geomEnvelope = feature.geometry?.envelope {
+                                    env.merge(other: geomEnvelope)
+                                }
                             }
                         }
                         layer.select(features: lf)
@@ -287,7 +288,7 @@ public class Map {
         for index in 0..<layerCount {
             if let layer = getLayer(by: index) {
                 if let ds = layer.dataSource as? FeatureClass {
-                    if ds.path == feature.featureClass?.path {
+                    if ds.path == feature.table?.path {
                         return layer
                     }
                 }
@@ -542,7 +543,7 @@ public class EditOverlay : Overlay {
     public func save() -> Feature? {
         if let feature = ngsEditOverlaySave(map.id) {
             return Feature(handle: feature,
-                           featureClass: editLayer?.dataSource as? FeatureClass)
+                           table: editLayer?.dataSource as? FeatureClass)
         }
         return nil
     }

@@ -120,6 +120,7 @@ public class Object {
         if let queryResult = ngsCatalogObjectQuery(object, 0) { // TODO: Add filter support
             var count: Int = 0
             while (queryResult[count].name != nil) {
+//                printMessage("Name \(String(cString: queryResult[count].name)) in folder \(name)")
                 out.append(Object(name: String(cString: queryResult[count].name),
                                   type: Int(queryResult[count].type),
                                   path: path + Catalog.separator + String(cString: queryResult[count].name),
@@ -134,8 +135,7 @@ public class Object {
     }
     
     public func child(name: String) -> Object? {
-        let childrenArray = children()
-        for childItem in childrenArray {
+        for childItem in children() {
             if childItem.name == name {
                 return childItem
             }
@@ -248,6 +248,20 @@ public class Object {
     
     public static func isContainer(_ type: Int) -> Bool {
         return type >= 50 && type <= 499
+    }
+    
+    public static func forceChildTo(table: Object) -> Table? {
+        if isTable(table.type) {
+            return Table(copyFrom: table)
+        }
+        return nil
+    }
+    
+    public static func forceChildTo(featureClass: Object) -> FeatureClass? {
+        if isFeatureClass(featureClass.type) {
+            return FeatureClass(copyFrom: featureClass)
+        }
+        return nil
     }
 }
 

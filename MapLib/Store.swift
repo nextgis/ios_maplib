@@ -50,13 +50,34 @@ public class Store: Object {
         
         return nil
     }
+    
+    public func createTable(name: String, fields: [Field],
+                            options: [String: String]) -> Table? {
+        
+        var fullOptions = options
+        fullOptions["TYPE"] = "\(CAT_TABLE_GPKG.rawValue)"
+        fullOptions["FIELD_COUNT"] = "\(fields.count)"
+        for index in 0..<fields.count {
+            fullOptions["FIELD_\(index)_TYPE"] = Field.fieldTypeToName(fields[index].type)
+            fullOptions["FIELD_\(index)_NAME"] = fields[index].name
+            fullOptions["FIELD_\(index)_ALIAS"] = fields[index].alias
+        }
+        
+        if ngsCatalogObjectCreate(object, name, toArrayOfCStrings(fullOptions)) ==
+            Int32(COD_SUCCESS.rawValue) {
+            if let tableObject = child(name: name) {
+                return Table(copyFrom: tableObject)
+            }
+        }
+        
+        return nil
+    }
 
 }
 
-public class FeatureClass: Object {
+public class Table: Object {
     public var fields: [Field] = []
-    public let geometryType: GeometryType
-    
+
     var batchModeValue = false
     public var batchMode: Bool {
         get {
@@ -74,13 +95,7 @@ public class FeatureClass: Object {
         }
     }
     
-    public enum GeometryType: Int32 {
-        case NONE = 0, POINT, LINESTRING, POLYGON, MULTIPOINT, MULTILINESTRING, MULTIPOLYGON
-    }
-    
     override init(copyFrom: Object) {
-        geometryType = GeometryType(rawValue:
-            Int32(ngsFeatureClassGeometryType(copyFrom.object)))!
         
         // Add fields
         if let fieldsList = ngsFeatureClassFields(copyFrom.object) {
@@ -90,7 +105,7 @@ public class FeatureClass: Object {
                 let fAlias = String(cString: fieldsList[count].alias)
                 let fType = Field.FieldType(rawValue: fieldsList[count].type)
                 
-                printMessage("Add field - name: \(fName), alias: \(fAlias), type: \(fType ?? Field.FieldType.UNKNOWN) to '\(copyFrom.name)'")
+                // printMessage("Add field - name: \(fName), alias: \(fAlias), type: \(fType ?? Field.FieldType.UNKNOWN) to '\(copyFrom.name)'")
                 
                 let fieldValue = Field(name: fName, alias: fAlias, type: fType!)
                 fields.append(fieldValue)
@@ -98,6 +113,89 @@ public class FeatureClass: Object {
             }
             ngsFree(fieldsList)
         }
+        
+        super.init(copyFrom: copyFrom)
+    }
+    
+    public func createFeature() -> Feature? {
+        if let handle = ngsFeatureClassCreateFeature(object) {
+            return Feature(handle: handle, table: self)
+        }
+        return nil
+    }
+
+    
+    public func insertFeature(_ feature: Feature) -> Bool {
+        return ngsFeatureClassInsertFeature(object, feature.handle) ==
+            Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func updateFeature(_ feature: Feature) -> Bool {
+        return ngsFeatureClassUpdateFeature(object, feature.handle) ==
+            Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func deleteFeature(id: Int64) -> Bool {
+        return ngsFeatureClassDeleteFeature(object, id) ==
+            Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func deleteFeature(feature: Feature) -> Bool {
+        return ngsFeatureClassDeleteFeature(object, feature.id) ==
+            Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func deleteFeatures() -> Bool {
+        return ngsFeatureClassDeleteFeatures(object) == Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func reset() {
+        ngsFeatureClassResetReading(object)
+    }
+    
+    public func nextFeature() -> Feature? {
+        if let handle = ngsFeatureClassNextFeature(object) {
+            return Feature(handle: handle, table: self)
+        }
+        return nil
+    }
+    
+    public func getFeature(index: Int64) -> Feature? {
+        if let handle = ngsFeatureClassGetFeature(object, index) {
+            return Feature(handle: handle, table: self)
+        }
+        return nil
+    }
+    
+    public func getFeature(remoteId: Int64) -> Feature? {
+        if let handle = ngsStoreFeatureClassGetFeatureByRemoteId(object, remoteId) {
+            return Feature(handle: handle, table: self)
+        }
+        return nil
+    }
+    
+    public func fieldIndexAndType(by name: String) -> (index: Int32, type: Field.FieldType) {
+        var count: Int32 = 0
+        for field in fields {
+            if field.name == name {
+                return (count, field.type)
+            }
+            count += 1
+        }
+        return (-1, Field.FieldType.UNKNOWN)
+    }
+}
+
+public class FeatureClass: Table {
+    public let geometryType: GeometryType
+    
+    public enum GeometryType: Int32 {
+        case NONE = 0, POINT, LINESTRING, POLYGON, MULTIPOINT, MULTILINESTRING, MULTIPOLYGON
+    }
+    
+    override init(copyFrom: Object) {
+        geometryType = GeometryType(rawValue:
+            Int32(ngsFeatureClassGeometryType(copyFrom.object)))!
         
         super.init(copyFrom: copyFrom)
     }
@@ -121,13 +219,12 @@ public class FeatureClass: Object {
         }
     }
     
-    public func createFeature() -> Feature {
-        return Feature(handle: ngsFeatureClassCreateFeature(object))
-    }
-    
     public func createOverviews(force: Bool, zoomLevels: [Int8],
                                 callback: (func: ngstore.ngsProgressFunc,
         data: UnsafeMutableRawPointer)? = nil) -> Bool {
+        
+        printMessage("create overviews: \(zoomLevels)")
+        
         var zoomLevelsValue = ""
         for zoomLevel in zoomLevels {
             if(!zoomLevelsValue.isEmpty) {
@@ -143,66 +240,6 @@ public class FeatureClass: Object {
                                               callback == nil ? nil : callback!.func,
                                               callback == nil ? nil : callback!.data) ==
             Int32(COD_SUCCESS.rawValue)
-    }
-    
-    public func insertFeature(_ feature: Feature) -> Bool {
-        return ngsFeatureClassInsertFeature(object, feature.handle) ==
-            Int32(COD_SUCCESS.rawValue)
-    }
-    
-    public func updateFeature(_ feature: Feature) -> Bool {
-        return ngsFeatureClassUpdateFeature(object, feature.handle) ==
-            Int32(COD_SUCCESS.rawValue)
-    }
-    
-    public func deleteFeature(id: Int64) -> Bool {
-        return ngsFeatureClassDeleteFeature(object, id) ==
-            Int32(COD_SUCCESS.rawValue)
-    }
-
-    public func deleteFeature(feature: Feature) -> Bool {
-        return ngsFeatureClassDeleteFeature(object, feature.id) ==
-            Int32(COD_SUCCESS.rawValue)
-    }
-    
-    public func deleteFeatures() -> Bool {
-        return ngsFeatureClassDeleteFeatures(object) == Int32(COD_SUCCESS.rawValue)
-    }
-    
-    public func reset() {
-        ngsFeatureClassResetReading(object)
-    }
-    
-    public func nextFeature() -> Feature? {
-        if let handle = ngsFeatureClassNextFeature(object) {
-            return Feature(handle: handle, featureClass: self)
-        }
-        return nil
-    }
-    
-    public func getFeature(index: Int64) -> Feature? {
-        if let handle = ngsFeatureClassGetFeature(object, index) {
-            return Feature(handle: handle, featureClass: self)
-        }
-        return nil
-    }
-    
-    public func getFeature(remoteId: Int64) -> Feature? {
-        if let handle = ngsStoreFeatureClassGetFeatureByRemoteId(object, remoteId) {
-            return Feature(handle: handle, featureClass: self)
-        }
-        return nil
-    }
-    
-    public func fieldIndexAndType(by name: String) -> (index: Int32, type: Field.FieldType) {
-        var count: Int32 = 0
-        for field in fields {
-            if field.name == name {
-                return (count, field.type)
-            }
-            count += 1
-        }
-        return (-1, Field.FieldType.UNKNOWN)
     }
     
     public func clearFilters() -> Bool {
@@ -231,19 +268,29 @@ public class FeatureClass: Object {
 
 public class Feature {
     let handle: FeatureH!
-    public let featureClass: FeatureClass?
+    public let table: Table?
     public var id: Int64 {
         get {
             return ngsFeatureGetId(handle)
         }
     }
     
-    public var geometry: Geometry {
+    public var geometry: Geometry? {
         get {
-            return Geometry(handle: ngsFeatureGetGeometry(handle))
+            if let handle = ngsFeatureGetGeometry(handle) {
+                return Geometry(handle: handle)
+            }
+            else {
+                return nil
+            }
         }
         set(value) {
-            ngsFeatureSetGeometry(handle, value.handle)
+            if table is FeatureClass && value != nil {
+                ngsFeatureSetGeometry(handle, value!.handle)
+            }
+            else {
+                printError("This is not Feature class. Don't add geometry")
+            }
         }
     }
     
@@ -256,9 +303,9 @@ public class Feature {
         }
     }
     
-    init(handle: FeatureH, featureClass: FeatureClass? = nil) {
+    init(handle: FeatureH, table: Table? = nil) {
         self.handle = handle
-        self.featureClass = featureClass
+        self.table = table
     }
     
     deinit {
@@ -338,8 +385,11 @@ public class Feature {
         return Geometry(handle: ngsFeatureCreateGeometryFromJson(json.handle))
     }
     
-    public func createGeometry() -> Geometry {
-        return Geometry(handle: ngsFeatureCreateGeometry(handle))
+    public func createGeometry() -> Geometry? {
+        if table is FeatureClass {
+            return Geometry(handle: ngsFeatureCreateGeometry(handle))
+        }
+        return nil
     }
     
     public func getAttachments() -> [Attachment] {
@@ -383,7 +433,7 @@ public class Feature {
     }
     
     public func delete() -> Bool {
-        return featureClass?.deleteFeature(id: id) ?? false
+        return table?.deleteFeature(id: id) ?? false
     }
 }
 

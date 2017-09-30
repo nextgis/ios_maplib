@@ -62,7 +62,7 @@ public class AttributesView: UIScrollView {
             subview.removeFromSuperview()
         }
         
-        if let fc = feature.featureClass {
+        if let fc = feature.table {
             if isSectionUppercased {
                 addSection("Attributes".localized.uppercased())
             }
@@ -386,7 +386,7 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
     public var hasEdits: Bool = false
     
     public override func fill(feature: Feature) {
-        if let fc = feature.featureClass {
+        if let fc = feature.table {
             if isSectionUppercased {
                 addSection("Attributes".localized.uppercased())
             }
@@ -694,7 +694,7 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
     }
     
     public func save(feature: Feature) -> Bool {
-        if let fc = feature.featureClass {
+        if let fc = feature.table {
             // Update fields
             
             let fields = fc.fields
