@@ -60,6 +60,18 @@ public class Request {
         return (result.status, outStr)
     }
     
+    public static func post(url: String, payload: String, options: [String: String]? = nil) -> (status: Int, value: String) {
+        var fullOptions = options ?? [:]
+        fullOptions["POSTFIELDS"] = payload
+        let result = API.instance.URLRequest(
+            method: ngsURLRequestType(requestType.POST.rawValue),
+            url: url, options: fullOptions)
+        
+        
+        let outStr = String(cString: result.data ?? [0])
+        return (result.status, outStr)
+    }
+    
     public static func getJson(url: String, options: [String: String]? = nil) -> (status: Int, value: Any?) {
         let result = API.instance.URLRequest(
             method: ngsURLRequestType(requestType.GET.rawValue),

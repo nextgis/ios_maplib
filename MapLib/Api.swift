@@ -175,13 +175,13 @@ public class API {
     /// - Returns: result structure with return code and raw data buffer
     func URLRequest(method: ngsURLRequestType, url: String, options: [String: String]? = nil) ->
         (status: Int, data: [UInt8]?){
-            if let requestResultPtr = ngsURLRequest(method, url,
-                                                    toArrayOfCStrings(options)) {
+        if let requestResultPtr = ngsURLRequest(method, url,
+                                                toArrayOfCStrings(options)) {
             let requestResult = requestResultPtr.pointee
             let status = Int(requestResult.status)
             
             if requestResult.dataLen == 0 {
-                return (543, nil)
+                return (status, nil)
             }
                
             let buffer = [UInt8](repeating: 0, count: Int(requestResult.dataLen + 1))
@@ -189,7 +189,6 @@ public class API {
             printMessage("Get \(requestResult.dataLen) data")
                 
             ngsURLRequestResultFree(requestResultPtr)
-                
                 
             return (status, buffer)
         }
@@ -241,10 +240,11 @@ public class API {
                 "TYPE" : "\(CAT_CONTAINER_NGS.rawValue)",
                 "CREATE_UNIQUE": "OFF"
             ]
-            store = geodataDir?.create(name: name, options: options)
+            store = geodataDir?.create(name: newName, options: options)
         }
         
         if store == nil {
+            printError("Store is nil")
             return nil
         }
         
