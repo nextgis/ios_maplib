@@ -108,6 +108,16 @@ public class MapView: GLKView {
         }
     }
     
+    public var mapExtent: Envelope {
+        get {
+            return map?.extent ?? Envelope()
+        }
+        
+        set(newExtent) {
+            map?.extent = newExtent
+        }
+    }
+    
     override init(frame: CGRect)
     {
         super.init(frame: frame, context: EAGLContext(api: .openGLES2))
@@ -501,17 +511,33 @@ public class MapViewEdit : MapView {
     /// Deletes selected geometry part
     ///
     /// - Returns: true if last part was deleted, else false
-    public func deleteGeometryPart() -> Bool {
-        let result = editOverlay?.deleteGeometryPart() ?? false
+    public func deleteGeometryPart() -> EditOverlay.DeleteResultType {
+        let result = editOverlay?.deleteGeometryPart() ?? .NON_LAST
         draw(.PRESERVED)
         return result
     }
     
-    public func deleteGeometryPoint() {
-        if editOverlay?.deleteGeometryPoint() ?? false {
+    public func deleteGeometryPoint() -> EditOverlay.DeleteResultType {
+        let result = editOverlay?.deleteGeometryPoint() ?? .NON_LAST
+        draw(.PRESERVED)
+        return result
+    }
+    
+    public func deleteGeometry() {
+        if editOverlay?.deleteGeometry() ?? false {
             draw(.PRESERVED)
         }
     }
     
+    public func addGeometryHole() {
+        if editOverlay?.addGeometryHole() ?? false {
+            draw(.PRESERVED)
+        }
+    }
     
+    public func deleteGeometryHole() -> EditOverlay.DeleteResultType {
+        let result = editOverlay?.deleteGeometryHole() ?? .NON_LAST
+        draw(.PRESERVED)
+        return result
+    }
 }

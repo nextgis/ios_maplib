@@ -76,6 +76,17 @@ public class Map {
         }
     }
     
+    public var extent: Envelope {
+        get {
+            let env = ngsMapGetExtent(id, Constants.Map.epsg)
+            return Envelope(envelope: env)
+        }
+        
+        set {
+            ngsMapSetExtent(id, newValue.extent)
+        }
+    }
+    
     public enum OverlayType: UInt32 {
         case UNKNOWN
         case LOCATION
@@ -475,6 +486,29 @@ public class EditOverlay : Overlay {
     
     public var editLayer: Layer? = nil
     
+    public enum DeleteResultType: UInt32 {
+        case NON_LAST
+        case LINE
+        case HOLE
+        case GEOMETRY_PART
+        case GEOMETRY
+        
+        public var rawValue: UInt32 {
+            switch self {
+            case .NON_LAST:
+                return EDT_NON_LAST.rawValue
+            case .LINE:
+                return EDT_LINE.rawValue
+            case .HOLE:
+                return EDT_HOLE.rawValue
+            case .GEOMETRY_PART:
+                return EDT_GEOMETRY_PART.rawValue
+            case .GEOMETRY:
+                return EDT_GEOMETRY.rawValue
+            }
+        }
+    }
+    
     fileprivate init(map: Map) {
         super.init(map: map, type: .EDIT)
     }
@@ -498,6 +532,16 @@ public class EditOverlay : Overlay {
             ngsEditOverlaySetStyle(map.id, EST_LINE, newValue.handle)
         }
     }
+
+    public var fillStyle: JsonObject {
+        get {
+            return JsonObject(handle: ngsEditOverlayGetStyle(map.id, EST_FILL))
+        }
+        
+        set {
+            ngsEditOverlaySetStyle(map.id, EST_FILL, newValue.handle)
+        }
+    }
     
     public var crossStyle: JsonObject {
         get {
@@ -509,13 +553,38 @@ public class EditOverlay : Overlay {
         }
     }
     
+    public var geometry: Geometry? {
+        get {
+            if let handle = ngsEditOverlayGetGeometry(map.id) {
+                return Geometry(handle: handle)
+            }
+            return nil
+        }
+    }
+    
+    public var geometryType: Geometry.GeometryType {
+        get {
+            if editLayer != nil {
+                if let ds = editLayer?.dataSource as? FeatureClass {
+                    return ds.geometryType
+                }
+            }
+            return .NONE
+        }
+    }
+    
     public func setStyle(point name: String) -> Bool {
         return ngsEditOverlaySetStyleName(map.id, EST_POINT, name) ==
             Int32(COD_SUCCESS.rawValue)
     }
     
     public func setStyle(line name: String) -> Bool {
-        return ngsEditOverlaySetStyleName(map.id, EST_POINT, name) ==
+        return ngsEditOverlaySetStyleName(map.id, EST_LINE, name) ==
+            Int32(COD_SUCCESS.rawValue)
+    }
+
+    public func setStyle(fill name: String) -> Bool {
+        return ngsEditOverlaySetStyleName(map.id, EST_FILL, name) ==
             Int32(COD_SUCCESS.rawValue)
     }
     
@@ -554,7 +623,13 @@ public class EditOverlay : Overlay {
 
     public func createNewGeometry(in layer: Layer) -> Bool {
         editLayer = layer
-        return ngsEditOverlayCreateGeometry(map.id, layer.layerH) ==
+        return ngsEditOverlayCreateGeometryInLayer(map.id, layer.layerH) ==
+            Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func createNewGeometry(of type: Geometry.GeometryType) -> Bool {
+        editLayer = nil
+        return ngsEditOverlayCreateGeometry(map.id, ngsGeometryType(type.rawValue)) ==
             Int32(COD_SUCCESS.rawValue)
     }
     
@@ -567,7 +642,7 @@ public class EditOverlay : Overlay {
         return false
     }
 
-    public func deleteEditedGeometry() -> Bool {
+    public func deleteGeometry() -> Bool {
         return ngsEditOverlayDeleteGeometry(map.id) == Int32(COD_SUCCESS.rawValue)
     }
     
@@ -579,15 +654,29 @@ public class EditOverlay : Overlay {
         return ngsEditOverlayAddPoint(map.id) == Int32(COD_SUCCESS.rawValue)
     }
     
-    public func deleteGeometryPoint() -> Bool {
-        return ngsEditOverlayDeletePoint(map.id) == Int32(COD_SUCCESS.rawValue)
+    public func deleteGeometryPoint() -> DeleteResultType {
+        return EditOverlay.DeleteResultType(
+            rawValue: UInt32(ngsEditOverlayDeletePoint(map.id).rawValue)) ??
+            .NON_LAST
     }
     
     /// Delete geometry part
     ///
-    /// - Returns: true if last part was deleted, else false
-    public func deleteGeometryPart() -> Bool {
-        return ngsEditOverlayDeleteGeometryPart(map.id) == 1
+    /// - Returns: The value of type enum DeleteResultType
+    public func deleteGeometryPart() -> DeleteResultType {
+        return EditOverlay.DeleteResultType(
+            rawValue: UInt32(ngsEditOverlayDeleteGeometryPart(map.id).rawValue)) ??
+            .NON_LAST
+    }
+    
+    public func addGeometryHole() -> Bool {
+        return ngsEditOverlayAddHole(map.id) == Int32(COD_SUCCESS.rawValue)
+    }
+
+    public func deleteGeometryHole() -> DeleteResultType {
+        return EditOverlay.DeleteResultType(
+            rawValue: UInt32(ngsEditOverlayDeleteHole(map.id).rawValue)) ??
+            .NON_LAST
     }
     
     public func touch(down x: Double, y: Double) -> (pointId: Int32, isHole: Bool) {

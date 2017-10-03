@@ -27,12 +27,12 @@ public class Store: Object {
     public static let ext = ".ngst"
     
     public func createFeatureClass(name: String,
-                                   geometryType: FeatureClass.GeometryType,
+                                   geometryType: Geometry.GeometryType,
                                    fields: [Field],
                                    options: [String: String]) -> FeatureClass? {
         
         var fullOptions = options
-        fullOptions["GEOMETRY_TYPE"] = FeatureClass.geometryTypeToName(geometryType)
+        fullOptions["GEOMETRY_TYPE"] = Geometry.geometryTypeToName(geometryType)
         fullOptions["TYPE"] = "\(CAT_FC_GPKG.rawValue)"
         fullOptions["FIELD_COUNT"] = "\(fields.count)"
         for index in 0..<fields.count {
@@ -187,36 +187,13 @@ public class Table: Object {
 }
 
 public class FeatureClass: Table {
-    public let geometryType: GeometryType
-    
-    public enum GeometryType: Int32 {
-        case NONE = 0, POINT, LINESTRING, POLYGON, MULTIPOINT, MULTILINESTRING, MULTIPOLYGON
-    }
+    public let geometryType: Geometry.GeometryType
     
     override init(copyFrom: Object) {
-        geometryType = GeometryType(rawValue:
-            Int32(ngsFeatureClassGeometryType(copyFrom.object)))!
+        geometryType = Geometry.GeometryType(rawValue:
+            Int32(ngsFeatureClassGeometryType(copyFrom.object))) ?? .NONE
         
         super.init(copyFrom: copyFrom)
-    }
-    
-    static func geometryTypeToName(_ geometryType: GeometryType) -> String {
-        switch geometryType {
-        case .NONE:
-            return "NONE"
-        case .POINT:
-            return "POINT"
-        case .LINESTRING:
-            return "LINESTRING"
-        case .POLYGON:
-            return "POLYGON"
-        case .MULTIPOINT:
-            return "MULTIPOINT"
-        case .MULTILINESTRING:
-            return "MULTILINESTRING"
-        case .MULTIPOLYGON:
-            return "MULTIPOLYGON"
-        }
     }
     
     public func createOverviews(force: Bool, zoomLevels: [Int8],
@@ -245,7 +222,7 @@ public class FeatureClass: Table {
     public func clearFilters() -> Bool {
         let result = ngsFeatureClassSetFilter(object, nil, nil) ==
             Int32(COD_SUCCESS.rawValue)
-        reset()
+//        reset()
         return result
     }
     
@@ -254,14 +231,21 @@ public class FeatureClass: Table {
                                                envelope.minX, envelope.minY,
                                                envelope.maxX, envelope.maxY) ==
             Int32(COD_SUCCESS.rawValue)
-        reset()
+//        reset()
+        return result
+    }
+    
+    public func setAttributeFilter(query: String) -> Bool {
+        let result = ngsFeatureClassSetFilter(object, nil, query) ==
+            Int32(COD_SUCCESS.rawValue)
+//        reset()
         return result
     }
     
     public func setFilters(geometry: Geometry, query: String) -> Bool {
         let result = ngsFeatureClassSetFilter(object, geometry.handle, query) ==
             Int32(COD_SUCCESS.rawValue)
-        reset()
+//        reset()
         return result
     }
 }
@@ -516,10 +500,62 @@ public struct Envelope : Equatable {
         return lhs.maxX == rhs.maxX && lhs.maxY == rhs.maxY &&
                 lhs.minX == rhs.minX && lhs.minY == rhs.minY
     }
+    
+    public var width: Double {
+        get {
+            return maxX - minX
+        }
+    }
+    
+    public var height: Double {
+        get {
+            return maxY - minY
+        }
+    }
+    
+    public var center: Point {
+        get {
+            let x = minX + width / 2
+            let y = minY + height / 2
+            return Point(x: x, y: y)
+        }
+    }
+    
+    public mutating func increase(by value: Double) {
+        let deltaWidth = (width * value - width) / 2.0
+        let deltaHeight = (height * value - height) / 2.0
+        minX -= deltaWidth
+        minY -= deltaHeight
+        maxX += deltaWidth
+        maxY += deltaHeight
+    }
 }
 
 public class Geometry {
     let handle: GeometryH!
+    
+    public enum GeometryType: Int32 {
+        case NONE = 0, POINT, LINESTRING, POLYGON, MULTIPOINT, MULTILINESTRING, MULTIPOLYGON
+    }
+    
+    static func geometryTypeToName(_ geometryType: GeometryType) -> String {
+        switch geometryType {
+        case .NONE:
+            return "NONE"
+        case .POINT:
+            return "POINT"
+        case .LINESTRING:
+            return "LINESTRING"
+        case .POLYGON:
+            return "POLYGON"
+        case .MULTIPOINT:
+            return "MULTIPOINT"
+        case .MULTILINESTRING:
+            return "MULTILINESTRING"
+        case .MULTIPOLYGON:
+            return "MULTIPOLYGON"
+        }
+    }
     
     public var envelope: Envelope {
         get {
@@ -527,13 +563,30 @@ public class Geometry {
         }
     }
     
+    public var isEmpty: Bool {
+        get {
+            return ngsGeometryIsEmpty(handle) == 1
+        }
+    }
+    
+    public var type: GeometryType {
+        get {
+            return Geometry.GeometryType(rawValue:
+                Int32(ngsGeometryGetType(handle))) ?? .NONE
+        }
+    }
+    
     init(handle: GeometryH) {
         self.handle = handle
     }
     
-    static func freeGeometry(_ geom: Geometry) {
-        ngsGeometryFree(geom.handle)
+    deinit {
+        ngsGeometryFree(handle)
     }
+    
+//    static func freeGeometry(_ geom: Geometry) {
+//        ngsGeometryFree(geom.handle)
+//    }
     
     public func transform(to epsg: Int32) -> Bool {
         return ngsGeometryTransformTo(handle, epsg) == Int32(COD_SUCCESS.rawValue)

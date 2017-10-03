@@ -139,6 +139,7 @@ struct Constants {
     
     struct Map {
         static let tolerance = 7.0
+        static let epsg: Int32 = 3857
     }
     
     struct Sizes {
