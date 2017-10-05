@@ -114,6 +114,10 @@ public class Object {
         self.object = copyFrom.object
     }
     
+    public func isSame(_ object: Object) -> Bool {
+        return self.object == object.object
+    }
+    
     public func children() -> [Object] {
         var out: [Object] = []
         

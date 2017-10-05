@@ -39,6 +39,9 @@ public class Store: Object {
             fullOptions["FIELD_\(index)_TYPE"] = Field.fieldTypeToName(fields[index].type)
             fullOptions["FIELD_\(index)_NAME"] = fields[index].name
             fullOptions["FIELD_\(index)_ALIAS"] = fields[index].alias
+            if fields[index].defaultValue != nil {
+                fullOptions["FIELD_\(index)_DEFAULT_VAL"] = fields[index].defaultValue
+            }
         }
         
         if ngsCatalogObjectCreate(object, name, toArrayOfCStrings(fullOptions)) ==
@@ -232,6 +235,12 @@ public class FeatureClass: Table {
                                                envelope.maxX, envelope.maxY) ==
             Int32(COD_SUCCESS.rawValue)
 //        reset()
+        return result
+    }
+    
+    public func setSpatialFilter(geometry: Geometry) -> Bool {
+        let result = ngsFeatureClassSetFilter(object, geometry.handle, nil) ==
+            Int32(COD_SUCCESS.rawValue)
         return result
     }
     
@@ -602,15 +611,17 @@ public class Field {
     public let name: String
     public let alias: String
     public let type: FieldType
+    public let defaultValue: String?
     
     public enum FieldType: Int32 {
         case UNKNOWN = -1, INTEGER = 0, REAL = 2, STRING = 4, DATE = 11
     }
     
-    public init(name: String, alias: String, type: FieldType) {
+    public init(name: String, alias: String, type: FieldType, defaultValue: String? = nil) {
         self.name = name
         self.alias = alias
         self.type = type
+        self.defaultValue = defaultValue
     }
     
     static func fieldTypeToName(_ fieldType: FieldType) -> String {

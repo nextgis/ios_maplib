@@ -296,10 +296,13 @@ public class Map {
     }
     
     func getLayer(for feature: Feature) -> Layer? {
+        if feature.table == nil {
+            return nil
+        }
         for index in 0..<layerCount {
             if let layer = getLayer(by: index) {
                 if let ds = layer.dataSource as? FeatureClass {
-                    if ds.path == feature.table?.path {
+                    if ds.isSame(feature.table!) {
                         return layer
                     }
                 }
