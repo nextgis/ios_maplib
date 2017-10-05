@@ -474,18 +474,18 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
         let leading = NSLayoutConstraint(item: tv,
                                           attribute: .leading,
                                           relatedBy: .equal,
-                                          toItem: self,
-                                          attribute: .leading,
+                                          toItem: self.superview,
+                                          attribute: .leadingMargin,
                                           multiplier: 1.0,
-                                          constant: 8.0)
+                                          constant: 0.0)
         
         let trailing = NSLayoutConstraint(item: tv,
                                            attribute: .trailing,
                                            relatedBy: .equal,
-                                           toItem: self,
-                                           attribute: .trailing,
+                                           toItem: self.superview,
+                                           attribute: .trailingMargin,
                                            multiplier: 1.0,
-                                           constant: -8.0)
+                                           constant: 0.0)
         
 //        let width = NSLayoutConstraint(item: tv,
 //                                       attribute: .width,
