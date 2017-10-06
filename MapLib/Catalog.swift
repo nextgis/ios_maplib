@@ -157,8 +157,7 @@ public class Object {
             return child(name: name)
         }
         return nil
-    }
-    
+    }   
     
     /// Create TMS datasource
     ///
@@ -264,6 +263,13 @@ public class Object {
     public static func forceChildTo(featureClass: Object) -> FeatureClass? {
         if isFeatureClass(featureClass.type) {
             return FeatureClass(copyFrom: featureClass)
+        }
+        return nil
+    }
+    
+    public static func forceChildTo(memoryStore: Object) -> MemoryStore? {
+        if memoryStore.type == 71 {
+            return MemoryStore(copyFrom: memoryStore)
         }
         return nil
     }

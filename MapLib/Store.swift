@@ -23,6 +23,39 @@
 import Foundation
 import ngstore
 
+public class MemoryStore: Object {
+    public static let ext = ".ngmem"
+    
+    public func createFeatureClass(name: String,
+                                   geometryType: Geometry.GeometryType,
+                                   epsg: Int,
+                                   fields: [Field],
+                                   options: [String: String]) -> FeatureClass? {
+        
+        var fullOptions = options
+        fullOptions["GEOMETRY_TYPE"] = Geometry.geometryTypeToName(geometryType)
+        fullOptions["TYPE"] = "\(CAT_FC_MEM.rawValue)"
+        fullOptions["EPSG"] = "\(epsg)"
+        fullOptions["FIELD_COUNT"] = "\(fields.count)"
+        for index in 0..<fields.count {
+            fullOptions["FIELD_\(index)_TYPE"] = Field.fieldTypeToName(fields[index].type)
+            fullOptions["FIELD_\(index)_NAME"] = fields[index].name
+            fullOptions["FIELD_\(index)_ALIAS"] = fields[index].alias
+            if fields[index].defaultValue != nil {
+                fullOptions["FIELD_\(index)_DEFAULT_VAL"] = fields[index].defaultValue
+            }
+        }
+        
+        if ngsCatalogObjectCreate(object, name, toArrayOfCStrings(fullOptions)) ==
+            Int32(COD_SUCCESS.rawValue) {
+            if let featureClassObject = child(name: name) {
+                return FeatureClass(copyFrom: featureClassObject)
+            }
+        }        
+        return nil
+    }
+}
+
 public class Store: Object {
     public static let ext = ".ngst"
     
