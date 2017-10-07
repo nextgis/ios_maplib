@@ -51,7 +51,7 @@ public class API {
     private var mapsDir: Object?
     private var geodataDir: Object?
     private var authArray: [Auth] = []
-    private var mapViewArray: [MapView] = []
+    private var mapViewArray: Set<MapView> = []
     
     init() {
         // Init library
@@ -287,19 +287,37 @@ public class API {
     }
     
     func addMapView(_ view: MapView) {
-        mapViewArray.append(view)
+        mapViewArray.insert(view)
     }
 
     func removeMapView(_ view: MapView) {
-        if let index = mapViewArray.index(of: view) {
-            mapViewArray.remove(at: index)
-        }
-
+        mapViewArray.remove(view)
     }
     
     func onMapViewNotify(url: String) {
-        for view in mapViewArray {
-            view.scheduleDraw(drawState: .REFILL)
+        let path = url.components(separatedBy: "#")
+        
+        printMessage("onMapViewNotify: \(path)")
+        
+        if path.count == 2 {
+            let fid = Int64(path[1])
+            if let object = getCatalog().childByPath(path: path[0]) {
+                if let fc = Object.forceChildTo(featureClass: object) {
+                    if let feautre = fc.getFeature(index: fid!) {
+                        let env = feautre.geometry?.envelope ??
+                            Envelope(minX: -0.5, minY: -0.5, maxX: 0.5, maxY: 0.5)
+                        for view in mapViewArray {
+                            view.invalidate(envelope: env)
+                            view.scheduleDraw(drawState: .PRESERVED)
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            for view in mapViewArray {
+                view.scheduleDraw(drawState: .REFILL)
+            }
         }
     }
     

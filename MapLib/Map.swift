@@ -277,7 +277,7 @@ public class Map {
                     if let ds = layer.dataSource as? FeatureClass {
                         var lf: [Feature] = []
                         for feature in features {
-                            if ds.path == feature.table?.path {
+                            if feature.table?.isSame(ds) ?? false {
                                 lf.append(feature)
                                 if let geomEnvelope = feature.geometry?.envelope {
                                     env.merge(other: geomEnvelope)

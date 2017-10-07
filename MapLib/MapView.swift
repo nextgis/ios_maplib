@@ -142,7 +142,7 @@ public class MapView: GLKView {
     }
     
     deinit {
-        
+        API.instance.removeMapView(self)
     }
     
     public func setMap(map: Map) {
@@ -150,6 +150,8 @@ public class MapView: GLKView {
         map.setSize(width: bounds.width, height: bounds.height)
         
         printMessage("Map set size w: \(bounds.width) h:\(bounds.height)")
+        
+        API.instance.addMapView(self)
         
         refresh()
     }
