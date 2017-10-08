@@ -28,7 +28,7 @@ public class MemoryStore: Object {
     
     public func createFeatureClass(name: String,
                                    geometryType: Geometry.GeometryType,
-                                   epsg: Int,
+                                   epsg: Int32,
                                    fields: [Field],
                                    options: [String: String]) -> FeatureClass? {
         

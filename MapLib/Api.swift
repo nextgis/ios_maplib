@@ -35,7 +35,7 @@ func notifyFunction(uri: UnsafePointer<Int8>?, code: ngsChangeCode) -> Swift.Voi
         API.instance.onAuthNotify(url: String(cString: uri!))
         return
     case CC_CREATE_FEATURE, CC_CHANGE_FEATURE, CC_DELETE_FEATURE, CC_DELETEALL_FEATURES:
-        API.instance.onMapViewNotify(url: String(cString: uri!))
+        API.instance.onMapViewNotify(url: String(cString: uri!), code: code)
         return
     default:
         return
@@ -294,12 +294,12 @@ public class API {
         mapViewArray.remove(view)
     }
     
-    func onMapViewNotify(url: String) {
+    func onMapViewNotify(url: String, code: ngsChangeCode) {
         let path = url.components(separatedBy: "#")
         
         printMessage("onMapViewNotify: \(path)")
         
-        if path.count == 2 {
+        if path.count == 2 && code == CC_CREATE_FEATURE { // NOTE: We dont know the last feature envelope so for change/delete - update all view
             let fid = Int64(path[1])
             if let object = getCatalog().childByPath(path: path[0]) {
                 if let fc = Object.forceChildTo(featureClass: object) {
