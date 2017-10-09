@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+  <file original="MapLib/Info.plist" source-language="en" datatype="plaintext" target-language="ru">
+    <header>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.0" build-num="9A235"/>
+    </header>
+    <body>
+      <trans-unit id="CFBundleDisplayName">
+        <source>MapLibSwift</source>
+        <target>MapLibSwift</target>
+      </trans-unit>
+      <trans-unit id="CFBundleName">
+        <source>$(PRODUCT_NAME)</source>
+        <target>$(PRODUCT_NAME)</target>
+      </trans-unit>
+      <trans-unit id="NSLocationWhenInUseUsageDescription">
+        <source>The application uses this information to show your location on map</source>
+        <target>Приложение использует эту информацию для отображения вашего местоположения на карте</target>
+      </trans-unit>
+    </body>
+  </file>
+  <file original="MapLib/Localizable.strings" source-language="en" datatype="plaintext" target-language="ru">
+    <header>
+      <tool tool-id="com.apple.dt.xcode" tool-name="Xcode" tool-version="9.0" build-num="9A235"/>
+    </header>
+    <body>
+      <trans-unit id="Add file">
+        <source>Add file</source>
+        <target>Добавить файл</target>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
+      <trans-unit id="Attachments">
+        <source>Attachments</source>
+        <target>Прикрепленные файлы</target>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
+      <trans-unit id="Attributes">
+        <source>Attributes</source>
+        <target>Атрибуты</target>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
+      <trans-unit id="Cancel">
+        <source>Cancel</source>
+        <target>Отмена</target>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
+      <trans-unit id="Create">
+        <source>Create</source>
+        <target>Создать</target>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
+      <trans-unit id="Input date">
+        <source>Input date</source>
+        <target>Введите дату</target>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
+      <trans-unit id="Select value">
+        <source>Select value</source>
+        <target>Выберите значение</target>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
+      <trans-unit id="Set">
+        <source>Set</source>
+        <target>Выбрать</target>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
+      <trans-unit id="dd-MM-yyyy HH:mm">
+        <source>dd-MM-yyyy HH:mm</source>
+        <target>dd-MM-yyyy HH:mm</target>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
+      <trans-unit id="hours">
+        <source>hours</source>
+        <target>часов</target>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
+      <trans-unit id="minutes">
+        <source>minutes</source>
+        <target>минут</target>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
+      <trans-unit id="seconds">
+        <source>seconds</source>
+        <target>секунд</target>
+        <note>No comment provided by engineer.</note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

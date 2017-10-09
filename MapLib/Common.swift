@@ -68,12 +68,6 @@ func printWarning(_ message: String) {
     }
 }
 
-extension String {
-    var localized: String {
-        return NSLocalizedString(self, tableName: nil, bundle: Bundle.main, value: "", comment: "")
-    }
-}
-
 extension UIView {
     
     var viewController: UIViewController? {
@@ -148,4 +142,6 @@ struct Constants {
         static let alertWidth: CGFloat = 270.0
         static let defaultPopoverMargin: CGFloat = 8.0
     }
+    
+    static let bandleId = "com.nextgis.MapLibSwift"
 }

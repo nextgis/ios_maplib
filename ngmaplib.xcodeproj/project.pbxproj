@@ -19,6 +19,8 @@
 		356511D71F488DCC00AC46B2 /* ComboBoxControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356511D61F488DCC00AC46B2 /* ComboBoxControl.swift */; };
 		356511D91F48910700AC46B2 /* SizeControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356511D81F48910700AC46B2 /* SizeControl.swift */; };
 		356511DB1F48946C00AC46B2 /* ColorControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356511DA1F48946C00AC46B2 /* ColorControl.swift */; };
+		35B7D6F71F8B772F0016CAB0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 35B7D6F91F8B772F0016CAB0 /* InfoPlist.strings */; };
+		35B7D6FC1F8B77300016CAB0 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 35B7D6FE1F8B77300016CAB0 /* Localizable.strings */; };
 		35C1A8D51EF6EE5F00C2CF67 /* ngstore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35C1A8D41EF6EE5F00C2CF67 /* ngstore.framework */; };
 		35D46B781EEF568E00024E7E /* ngmaplib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35D46B6E1EEF568E00024E7E /* ngmaplib.framework */; };
 		35D46B7D1EEF568E00024E7E /* MapLibTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35D46B7C1EEF568E00024E7E /* MapLibTests.swift */; };
@@ -52,6 +54,8 @@
 		356511D61F488DCC00AC46B2 /* ComboBoxControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComboBoxControl.swift; sourceTree = "<group>"; };
 		356511D81F48910700AC46B2 /* SizeControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SizeControl.swift; sourceTree = "<group>"; };
 		356511DA1F48946C00AC46B2 /* ColorControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorControl.swift; sourceTree = "<group>"; };
+		35B7D6FF1F8B7AF30016CAB0 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		35B7D7001F8B7AF30016CAB0 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		35C1A8D41EF6EE5F00C2CF67 /* ngstore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ngstore.framework; path = Carthage/Build/iOS/ngstore.framework; sourceTree = "<group>"; };
 		35D46B6E1EEF568E00024E7E /* ngmaplib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ngmaplib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		35D46B711EEF568E00024E7E /* MapLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MapLib.h; sourceTree = "<group>"; };
@@ -146,6 +150,8 @@
 		35D46B701EEF568E00024E7E /* MapLib */ = {
 			isa = PBXGroup;
 			children = (
+				35B7D6FE1F8B77300016CAB0 /* Localizable.strings */,
+				35B7D6F91F8B772F0016CAB0 /* InfoPlist.strings */,
 				356511CD1F45BF5C00AC46B2 /* control */,
 				353676111F010ECB00C7B846 /* view */,
 				353675FD1EF926A300C7B846 /* util */,
@@ -248,6 +254,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				ru,
 			);
 			mainGroup = 35D46B641EEF568E00024E7E;
 			productRefGroup = 35D46B6F1EEF568E00024E7E /* Products */;
@@ -265,6 +272,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35B7D6F71F8B772F0016CAB0 /* InfoPlist.strings in Resources */,
+				35B7D6FC1F8B77300016CAB0 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -336,11 +345,31 @@
 		};
 /* End PBXTargetDependency section */
 
+/* Begin PBXVariantGroup section */
+		35B7D6F91F8B772F0016CAB0 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				35B7D7001F8B7AF30016CAB0 /* ru */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		35B7D6FE1F8B77300016CAB0 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				35B7D6FF1F8B7AF30016CAB0 /* ru */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
 		35D46B801EEF568E00024E7E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -396,6 +425,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";

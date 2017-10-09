@@ -67,17 +67,17 @@ public class MapView: GLKView {
         set {
             showLocationVal = newValue
             if showLocationVal {
-                let authorizationStatus = CLLocationManager.authorizationStatus()
-                if authorizationStatus != .authorizedWhenInUse && authorizationStatus != .authorizedAlways {
-                    // User has not authorized access to location information.
-                    return
-                }
-                
-                // Do not start services that aren't available.
-                if !CLLocationManager.locationServicesEnabled() {
-                    // Location services is not available.
-                    return
-                }
+//                let authorizationStatus = CLLocationManager.authorizationStatus()
+//                if authorizationStatus != .authorizedWhenInUse && authorizationStatus != .authorizedAlways {
+//                    // User has not authorized access to location information.
+//                    return
+//                }
+//
+//                // Do not start services that aren't available.
+//                if !CLLocationManager.locationServicesEnabled() {
+//                    // Location services is not available.
+//                    return
+//                }
                 
                 locationManager.desiredAccuracy = kCLLocationAccuracyBest
                 locationManager.delegate = self

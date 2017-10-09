@@ -48,7 +48,12 @@ import UIKit
             return label.text
         }
         set {
-            label.text = newValue
+            if newValue != nil {
+                label.text = NSLocalizedString(newValue!, comment: "")
+            }
+            else {
+                label.text = newValue
+            }
         }
     }
     

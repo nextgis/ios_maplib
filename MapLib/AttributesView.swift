@@ -64,10 +64,10 @@ public class AttributesView: UIScrollView {
         
         if let fc = feature.table {
             if isSectionUppercased {
-                addSection("Attributes".localized.uppercased())
+                addSection(NSLocalizedString("Attributes", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: "").uppercased())
             }
             else {
-                addSection("Attributes".localized)
+                addSection(NSLocalizedString("Attributes", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: ""))
             }
             let fields = fc.fields
             var count: Int32 = 0
@@ -81,7 +81,7 @@ public class AttributesView: UIScrollView {
                 count += 1
             }
             
-            addSection("Attachments".localized.uppercased())
+            addSection(NSLocalizedString("Attachments", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: "").uppercased())
             
             for attachment in feature.getAttachments() {
                 addAttachment(attachment)
@@ -388,10 +388,10 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
     public override func fill(feature: Feature) {
         if let fc = feature.table {
             if isSectionUppercased {
-                addSection("Attributes".localized.uppercased())
+                addSection(NSLocalizedString("Attributes", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: "").uppercased())
             }
             else {
-                addSection("Attributes".localized)
+                addSection(NSLocalizedString("Attributes", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: ""))
             }
             let fields = fc.fields
             var count: Int32 = 0
@@ -405,7 +405,7 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
                 count += 1
             }
             
-            addSection("Attachments".localized.uppercased())
+            addSection(NSLocalizedString("Attachments", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: "").uppercased())
             attachments = addSubview()
             for attachment in feature.getAttachments() {
                 addAttachmentEdit(attachment)
@@ -456,7 +456,7 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
             tv.isUserInteractionEnabled = true
             
             let formatter = DateFormatter()
-            formatter.dateFormat = "dd-MM-yyyy HH:mm".localized
+            formatter.dateFormat = NSLocalizedString("dd-MM-yyyy HH:mm", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: "")
             tv.text = formatter.string(from: dateValue)
         }
         
@@ -580,7 +580,7 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
         
         let lb = UIButtonWithAttachment()
         lb.translatesAutoresizingMaskIntoConstraints = false
-        lb.setTitle("Add file".localized, for: .normal)
+        lb.setTitle(NSLocalizedString("Add file", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: ""), for: .normal)
         lb.setTitleColor(attachmentBtnColor, for: .normal)
         
         lb.titleLabel?.numberOfLines = 2
@@ -646,7 +646,7 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
         // user touch field
         let h = 265.0
         var alertHeight: CGFloat = 0.0
-        var titleText = "Input date".localized
+        var titleText = NSLocalizedString("Input date", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: "")
         for _ in stride(from: 0.0, through: h, by: 28.0) {
             titleText += "\n"
             alertHeight += 25.0
@@ -672,10 +672,10 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
         
         
         // add an action (button)
-        alert.addAction(UIAlertAction(title: "Cancel".localized,
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: ""),
                                       style: UIAlertActionStyle.cancel,
                                       handler: nil))
-        alert.addAction(UIAlertAction(title: "Set".localized,
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Set", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: ""),
                                       style: UIAlertActionStyle.default,
                                       handler:
             { action in self.onSetValue(
@@ -689,7 +689,7 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
     
     func onSetValue(sender: UIAlertAction, view: UIDatePicker, textField: UITextField) {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd-MM-yyyy HH:mm".localized
+        formatter.dateFormat = NSLocalizedString("dd-MM-yyyy HH:mm", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: "")
         textField.text = formatter.string(from: view.date)
     }
     
@@ -718,7 +718,7 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
                         }
                     case .DATE:
                         let formatter = DateFormatter()
-                        formatter.dateFormat = "dd-MM-yyyy HH:mm".localized
+                        formatter.dateFormat = NSLocalizedString("dd-MM-yyyy HH:mm", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: "")
                         if let dateValue = formatter.date(from: value) {
                             feature.setField(for: count, date: dateValue)
                         }

@@ -1,0 +1,9 @@
+/* (No Comment) */
+"CFBundleDisplayName" = "MapLibSwift";
+
+/* (No Comment) */
+"CFBundleName" = "$(PRODUCT_NAME)";
+
+/* (No Comment) */
+"NSLocationWhenInUseUsageDescription" = "The application uses this information to show your location on map";
+

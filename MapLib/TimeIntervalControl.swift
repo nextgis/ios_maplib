@@ -134,11 +134,11 @@ import UIKit
         type.translatesAutoresizingMaskIntoConstraints = false
         type.setupControls()
         type.selection = [
-            "seconds".localized,
-            "minutes".localized,
-            "hours".localized
+            NSLocalizedString("seconds", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: ""),
+            NSLocalizedString("minutes", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: ""),
+            NSLocalizedString("hours", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: "")
         ]
-        type.setSelection(value: "minutes".localized)
+        type.setSelection(value: NSLocalizedString("minutes", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: ""))
         
 //        type.backgroundColor = controlsBackgroundColor
 //        type.layer.borderColor = borderColor?.cgColor
@@ -226,11 +226,11 @@ import UIKit
     
     public func getType() -> IntervalType {
         switch type.currentValue {
-        case "seconds".localized:
+        case NSLocalizedString("seconds", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: ""):
             return .SECOND
-        case "minutes".localized:
+        case NSLocalizedString("minutes", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: ""):
             return .MINUTE
-        case "hours".localized:
+        case NSLocalizedString("hours", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: ""):
             return .HOUR
         default:
             return .MINUTE
@@ -240,13 +240,13 @@ import UIKit
     public func setType(value: IntervalType) {
         switch value {
         case .SECOND:
-            type.setSelection(value: "seconds".localized)
+            type.setSelection(value: NSLocalizedString("seconds", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: ""))
         case .MINUTE:
-            type.setSelection(value: "minutes".localized)
+            type.setSelection(value: NSLocalizedString("minutes", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: ""))
         case .HOUR:
-            type.setSelection(value: "hours".localized)
-        default:
-            break
+            type.setSelection(value: NSLocalizedString("hours", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: ""))
+//        default:
+//            break
         }
     }
 }

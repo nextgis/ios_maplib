@@ -70,7 +70,7 @@ import UIKit
     @IBInspectable open var items: String = "" {
         didSet {
             clear()
-            let buttonNames: [String] = items.components(separatedBy: "|")
+            let buttonNames: [String] = NSLocalizedString(items, comment: "").components(separatedBy: "|")
             for buttonName in buttonNames {
                 printMessage("Add radio button with name: \(buttonName)")
                 addRadioButton(with: buttonName)

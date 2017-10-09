@@ -73,7 +73,12 @@ extension UIColor {
             return label.text
         }
         set {
-            label.text = newValue
+            if newValue != nil {
+                label.text = NSLocalizedString(newValue!, comment: "")
+            }
+            else {
+                label.text = newValue
+            }
         }
     }
     
@@ -183,10 +188,10 @@ extension UIColor {
         
         
         // add an action (button)
-        alert.addAction(UIAlertAction(title: "Cancel".localized,
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: ""),
                                       style: UIAlertActionStyle.cancel,
                                       handler: nil))
-        alert.addAction(UIAlertAction(title: "Create".localized,
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Create", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: ""),
                                       style: UIAlertActionStyle.default,
                                       handler:
             { action in self.onUpdateColor(sender: action, view: customView)}))

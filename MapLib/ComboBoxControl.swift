@@ -76,7 +76,7 @@ import UIKit
     }
     
     func onListAction(sender: ComboBoxControl) {
-        let alert = UIAlertController(title: "Select value".localized,
+        let alert = UIAlertController(title: NSLocalizedString("Select value", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: ""),
                                       message: "",
                                       preferredStyle: UIAlertControllerStyle.alert)
         
