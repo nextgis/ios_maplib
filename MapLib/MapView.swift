@@ -39,6 +39,7 @@ public protocol GestureDelegate: class {
 
 public protocol LocationDelegate: class {
     func onLocationChanged(location: CLLocation)
+    func onLocationStop()
 }
 
 public protocol MapViewDelegate: class {
@@ -66,6 +67,18 @@ public class MapView: GLKView {
         set {
             showLocationVal = newValue
             if showLocationVal {
+                let authorizationStatus = CLLocationManager.authorizationStatus()
+                if authorizationStatus != .authorizedWhenInUse && authorizationStatus != .authorizedAlways {
+                    // User has not authorized access to location information.
+                    return
+                }
+                
+                // Do not start services that aren't available.
+                if !CLLocationManager.locationServicesEnabled() {
+                    // Location services is not available.
+                    return
+                }
+                
                 locationManager.desiredAccuracy = kCLLocationAccuracyBest
                 locationManager.delegate = self
                 locationManager.requestWhenInUseAuthorization()
@@ -372,7 +385,7 @@ extension MapView: CLLocationManagerDelegate {
     public func locationManager(_ manager: CLLocationManager,
                          didUpdateLocations locations: [CLLocation])
     {
-        let location = locations[locations.count - 1]
+        if let location = locations.last {
         if location.coordinate.latitude == currentLocation?.coordinate.latitude &&
             location.coordinate.longitude == currentLocation?.coordinate.longitude &&
             location.altitude == currentLocation?.altitude &&
@@ -400,6 +413,28 @@ extension MapView: CLLocationManagerDelegate {
             printMessage("Location. Lat: \(currentLocation!.coordinate.latitude) Long:\(currentLocation!.coordinate.longitude) Alt:\(currentLocation!.altitude) Dir:\(currentLocation!.course), Accuracy: \(currentLocation!.horizontalAccuracy)")
         
             locationDelegate?.onLocationChanged(location: currentLocation!)
+        }
+        }
+    }
+    
+    public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        if let error = error as? CLError {
+            if error.code == .denied {
+                locationManager.stopUpdatingLocation()
+            }
+            else if error.code != .locationUnknown {
+                if let locationOverlay = map?.getOverlay(type: Map.OverlayType.LOCATION) as? LocationOverlay {
+                    locationOverlay.visible = false
+                    draw(.PRESERVED)
+                }
+            }
+        }
+    }
+    
+    public func locationManagerDidPauseLocationUpdates(_ manager: CLLocationManager) {
+        if let locationOverlay = map?.getOverlay(type: Map.OverlayType.LOCATION) as? LocationOverlay {
+            locationOverlay.visible = false
+            draw(.PRESERVED)
         }
     }
 }
@@ -506,6 +541,12 @@ public class MapViewEdit : MapView {
     
     public func addGeometryPoint() {
         if editOverlay?.addGeometryPoint() ?? false {
+            draw(.PRESERVED)
+        }
+    }
+    
+    public func addGeometryPoint(with coordinates: Point) {
+        if editOverlay?.addGeometryPoint(with: coordinates) ?? false {
             draw(.PRESERVED)
         }
     }

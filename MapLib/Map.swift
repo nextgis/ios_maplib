@@ -576,6 +576,16 @@ public class EditOverlay : Overlay {
         }
     }
     
+    public var walkingMode: Bool {
+        get {
+            return ngsEditOverlayGetWalkingMode(map.id) == 1
+        }
+        
+        set {
+            ngsEditOverlaySetWalkingMode(map.id, newValue ? 1 : 0)
+        }
+    }
+    
     public func setStyle(point name: String) -> Bool {
         return ngsEditOverlaySetStyleName(map.id, EST_POINT, name) ==
             Int32(COD_SUCCESS.rawValue)
@@ -626,7 +636,13 @@ public class EditOverlay : Overlay {
 
     public func createNewGeometry(in layer: Layer) -> Bool {
         editLayer = layer
-        return ngsEditOverlayCreateGeometryInLayer(map.id, layer.layerH) ==
+        return ngsEditOverlayCreateGeometryInLayer(map.id, layer.layerH, 0) ==
+            Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func createNewEmptyGeometry(in layer: Layer) -> Bool {
+        editLayer = layer
+        return ngsEditOverlayCreateGeometryInLayer(map.id, layer.layerH, 1) ==
             Int32(COD_SUCCESS.rawValue)
     }
     
@@ -655,6 +671,13 @@ public class EditOverlay : Overlay {
     
     public func addGeometryPoint() -> Bool {
         return ngsEditOverlayAddPoint(map.id) == Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func addGeometryPoint(with coordinates: Point) -> Bool {
+        return ngsEditOverlayAddVertex(map.id, ngsCoordinate(X: coordinates.x,
+                                                             Y: coordinates.y,
+                                                             Z: 0.0)) ==
+            Int32(COD_SUCCESS.rawValue)
     }
     
     public func deleteGeometryPoint() -> DeleteResultType {
