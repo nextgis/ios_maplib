@@ -23,25 +23,6 @@
 import Foundation
 import ngstore
 
-public struct BBox {
-    public var minx, miny, maxx, maxy: Double
-    
-    public init() {
-        minx = 0.0
-        miny = 0.0
-        maxx = 0.0
-        maxy = 0.0
-    }
-    
-    public init(minx: Double, miny: Double, maxx: Double, maxy: Double) {
-        self.minx = minx
-        self.miny = miny
-        self.maxx = maxx
-        self.maxy = maxy
-    }
-}
-
-
 public class Object {
     public let type: Int
     public let name: String
@@ -173,8 +154,8 @@ public class Object {
     ///   - options: Addtional options as key: value array
     /// - Returns: Catalog object or nil
     public func createTMS(name: String, url: String, epsg: Int32,
-                          z_min: UInt8, z_max: UInt8, fullExtent: BBox,
-                          limitExtent: BBox, cacheExpires: Int,
+                          z_min: UInt8, z_max: UInt8, fullExtent: Envelope,
+                          limitExtent: Envelope, cacheExpires: Int,
                           options: [String: String] = [:]) -> Object? {
         var createOptions = [
             "TYPE": "\(ObjectType.TMS.rawValue)",
@@ -183,15 +164,15 @@ public class Object {
             "epsg": "\(epsg)",
             "z_min": "\(z_min)",
             "z_max": "\(z_max)",
-            "x_min": "\(fullExtent.minx)",
-            "y_min": "\(fullExtent.miny)",
-            "x_max": "\(fullExtent.maxx)",
-            "y_max": "\(fullExtent.maxy)",
+            "x_min": "\(fullExtent.minX)",
+            "y_min": "\(fullExtent.minY)",
+            "x_max": "\(fullExtent.maxX)",
+            "y_max": "\(fullExtent.maxY)",
             "cache_expires": "\(cacheExpires)",
-            "limit_x_min": "\(limitExtent.minx)",
-            "limit_y_min": "\(limitExtent.miny)",
-            "limit_x_max": "\(limitExtent.maxx)",
-            "limit_y_max": "\(limitExtent.maxy)"
+            "limit_x_min": "\(limitExtent.minX)",
+            "limit_y_min": "\(limitExtent.minY)",
+            "limit_x_max": "\(limitExtent.maxX)",
+            "limit_y_max": "\(limitExtent.maxY)"
         ]
         
         for option in options {

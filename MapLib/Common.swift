@@ -132,7 +132,7 @@ struct Constants {
     static let refreshTime = 0.35
     
     struct Map {
-        static let tolerance = 7.0
+        static let tolerance = 11.0
         static let epsg: Int32 = 3857
     }
     

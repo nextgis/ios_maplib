@@ -93,7 +93,7 @@ public class AttributesView: UIScrollView {
                                             toItem: self,
                                             attribute: .bottom,
                                             multiplier: 1.0,
-                                            constant: 8.0)
+                                            constant: -16.0)
             NSLayoutConstraint.activate([bottom])
         }
     }
@@ -151,7 +151,7 @@ public class AttributesView: UIScrollView {
                                           toItem: self,
                                           attribute: .trailing,
                                           multiplier: 1.0,
-                                          constant: 8.0)
+                                          constant: -8.0)
         
         let height = NSLayoutConstraint(item: lb,
                                         attribute: .height,
@@ -207,7 +207,7 @@ public class AttributesView: UIScrollView {
                                           toItem: self,
                                           attribute: .trailing,
                                           multiplier: 1.0,
-                                          constant: 8.0)
+                                          constant: -8.0)
         
         let height = NSLayoutConstraint(item: lb,
                                         attribute: .height,
@@ -289,7 +289,7 @@ public class AttributesView: UIScrollView {
                                            toItem: self,
                                            attribute: .trailing,
                                            multiplier: 1.0,
-                                           constant: 8.0)
+                                           constant: -8.0)
         
         let height1 = NSLayoutConstraint(item: vl,
                                          attribute: .height,
@@ -357,7 +357,7 @@ public class AttributesView: UIScrollView {
                                           toItem: self,
                                           attribute: .trailing,
                                           multiplier: 1.0,
-                                          constant: 8.0)
+                                          constant: -8.0)
         
         let height = NSLayoutConstraint(item: lb,
                                         attribute: .height,
@@ -418,7 +418,7 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
                                             toItem: self,
                                             attribute: .bottom,
                                             multiplier: 1.0,
-                                            constant: 8.0)
+                                            constant: -16.0)
             NSLayoutConstraint.activate([bottom])
         }
     }
@@ -474,28 +474,28 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
         let leading = NSLayoutConstraint(item: tv,
                                           attribute: .leading,
                                           relatedBy: .equal,
-                                          toItem: self.superview,
-                                          attribute: .leadingMargin,
+                                          toItem: self,
+                                          attribute: .leading,
                                           multiplier: 1.0,
-                                          constant: 0.0)
+                                          constant: 8.0)
         
         let trailing = NSLayoutConstraint(item: tv,
                                            attribute: .trailing,
                                            relatedBy: .equal,
-                                           toItem: self.superview,
-                                           attribute: .trailingMargin,
+                                           toItem: self,
+                                           attribute: .trailing,
                                            multiplier: 1.0,
-                                           constant: 0.0)
+                                           constant: -8.0)
         
-//        let width = NSLayoutConstraint(item: tv,
-//                                       attribute: .width,
-//                                       relatedBy: .lessThanOrEqual,
-//                                       toItem: self,
-//                                       attribute: .width,
-//                                       multiplier: 1.0,
-//                                       constant: 0.0)
+        let width = NSLayoutConstraint(item: tv,
+                                       attribute: .width,
+                                       relatedBy: .lessThanOrEqual,
+                                       toItem: self,
+                                       attribute: .width,
+                                       multiplier: 1.0,
+                                       constant: 0.0)
         
-        NSLayoutConstraint.activate([leading, trailing, top/*, width*/])
+        NSLayoutConstraint.activate([leading, trailing, top, width])
         
         prevView = tv
     }
