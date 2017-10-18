@@ -141,7 +141,7 @@ public class Table: Object {
                 let fAlias = String(cString: fieldsList[count].alias)
                 let fType = Field.FieldType(rawValue: fieldsList[count].type)
                 
-                // printMessage("Add field - name: \(fName), alias: \(fAlias), type: \(fType ?? Field.FieldType.UNKNOWN) to '\(copyFrom.name)'")
+//                printMessage("Add field \(count) - name: \(fName), alias: \(fAlias), type: \(fType ?? Field.FieldType.UNKNOWN) to '\(copyFrom.name)'")
                 
                 let fieldValue = Field(name: fName, alias: fAlias, type: fType!)
                 fields.append(fieldValue)
@@ -355,28 +355,35 @@ public class Feature {
     }
     
     public func getField(asDateTime index: Int32) -> Date {
-        let year = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
-        let month = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
-        let day = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
-        let hour = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
-        let minute = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
-        let second = UnsafeMutablePointer<Float>.allocate(capacity: 1)
-        let tag = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
-        ngsFeatureGetFieldAsDateTime(handle, index, year, month, day,
-                                     hour, minute, second, tag)
-        var dateComponents = DateComponents()
-        dateComponents.year = Int(year.pointee)
-        dateComponents.month = Int(month.pointee)
-        dateComponents.day = Int(day.pointee)
-        dateComponents.hour = Int(hour.pointee)
-        dateComponents.minute = Int(minute.pointee)
-        dateComponents.second = Int(second.pointee)
-        
-        if tag.pointee > 1 {
-            dateComponents.timeZone = TimeZone(secondsFromGMT: Int(tag.pointee - 100) / 4 * 3600)
+        if ngsFeatureIsFieldSet(handle, index) == 1 {
+            let year = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
+            let month = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
+            let day = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
+            let hour = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
+            let minute = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
+            let second = UnsafeMutablePointer<Float>.allocate(capacity: 1)
+            let tag = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
+            ngsFeatureGetFieldAsDateTime(handle, index, year, month, day,
+                                         hour, minute, second, tag)
+            var dateComponents = DateComponents()
+            dateComponents.year = Int(year.pointee)
+            dateComponents.month = Int(month.pointee)
+            dateComponents.day = Int(day.pointee)
+            dateComponents.hour = Int(hour.pointee)
+            dateComponents.minute = Int(minute.pointee)
+            dateComponents.second = Int(second.pointee)
+            
+            if tag.pointee > 1 {
+                dateComponents.timeZone = TimeZone(secondsFromGMT: Int(tag.pointee - 100) / 4 * 3600)
+            }
+            else {
+                dateComponents.timeZone = TimeZone(secondsFromGMT: 0) // UTC
+            }
+            
+            return Calendar.current.date(from: dateComponents)!
         }
         
-        return Calendar.current.date(from: dateComponents)!
+        return Date()
     }
     
     public func setField(for index: Int32, string value: String) {
@@ -392,15 +399,14 @@ public class Feature {
     }
     
     public func setField(for index: Int32, date value: Date) {
-        let calendar = Calendar.current
-        
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
         let year = calendar.component(.year, from: value)
         let month = calendar.component(.month, from: value)
         let day = calendar.component(.day, from: value)
         let hour = calendar.component(.hour, from: value)
         let minute = calendar.component(.minute, from: value)
         let second = calendar.component(.second, from: value)
-        
         
         ngsFeatureSetFieldDateTime(handle, index, Int32(year), Int32(month),
                                    Int32(day), Int32(hour), Int32(minute),

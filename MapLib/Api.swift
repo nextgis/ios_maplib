@@ -256,7 +256,11 @@ public class API {
     }
     
     public func getTmpDirectory() -> Object? {
-        return catalog.childByPath(path: "ngc://Local connections/Home/tmp")
+        return catalog.childByPath(path: Constants.tmpDirCatalogPath)
+    }
+
+    public func getDocDirectory() -> Object? {
+        return catalog.childByPath(path: Constants.docDirCatalogPath)
     }
     
     public func md5(string: String) -> String {
@@ -295,6 +299,10 @@ public class API {
     }
     
     func onMapViewNotify(url: String, code: ngsChangeCode) {
+        if url.hasPrefix(Constants.tmpDirCatalogPath) {
+            return
+        }
+        
         let path = url.components(separatedBy: "#")
         
         printMessage("onMapViewNotify: \(path)")

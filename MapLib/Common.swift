@@ -144,4 +144,6 @@ struct Constants {
     }
     
     static let bandleId = "com.nextgis.MapLibSwift"
+    static let tmpDirCatalogPath = "ngc://Local connections/Home/tmp"
+    static let docDirCatalogPath = "ngc://Local connections/Home/Documents"
 }
