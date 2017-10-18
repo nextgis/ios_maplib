@@ -231,12 +231,25 @@ public class AttributesView: UIScrollView {
         prevView = lb
     }
     
+    fileprivate func getStringValue(from feature: Feature, _ field: Field, _ pos: Int32) -> String {
+        if field.type == .DATE {
+            let dateValue = feature.getField(asDateTime: pos)
+            let formatter = DateFormatter()
+            formatter.dateFormat = NSLocalizedString("dd-MM-yyyy HH:mm", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: "")
+            formatter.timeZone = .current
+            return formatter.string(from: dateValue)
+        }
+        
+        return feature.getField(asString: pos)
+    }
+    
     public func addFieldLabel(_ feature: Feature, _ field: Field, _ pos: Int32) {
         addFieldNameLabel(field)
         
         let vl: UIView
         
-        let value = feature.getField(asString: pos)
+        let value = getStringValue(from: feature, field, pos)
+        
         if value.hasPrefix("http") {
             let tv = UITextView()
             tv.isEditable = false;
@@ -301,11 +314,11 @@ public class AttributesView: UIScrollView {
         
         let width = NSLayoutConstraint(item: vl,
                                        attribute: .width,
-                                       relatedBy: .lessThanOrEqual,
-                                       toItem: self,
+                                       relatedBy: .equal,
+                                       toItem: self.superview,
                                        attribute: .width,
                                        multiplier: 1.0,
-                                       constant: 0.0)
+                                       constant: -32.0)
         
         NSLayoutConstraint.activate([leading1, trailing1, top1, height1, width])
         
@@ -384,8 +397,14 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
     weak var attachments: UIView!
     weak var bottomAttribute: NSLayoutConstraint? = nil
     public var hasEdits: Bool = false
+    var prevAttachmentCellView: UIView? = nil
     
     public override func fill(feature: Feature) {
+        prevView = nil
+        for subview in subviews {
+            subview.removeFromSuperview()
+        }
+        
         if let fc = feature.table {
             if isSectionUppercased {
                 addSection(NSLocalizedString("Attributes", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: "").uppercased())
@@ -440,7 +459,7 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
         tv.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
         
         
-        let value = feature.getField(asString: pos)
+        let value = getStringValue(from: feature, field, pos)
         switch(field.type) {
         case .STRING, .UNKNOWN:
             tv.text = value
@@ -451,13 +470,9 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
             tv.text = value
             tv.keyboardType = .decimalPad
         case .DATE:
-            let dateValue = feature.getField(asDateTime: pos)
             tv.delegate = self
             tv.isUserInteractionEnabled = true
-            
-            let formatter = DateFormatter()
-            formatter.dateFormat = NSLocalizedString("dd-MM-yyyy HH:mm", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: "")
-            tv.text = formatter.string(from: dateValue)
+            tv.text = value
         }
         
         fieldControlMap[pos] = tv
@@ -489,11 +504,11 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
         
         let width = NSLayoutConstraint(item: tv,
                                        attribute: .width,
-                                       relatedBy: .lessThanOrEqual,
-                                       toItem: self,
+                                       relatedBy: .equal, //.lessThanOrEqual,
+                                       toItem: self.superview,
                                        attribute: .width,
                                        multiplier: 1.0,
-                                       constant: 0.0)
+                                       constant: -32.0)
         
         NSLayoutConstraint.activate([leading, trailing, top, width])
         
@@ -521,7 +536,7 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
             top = NSLayoutConstraint(item: lb,
                                      attribute: .top,
                                      relatedBy: .equal,
-                                     toItem: prevView,
+                                     toItem: prevAttachmentCellView,
                                      attribute: .bottom,
                                      multiplier: 1.0,
                                      constant: 0.0)
@@ -573,7 +588,8 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
         
         NSLayoutConstraint.activate([leading, trailing, top, height, width, bottomAttribute!])
         
-        prevView = lb
+        //prevView = lb
+        prevAttachmentCellView = lb
     }
     
     public func addAttachmentBtn() {
@@ -667,6 +683,17 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
                           height: alertHeight)
         let customView = UIDatePicker(frame: rect)
         customView.datePickerMode = UIDatePickerMode.dateAndTime
+        customView.timeZone = .current
+        if textField.text != nil {
+        if !(textField.text?.isEmpty ?? true) {
+            let formatter = DateFormatter()
+            formatter.dateFormat = NSLocalizedString("dd-MM-yyyy HH:mm", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: "")
+            formatter.timeZone = customView.timeZone
+            if let dateValue = formatter.date(from: textField.text!) {
+                customView.setDate(dateValue, animated: true)
+            }
+        }
+        }
         
         alert.view.addSubview(customView)
         
@@ -690,6 +717,7 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
     func onSetValue(sender: UIAlertAction, view: UIDatePicker, textField: UITextField) {
         let formatter = DateFormatter()
         formatter.dateFormat = NSLocalizedString("dd-MM-yyyy HH:mm", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: "")
+        formatter.timeZone = view.timeZone
         textField.text = formatter.string(from: view.date)
     }
     
@@ -719,6 +747,7 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
                     case .DATE:
                         let formatter = DateFormatter()
                         formatter.dateFormat = NSLocalizedString("dd-MM-yyyy HH:mm", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: "")
+                        formatter.timeZone = .current
                         if let dateValue = formatter.date(from: value) {
                             feature.setField(for: count, date: dateValue)
                         }
@@ -755,6 +784,7 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
         printMessage("Add attachment with name: \(name) and path: \(path)")
         let newAttachment = Attachment(name: name, description: "", path: path)
         addAttachmentEdit(newAttachment)
+        layoutIfNeeded()
     }
     
     func addSubview() -> UIView {
