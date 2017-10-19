@@ -111,6 +111,97 @@ public class Store: Object {
 
 }
 
+public enum EditOperationType {
+    case NOP, CREATE_FEATURE, CHANGE_FEATURE, DELETE_FEATURE, DELETE_ALL_FEATURES,
+    CREATE_ATTACHMENT, CHANGE_ATTACHMENT, DELETE_ATTACHMNET, DELETE_ALL_ATTACHMENTS
+}
+
+public struct EditOperation {
+    public var fid: Int64
+    public var aid: Int64
+    public var operation: EditOperationType
+    
+    init(operation: ngsEditOperation) {
+        self.fid = operation.fid
+        self.aid = operation.aid
+        
+        switch operation.code {
+        case CC_CREATE_FEATURE:
+            self.operation = .CREATE_FEATURE
+        case CC_CHANGE_FEATURE:
+            self.operation = .CHANGE_FEATURE
+        case CC_DELETE_FEATURE:
+            self.operation = .DELETE_FEATURE
+        case CC_DELETEALL_FEATURES:
+            self.operation = .DELETE_ALL_FEATURES
+        case CC_CREATE_ATTACHMENT:
+            self.operation = .CREATE_ATTACHMENT
+        case CC_CHANGE_ATTACHMENT:
+            self.operation = .CHANGE_ATTACHMENT
+        case CC_DELETE_ATTACHMENT:
+            self.operation = .DELETE_ATTACHMNET
+        case CC_DELETEALL_ATTACHMENTS:
+            self.operation = .DELETE_ALL_ATTACHMENTS
+        default:
+            self.operation = .NOP
+        }
+    }
+    
+    var rawOperation: ngsEditOperation {
+        get {
+            var rawOperation: ngsChangeCode = CC_NOP
+            switch self.operation {
+            case .CREATE_FEATURE:
+                rawOperation = CC_CREATE_FEATURE
+            case .CHANGE_FEATURE:
+                rawOperation = CC_CHANGE_FEATURE
+            case .DELETE_FEATURE:
+                rawOperation = CC_DELETE_FEATURE
+            case .DELETE_ALL_FEATURES:
+                rawOperation = CC_DELETEALL_FEATURES
+            case .CREATE_ATTACHMENT:
+                rawOperation = CC_CREATE_ATTACHMENT
+            case .CHANGE_ATTACHMENT:
+                rawOperation = CC_CHANGE_ATTACHMENT
+            case .DELETE_ATTACHMNET:
+                rawOperation = CC_DELETE_ATTACHMENT
+            case .DELETE_ALL_ATTACHMENTS:
+                rawOperation = CC_DELETEALL_ATTACHMENTS
+            default:
+                rawOperation = CC_NOP
+            }
+            
+            return ngsEditOperation(fid: self.fid, aid: self.aid, code: rawOperation)
+        }
+    }
+}
+
+public class Raster: Object {
+    
+    public func cacheArea(bbox: Envelope, zoomLevels: [Int8],
+                          callback: (func: ngstore.ngsProgressFunc,
+        data: UnsafeMutableRawPointer)? = nil) -> Bool {
+        var zoomLevelsValue = ""
+        for zoomLevel in zoomLevels {
+            if(!zoomLevelsValue.isEmpty) {
+                zoomLevelsValue += ","
+            }
+            zoomLevelsValue += "\(zoomLevel)"
+        }
+        let options = [
+            "MINX" : "\(bbox.minX)",
+            "MINY" : "\(bbox.minY)",
+            "MAXX" : "\(bbox.maxX)",
+            "MAXY" : "\(bbox.maxY)",
+            "ZOOM_LEVELS" : zoomLevelsValue
+        ]
+        return ngsRasterCacheArea(object, toArrayOfCStrings(options),
+                                              callback == nil ? nil : callback!.func,
+                                              callback == nil ? nil : callback!.data) ==
+            Int32(COD_SUCCESS.rawValue)
+    }
+}
+
 public class Table: Object {
     public var fields: [Field] = []
 
@@ -219,6 +310,32 @@ public class Table: Object {
             count += 1
         }
         return (-1, Field.FieldType.UNKNOWN)
+    }
+
+    public func editOperations() -> [EditOperation] {
+        let op = ngsFeatureClassGetEditOperations(object)
+        var out: [EditOperation] = []
+        if op == nil {
+            return out
+        }
+        var count = 0
+        while op![count].fid != -1 {
+            count += 1
+            
+            let opItem = EditOperation(operation: op![count])
+            
+            if opItem.operation == .NOP {
+                continue
+            }
+            
+            out.append(opItem)
+        }
+        
+        return out
+    }
+    
+    public func delete(editOperation: EditOperation) {
+        ngsFeatureClassDeleteEditOperation(object, editOperation.rawOperation)
     }
 }
 

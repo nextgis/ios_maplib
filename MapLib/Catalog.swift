@@ -248,6 +248,13 @@ public class Object {
         return nil
     }
     
+    public static func forceChildTo(raster: Object) -> Raster? {
+        if isRaster(raster.type) {
+            return Raster(copyFrom: raster)
+        }
+        return nil
+    }
+    
     public static func forceChildTo(memoryStore: Object) -> MemoryStore? {
         if memoryStore.type == 71 {
             return MemoryStore(copyFrom: memoryStore)

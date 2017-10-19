@@ -267,6 +267,14 @@ public class API {
         return String(cString: ngsMD5(string))
     }
     
+    public func getProperty(for key: String, withDefault value: String) -> String {
+        return String(cString: ngsSettingsGetString(key, value))
+    }
+    
+    public func setProperty(for key: String, with value: String) {
+        _ = ngsSettingsSetString(key, value)
+    }
+    
     func addAuth(auth: Auth) -> Bool {
         if ngsURLAuthAdd(auth.getURL(), toArrayOfCStrings(auth.options())) ==
             Int32(COD_SUCCESS.rawValue) {
