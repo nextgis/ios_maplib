@@ -113,17 +113,22 @@ public class Store: Object {
 
 public enum EditOperationType {
     case NOP, CREATE_FEATURE, CHANGE_FEATURE, DELETE_FEATURE, DELETE_ALL_FEATURES,
-    CREATE_ATTACHMENT, CHANGE_ATTACHMENT, DELETE_ATTACHMNET, DELETE_ALL_ATTACHMENTS
+    CREATE_ATTACHMENT, CHANGE_ATTACHMENT, DELETE_ATTACHMENT, DELETE_ALL_ATTACHMENTS
 }
 
 public struct EditOperation {
     public var fid: Int64
     public var aid: Int64
+    public var rid: Int64
+    public var arid: Int64
     public var operation: EditOperationType
     
     init(operation: ngsEditOperation) {
+        printMessage("EditOperation -- fid: \(operation.fid), aid: \(operation.aid), rid: \(operation.rid), arid: \(operation.arid)")
         self.fid = operation.fid
         self.aid = operation.aid
+        self.rid = operation.rid
+        self.arid = operation.arid
         
         switch operation.code {
         case CC_CREATE_FEATURE:
@@ -139,7 +144,7 @@ public struct EditOperation {
         case CC_CHANGE_ATTACHMENT:
             self.operation = .CHANGE_ATTACHMENT
         case CC_DELETE_ATTACHMENT:
-            self.operation = .DELETE_ATTACHMNET
+            self.operation = .DELETE_ATTACHMENT
         case CC_DELETEALL_ATTACHMENTS:
             self.operation = .DELETE_ALL_ATTACHMENTS
         default:
@@ -163,7 +168,7 @@ public struct EditOperation {
                 rawOperation = CC_CREATE_ATTACHMENT
             case .CHANGE_ATTACHMENT:
                 rawOperation = CC_CHANGE_ATTACHMENT
-            case .DELETE_ATTACHMNET:
+            case .DELETE_ATTACHMENT:
                 rawOperation = CC_DELETE_ATTACHMENT
             case .DELETE_ALL_ATTACHMENTS:
                 rawOperation = CC_DELETEALL_ATTACHMENTS
@@ -171,7 +176,7 @@ public struct EditOperation {
                 rawOperation = CC_NOP
             }
             
-            return ngsEditOperation(fid: self.fid, aid: self.aid, code: rawOperation)
+            return ngsEditOperation(fid: self.fid, aid: self.aid, code: rawOperation, rid: self.rid, arid: self.arid)
         }
     }
 }
@@ -250,30 +255,30 @@ public class Table: Object {
         }
         return nil
     }
-
     
-    public func insertFeature(_ feature: Feature) -> Bool {
-        return ngsFeatureClassInsertFeature(object, feature.handle) ==
+    public func insertFeature(_ feature: Feature, logEdits: Bool = true) -> Bool {
+        return ngsFeatureClassInsertFeature(object, feature.handle, logEdits ? 1 : 0) ==
             Int32(COD_SUCCESS.rawValue)
     }
     
-    public func updateFeature(_ feature: Feature) -> Bool {
-        return ngsFeatureClassUpdateFeature(object, feature.handle) ==
+    public func updateFeature(_ feature: Feature, logEdits: Bool = true) -> Bool {
+        return ngsFeatureClassUpdateFeature(object, feature.handle, logEdits ? 1 : 0) ==
             Int32(COD_SUCCESS.rawValue)
     }
     
-    public func deleteFeature(id: Int64) -> Bool {
-        return ngsFeatureClassDeleteFeature(object, id) ==
+    public func deleteFeature(id: Int64, logEdits: Bool = true) -> Bool {
+        return ngsFeatureClassDeleteFeature(object, id, logEdits ? 1 : 0) ==
             Int32(COD_SUCCESS.rawValue)
     }
     
-    public func deleteFeature(feature: Feature) -> Bool {
-        return ngsFeatureClassDeleteFeature(object, feature.id) ==
+    public func deleteFeature(feature: Feature, logEdits: Bool = true) -> Bool {
+        return ngsFeatureClassDeleteFeature(object, feature.id, logEdits ? 1 : 0) ==
             Int32(COD_SUCCESS.rawValue)
     }
     
-    public func deleteFeatures() -> Bool {
-        return ngsFeatureClassDeleteFeatures(object) == Int32(COD_SUCCESS.rawValue)
+    public func deleteFeatures(logEdits: Bool = true) -> Bool {
+        return ngsFeatureClassDeleteFeatures(object, logEdits ? 1 : 0) ==
+            Int32(COD_SUCCESS.rawValue)
     }
     
     public func reset() {
@@ -313,24 +318,22 @@ public class Table: Object {
     }
 
     public func editOperations() -> [EditOperation] {
-        let op = ngsFeatureClassGetEditOperations(object)
         var out: [EditOperation] = []
-        if op == nil {
-            return out
-        }
-        var count = 0
-        while op![count].fid != -1 {
-            count += 1
-            
-            let opItem = EditOperation(operation: op![count])
-            
-            if opItem.operation == .NOP {
-                continue
+        if let op = ngsFeatureClassGetEditOperations(object) {
+            var count = 0
+            while op[count].fid != -1 {
+                let opItem = EditOperation(operation: op[count])
+                
+                count += 1
+                if opItem.operation == .NOP {
+                    continue
+                }
+                
+                out.append(opItem)
             }
             
-            out.append(opItem)
+            return out
         }
-        
         return out
     }
     
@@ -541,6 +544,24 @@ public class Feature {
         return nil
     }
     
+    public func getAttachment(aid: Int64) -> Attachment? {
+        if let attachments = ngsFeatureAttachmentsGet(handle) {
+            var count = 0
+            while(attachments[count].name != nil) {
+                if attachments[count].id == aid {
+                    return Attachment(featureHandle: handle, id: attachments[count].id,
+                                      name: String(cString: attachments[count].name),
+                                      description: String(cString: attachments[count].description),
+                                      path: String(cString: attachments[count].path),
+                                      size: attachments[count].size,
+                                      remoteId: attachments[count].rid)
+                }
+                count += 1
+            }
+        }
+        return nil
+    }
+    
     public func getAttachments() -> [Attachment] {
         var attachmentsArray = [Attachment]()
         if let attachments = ngsFeatureAttachmentsGet(handle) {
@@ -561,23 +582,24 @@ public class Feature {
     }
     
     public func addAttachment(name: String, description: String, path: String,
-                              move: Bool, remoteId: Int64 = -1) -> Int64 {
+                              move: Bool, remoteId: Int64 = -1,
+                              logEdits: Bool = true) -> Int64 {
         let options = [
             "MOVE" : move ? "ON" :  "OFF",
             "RID" : "\(remoteId)"
         ]
         
         return ngsFeatureAttachmentAdd(handle, name, description, path,
-                                toArrayOfCStrings(options))
+                                       toArrayOfCStrings(options), logEdits ? 1 : 0)
     }
     
-    public func deleteAttachment(aid: Int64) -> Bool {
-        return ngsFeatureAttachmentDelete(handle, aid) ==
+    public func deleteAttachment(aid: Int64, logEdits: Bool = true) -> Bool {
+        return ngsFeatureAttachmentDelete(handle, aid, logEdits ? 1 : 0) ==
             Int32(COD_SUCCESS.rawValue)
     }
     
-    public func deleteAttachment(attachment: Attachment) -> Bool {
-        return ngsFeatureAttachmentDelete(handle, attachment.id) ==
+    public func deleteAttachment(attachment: Attachment, logEdits: Bool = true) -> Bool {
+        return ngsFeatureAttachmentDelete(handle, attachment.id, logEdits ? 1 : 0) ==
             Int32(COD_SUCCESS.rawValue)
     }
     
@@ -749,10 +771,6 @@ public class Geometry {
         ngsGeometryFree(handle)
     }
     
-//    static func freeGeometry(_ geom: Geometry) {
-//        ngsGeometryFree(geom.handle)
-//    }
-    
     public func transform(to epsg: Int32) -> Bool {
         return ngsGeometryTransformTo(handle, epsg) == Int32(COD_SUCCESS.rawValue)
     }
@@ -760,6 +778,10 @@ public class Geometry {
     public func transform(_ transformation: CoordinateTransformation) -> Bool {
         return ngsGeometryTransform(handle, transformation.handle) ==
             Int32(COD_SUCCESS.rawValue)
+    }
+    
+    public func asJson() -> String {
+        return String(cString: ngsGeometryToJson(handle))
     }
 }
 
@@ -842,11 +864,11 @@ public class Attachment {
         return path.isEmpty
     }
     
-    public func update(name: String, description: String) -> Bool {
+    public func update(name: String, description: String, logEdits: Bool = true) -> Bool {
         if handle == nil {
             return false
         }
-        return ngsFeatureAttachmentUpdate(handle, id, name, description) ==
+        return ngsFeatureAttachmentUpdate(handle, id, name, description, logEdits ? 1 : 0) ==
             Int32(COD_SUCCESS.rawValue)
     }
 }
