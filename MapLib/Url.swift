@@ -60,11 +60,33 @@ public class Request {
         return (result.status, outStr)
     }
     
+    public static func delete(url: String, options: [String: String]? = nil) -> (status: Int, value: String) {
+        let result = API.instance.URLRequest(
+            method: ngsURLRequestType(requestType.DELETE.rawValue),
+            url: url, options: options)
+        
+        
+        let outStr = String(cString: result.data ?? [0])
+        return (result.status, outStr)
+    }
+    
     public static func post(url: String, payload: String, options: [String: String]? = nil) -> (status: Int, value: String) {
         var fullOptions = options ?? [:]
         fullOptions["POSTFIELDS"] = payload
         let result = API.instance.URLRequest(
             method: ngsURLRequestType(requestType.POST.rawValue),
+            url: url, options: fullOptions)
+        
+        
+        let outStr = String(cString: result.data ?? [0])
+        return (result.status, outStr)
+    }
+    
+    public static func put(url: String, payload: String, options: [String: String]? = nil) -> (status: Int, value: String) {
+        var fullOptions = options ?? [:]
+        fullOptions["POSTFIELDS"] = payload
+        let result = API.instance.URLRequest(
+            method: ngsURLRequestType(requestType.PUT.rawValue),
             url: url, options: fullOptions)
         
         
@@ -118,5 +140,24 @@ public class Request {
         return (status: result.status, value: result.data)
     }
     
-    // TODO: get image, get file
+    public static func upload(file path: String, to url: String,
+                              with options: [String: String]? = nil,
+                              callback: (func: ngstore.ngsProgressFunc,
+                                         data: UnsafeMutableRawPointer)? = nil) -> (status: Int, value: Any?) {
+        let result = API.instance.URLRequestUpload(file: path, url: url,
+                                                   options: options,
+                                                   callback: callback)
+        
+        do {
+            let outStr = String(cString: result.data ?? [0])
+            if !outStr.isEmpty {
+                let json = try JSONSerialization.jsonObject(with: outStr.data(using: .utf8)!, options: [])
+                return (result.status, json)
+            }
+        }
+        catch {
+            print("Error deserializing JSON: \(error)")
+        }
+        return (543, nil)
+    }
 }

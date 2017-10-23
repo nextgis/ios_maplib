@@ -195,6 +195,32 @@ public class API {
         return (543, nil)
     }
     
+    func URLRequestUpload(file: String, url: String, options: [String: String]? = nil,
+                          callback: (func: ngstore.ngsProgressFunc,
+        data: UnsafeMutableRawPointer)? = nil) ->
+        (status: Int, data: [UInt8]?){
+            if let requestResultPtr = ngsURLUploadFile(file, url,
+                                                       toArrayOfCStrings(options),
+                                                       callback == nil ? nil : callback!.func,
+                                                       callback == nil ? nil : callback!.data) {
+                let requestResult = requestResultPtr.pointee
+                let status = Int(requestResult.status)
+                
+                if requestResult.dataLen == 0 {
+                    return (status, nil)
+                }
+                
+                let buffer = [UInt8](repeating: 0, count: Int(requestResult.dataLen + 1))
+                memcpy(UnsafeMutableRawPointer(mutating: buffer), requestResult.data, Int(requestResult.dataLen))
+                printMessage("Get \(requestResult.dataLen) data")
+                
+                ngsURLRequestResultFree(requestResultPtr)
+                
+                return (status, buffer)
+            }
+            return (543, nil)
+    }
+    
     public func getCatalog() -> Catalog {
         return catalog
     }
