@@ -52,6 +52,7 @@ public class Auth : Equatable {
     }
     
     func onRefreshTokenFailed(url: String) {
+        printMessage("Refresh oAuth token for url \(url) failed")
         if url == self.url {
             tokenUpdateFailed!()
         }
