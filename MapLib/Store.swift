@@ -183,6 +183,20 @@ public struct EditOperation {
 
 public class Raster: Object {
     
+    var isOpened: Bool {
+        get {
+            return ngsDatasetIsOpened(object) == Int32(COD_SUCCESS.rawValue)
+        }
+        set {
+            if newValue {
+                ngsDatasetOpen(object, 96, nil)
+            }
+            else {
+                ngsDatasetClose(object)
+            }
+        }
+    }
+    
     public func cacheArea(bbox: Envelope, zoomLevels: [Int8],
                           callback: (func: ngstore.ngsProgressFunc,
         data: UnsafeMutableRawPointer)? = nil) -> Bool {
