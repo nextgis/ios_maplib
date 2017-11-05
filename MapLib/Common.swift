@@ -88,13 +88,13 @@ extension UIView {
 public typealias funcReturnCode = ngstore.ngsCode
 
 public func hexStringToUIColor (hex: String) -> UIColor {
-    var cString:String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+    var cString: String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
     
     if (cString.hasPrefix("#")) {
         cString.remove(at: cString.startIndex)
     }
     
-    if ((cString.characters.count) != 8) {
+    if ((cString.count) != 8) {
         return UIColor.gray
     }
     

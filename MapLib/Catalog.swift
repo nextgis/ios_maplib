@@ -58,9 +58,9 @@ public class Object {
             var out: [String: String] = [:]
             while(rawArray[count] != nil) {
                 let metadataItem = String(cString: rawArray[count]!)
-                if let splitIndex = metadataItem.characters.index(of: "=") {
-                    let key = metadataItem.substring(to: splitIndex)
-                    let value = metadataItem.substring(from: metadataItem.index(splitIndex, offsetBy: 1))
+                if let splitIndex = metadataItem.range(of: "=") {
+                    let key = metadataItem.substring(to: splitIndex.lowerBound)
+                    let value = metadataItem.substring(from: metadataItem.index(splitIndex.lowerBound, offsetBy: 1))
                     out[key] = value
                 }
                 count += 1

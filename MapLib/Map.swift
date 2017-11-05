@@ -440,9 +440,9 @@ public class Overlay {
                 var out: [String: String] = [:]
                 while(rawOptions[count] != nil) {
                     let optionItem = String(cString: rawOptions[count]!)
-                    if let splitIndex = optionItem.characters.index(of: "=") {
-                        let key = optionItem.substring(to: splitIndex)
-                        let value = optionItem.substring(from: optionItem.index(splitIndex, offsetBy: 1))
+                    if let splitIndex = optionItem.range(of: "=") {
+                        let key = optionItem.substring(to: splitIndex.lowerBound)
+                        let value = optionItem.substring(from: optionItem.index(splitIndex.lowerBound, offsetBy: 1))
                         out[key] = value
                     }
                     count += 1

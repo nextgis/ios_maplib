@@ -547,8 +547,11 @@ public class Feature {
                                    Float(second), 100) // 100 is UTC
     }
     
-    static public func createGeometry(fromJson json: JsonObject) -> Geometry {
-        return Geometry(handle: ngsFeatureCreateGeometryFromJson(json.handle))
+    static public func createGeometry(fromJson json: JsonObject) -> Geometry? {
+        if let handle = ngsFeatureCreateGeometryFromJson(json.handle) {
+            return Geometry(handle: handle)
+        }
+        return nil
     }
     
     public func createGeometry() -> Geometry? {
