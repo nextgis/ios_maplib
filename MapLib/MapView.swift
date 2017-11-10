@@ -242,8 +242,9 @@ public class MapView: GLKView {
     
     func onTimer(timer: Timer) {
         globalTimer = nil
-        let drawState = timer.userInfo as! Map.DrawState
-        draw(drawState)
+        if let drawState = timer.userInfo as? Map.DrawState {
+            draw(drawState)
+        }
     }
     
     public func scheduleDraw(drawState: Map.DrawState, timeInterval: TimeInterval = Constants.refreshTime) {
