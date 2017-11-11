@@ -180,7 +180,9 @@ public class MapView: GLKView {
     
     func draw(_ state: Map.DrawState) {
         drawState = state
-        display()
+        if !freeze {
+            display()
+        }
     }
     
     public func cancelDraw() -> Bool {
@@ -188,12 +190,10 @@ public class MapView: GLKView {
     }
     
     public func refresh(normal: Bool = true) {
-        if !freeze {
-            if normal {
-                draw(.NORMAL)
-            } else {
-                draw(.REFILL)
-            }
+        if normal {
+            draw(.NORMAL)
+        } else {
+            draw(.REFILL)
         }
     }
     
