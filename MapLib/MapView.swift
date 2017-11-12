@@ -387,34 +387,33 @@ extension MapView: CLLocationManagerDelegate {
                          didUpdateLocations locations: [CLLocation])
     {
         if let location = locations.last {
-        if location.coordinate.latitude == currentLocation?.coordinate.latitude &&
-            location.coordinate.longitude == currentLocation?.coordinate.longitude &&
-            location.altitude == currentLocation?.altitude &&
-            location.course == currentLocation?.course &&
-            location.horizontalAccuracy == currentLocation?.horizontalAccuracy {
-            return // Nothing changed
-        }
+// Don't need as iOS filter it manually
+//        if location.coordinate.latitude == currentLocation?.coordinate.latitude &&
+//            location.coordinate.longitude == currentLocation?.coordinate.longitude &&
+//            location.altitude == currentLocation?.altitude &&
+//            location.course == currentLocation?.course &&
+//            location.horizontalAccuracy == currentLocation?.horizontalAccuracy {
+//            return // Nothing changed
+//        }
         
-        currentLocation = location
-        if currentLocation != nil {
-        
+            currentLocation = location
             if showLocation {
-                let position = transformFrom(gps: currentLocation!.coordinate.longitude,
-                                             y: currentLocation!.coordinate.latitude)
+                let position = transformFrom(gps: location.coordinate.longitude,
+                                             y: location.coordinate.latitude)
                 
                 if let locationOverlay = map?.getOverlay(type: Map.OverlayType.LOCATION) as? LocationOverlay {
                 
                     locationOverlay.location(update: position,
-                                             direction: Float(currentLocation!.course),
-                                             accuracy: Float(currentLocation!.horizontalAccuracy))
+                                             direction: Float(location.course),
+                                             accuracy: Float(location.horizontalAccuracy))
                     draw(.PRESERVED)
                 }
             }
         
-            printMessage("Location. Lat: \(currentLocation!.coordinate.latitude) Long:\(currentLocation!.coordinate.longitude) Alt:\(currentLocation!.altitude) Dir:\(currentLocation!.course), Accuracy: \(currentLocation!.horizontalAccuracy)")
+            printMessage("Location. Lat: \(location.coordinate.latitude) Long:\(location.coordinate.longitude) Alt:\(location.altitude) Dir:\(location.course), Accuracy: \(location.horizontalAccuracy)")
         
-            locationDelegate?.onLocationChanged(location: currentLocation!)
-        }
+            locationDelegate?.onLocationChanged(location: location)
+            
         }
     }
     
