@@ -22,13 +22,22 @@
 
 import UIKit
 
+/// Control to set time. For exampe update timeout or fetch timeout.
 @IBDesignable open class TimeIntervalControl: UIControl {
+    /// Text field.
     public var interval: FormTextField!
+    /// Combo box button.
     public var type: ComboBoxControl!
+    /// Interval type.
+    ///
+    /// - SECOND: Second
+    /// - MINUTE: Minute
+    /// - HOUR: Hour
     public enum IntervalType {
         case SECOND, MINUTE, HOUR
     }
     
+    /// Time interval text.
     @IBInspectable open var intervalText: String? {
         get {
             return interval.text
@@ -38,6 +47,7 @@ import UIKit
         }
     }
     
+    /// Time interval text color.
     @IBInspectable open var intervalColor: UIColor? {
         get {
             return interval.textColor
@@ -47,12 +57,14 @@ import UIKit
         }
     }
     
+    /// Time interval text size. Default is 17.
     @IBInspectable open var intervalTextSize: CGFloat = 17.0 {
         didSet {
             interval.font = UIFont.systemFont(ofSize: intervalTextSize)
         }
     }
     
+    /// Combobox buttom text color.
     @IBInspectable open var typeTextColor: UIColor? {
         get {
             return type.titleColor(for: .normal)
@@ -62,18 +74,21 @@ import UIKit
         }
     }
     
+    /// Combobox buttom text size. Default is 17.
     @IBInspectable open var typeTextSize: CGFloat = 17.0 {
         didSet {
             type.titleLabel?.font = UIFont.systemFont(ofSize: intervalTextSize)
         }
     }
     
+    /// Combobox buttom drop down image.
     @IBInspectable open var typeImage: UIImage? {
         didSet {
             type.setImage(typeImage, for: .normal) // ?.withRenderingMode(UIImageRenderingMode.alwaysTemplate)
         }
     }
     
+    /// Background color.
     @IBInspectable open var controlsBackgroundColor: UIColor? = UIColor.white {
         didSet {
             type.backgroundColor = controlsBackgroundColor
@@ -81,6 +96,7 @@ import UIKit
         }
     }
     
+    /// Border color of input field and combobox button.
     @IBInspectable open var borderColor: UIColor? = UIColor.black {
         didSet {
             type.layer.borderColor = borderColor?.cgColor
@@ -88,6 +104,7 @@ import UIKit
         }
     }
     
+    /// Border radius of input field and combobox button.
     @IBInspectable open var borderRadius: CGFloat = 10.0 {
         didSet {
             type.layer.cornerRadius = borderRadius
@@ -97,6 +114,7 @@ import UIKit
         }
     }
     
+    /// Border width of input field and combobox button.
     @IBInspectable open var borderWidth: CGFloat = 1.0 {
         didSet {
             type.layer.borderWidth = borderWidth
@@ -208,22 +226,37 @@ import UIKit
                                      typeTopCt, typeTrailingCt, typeWidthCt])
     }
     
+    /// Get time interval value as decimal.
+    ///
+    /// - Returns: Control value as decimal.
     public func getValueAsDecimal() -> Int {
         return Int(interval.text ?? "0") ?? 0
     }
     
+    /// Get time interval value as double.
+    ///
+    /// - Returns: Control value as double.
     public func getValueAsReal() -> Double {
         return Double(interval.text ?? "0.0") ?? 0.0
     }
     
+    /// Set control value as double.
+    ///
+    /// - Parameter real: Double value.
     public func setValue(real: Double) {
         interval.text = "\(real)"
     }
     
+    /// Set control value as decimal.
+    ///
+    /// - Parameter decimal: Decimal value.
     public func setValue(decimal: Int) {
         interval.text = "\(decimal)"
     }
     
+    /// Get time interval type.
+    ///
+    /// - Returns: Time interval type.
     public func getType() -> IntervalType {
         switch type.currentValue {
         case NSLocalizedString("seconds", tableName: nil, bundle: Bundle(identifier: Constants.bandleId)!, value: "", comment: ""):
@@ -237,6 +270,9 @@ import UIKit
         }
     }
     
+    /// Set time interval type.
+    ///
+    /// - Parameter value: Time interval type.
     public func setType(value: IntervalType) {
         switch value {
         case .SECOND:
@@ -251,9 +287,12 @@ import UIKit
     }
 }
 
+/// Edit control with text align.
 @IBDesignable open class FormTextField: UITextField {
     
+    /// Padding left value. Default is 8.
     @IBInspectable var paddingLeft: CGFloat = 8.0
+    /// Padding right value. Default is 8.
     @IBInspectable var paddingRight: CGFloat = 8.0
     
     override open func textRect(forBounds bounds: CGRect) -> CGRect {

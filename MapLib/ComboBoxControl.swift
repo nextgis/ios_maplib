@@ -23,8 +23,11 @@
 
 import UIKit
 
+
+/// Combobox control.
 @IBDesignable open class ComboBoxControl: UIButton {
     
+    /// List of combobox values.
     public var selection: [String] = []
     var currentValue: String = ""
     
@@ -58,6 +61,11 @@ import UIKit
         addTarget(self, action: #selector(onListAction), for: .touchUpInside)
     }
     
+    /// Set current value. Overrides UIButton function.
+    ///
+    /// - Parameters:
+    ///   - title: Value
+    ///   - state: UIButton state
     override open func setTitle(_ title: String?, for state: UIControlState) {
         super.setTitle(title, for: state)
         if title != nil {
@@ -65,12 +73,18 @@ import UIKit
         }
     }
     
+    /// Set selection.
+    ///
+    /// - Parameter value: Value to select. If value is not from selection nothing will be changed.
     public func setSelection(value: String) {
         if selection.contains(value) {
             self.setTitle(value, for: .normal)
         }
     }
     
+    /// Get selection.
+    ///
+    /// - Returns: Selection string. May be empty string.
     public func getSelection() -> String {
         return currentValue
     }

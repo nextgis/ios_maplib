@@ -23,15 +23,22 @@
 import Foundation
 import ngstore
 
+/// HTTP request class.
 public class Request {
     
+    /// Request type.
+    ///
+    /// - GET: GET request.
+    /// - POST: POST request.
+    /// - PUT: PUT request.
+    /// - DELETE: DELETE request.
     public enum requestType : UInt32 {
         case GET = 1, POST, PUT, DELETE
     }
 
-    /// Executes get request
+    /// Executes get request.
     ///
-    /// # Request option values
+    /// # Request option values.
     ///
     /// Request options are key-value array. The keys may be:
     ///
@@ -47,9 +54,9 @@ public class Request {
     /// - seealso: `Request option values`, for a description of the available options.
     ///
     /// - Parameters:
-    ///   - url: URL to execute
-    ///   - options: the array of key-value pairs - String:String
-    /// - Returns: structure with return status code and String data
+    ///   - url: URL to execute.
+    ///   - options: the array of key-value pairs - String:String.
+    /// - Returns: structure with return status code and String data.
     public static func get(url: String, options: [String: String]? = nil) -> (status: Int, value: String) {
         let result = API.instance.URLRequest(
             method: ngsURLRequestType(requestType.GET.rawValue),
@@ -60,6 +67,14 @@ public class Request {
         return (result.status, outStr)
     }
     
+    /// Executes delete request.
+    ///
+    /// - seealso: `Request option values`, for a description of the available options.
+    ///
+    /// - Parameters:
+    ///   - url: URL to execute.
+    ///   - options: the array of key-value pairs - String:String.
+    /// - Returns: structure with return status code and String data.
     public static func delete(url: String, options: [String: String]? = nil) -> (status: Int, value: String) {
         let result = API.instance.URLRequest(
             method: ngsURLRequestType(requestType.DELETE.rawValue),
@@ -70,6 +85,15 @@ public class Request {
         return (result.status, outStr)
     }
     
+    /// Executes post request.
+    ///
+    /// - seealso: `Request option values`, for a description of the available options.
+    ///
+    /// - Parameters:
+    ///   - url: URL to execute.
+    ///   - payload: Post payload string.
+    ///   - options: the array of key-value pairs - String:String.
+    /// - Returns: structure with return status code and String data.
     public static func post(url: String, payload: String, options: [String: String]? = nil) -> (status: Int, value: String) {
         var fullOptions = options ?? [:]
         fullOptions["POSTFIELDS"] = payload
@@ -82,6 +106,15 @@ public class Request {
         return (result.status, outStr)
     }
     
+    /// Executes put request.
+    ///
+    /// - seealso: `Request option values`, for a description of the available options.
+    ///
+    /// - Parameters:
+    ///   - url: URL to execute.
+    ///   - payload: Put payload string.
+    ///   - options: the array of key-value pairs - String:String.
+    /// - Returns: structure with return status code and String data.
     public static func put(url: String, payload: String, options: [String: String]? = nil) -> (status: Int, value: String) {
         var fullOptions = options ?? [:]
         fullOptions["POSTFIELDS"] = payload
@@ -94,6 +127,12 @@ public class Request {
         return (result.status, outStr)
     }
     
+    /// Executes get request.
+    ///
+    /// - Parameters:
+    ///   - url: URL to execute.
+    ///   - options: the array of key-value pairs - String:String.
+    /// - Returns: structure with return status code and json data.
     public static func getJson(url: String, options: [String: String]? = nil) -> (status: Int, value: Any?) {
         let result = API.instance.URLRequest(
             method: ngsURLRequestType(requestType.GET.rawValue),
@@ -112,6 +151,13 @@ public class Request {
         return (543, nil)
     }
     
+    /// Executes post request.
+    ///
+    /// - Parameters:
+    ///   - url: URL to execute.
+    ///   - payload: Post payload.
+    ///   - options: the array of key-value pairs - String:String.
+    /// - Returns: structure with return status code and json data.
     public static func postJson(url: String, payload: String, options: [String: String]? = nil) -> (status: Int, value: Any?) {
         
         var fullOptions = options ?? [:]
@@ -133,6 +179,12 @@ public class Request {
         return (543, nil)
     }
     
+    /// Executes get request. Useful for get images.
+    ///
+    /// - Parameters:
+    ///   - url: URL to execute.
+    ///   - options: the array of key-value pairs - String:String.
+    /// - Returns: structure with return status code and raw data.
     public static func getRaw(url: String, options: [String: String]? = nil) -> (status: Int, value: [UInt8]?) {
         let result = API.instance.URLRequest(
             method: ngsURLRequestType(requestType.GET.rawValue),
@@ -140,6 +192,14 @@ public class Request {
         return (status: result.status, value: result.data)
     }
     
+    /// Executes upload request.
+    ///
+    /// - Parameters:
+    ///   - path: Path to file in file system to upload.
+    ///   - url: URL to execute.
+    ///   - options: the array of key-value pairs - String:String.
+    ///   - callback: callback function to show progress or cancel upload.
+    /// - Returns: structure with return status code and json data.
     public static func upload(file path: String, to url: String,
                               with options: [String: String]? = nil,
                               callback: (func: ngstore.ngsProgressFunc,

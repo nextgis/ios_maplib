@@ -24,9 +24,11 @@
 import Foundation
 import ngstore
 
+/// Map layer class
 public class Layer {
     let layerH: LayerH!
     
+    /// Layer name read/write property
     public var name: String {
         get {
             return String(cString: ngsLayerGetName(layerH))
@@ -37,6 +39,7 @@ public class Layer {
         }
     }
     
+    /// Layer visible read/write property
     public var visible: Bool {
         get {
             return ngsLayerGetVisible(layerH) == 1 ? true : false
@@ -47,6 +50,7 @@ public class Layer {
         }
     }
     
+    /// Layer data source readonly propertry
     public var dataSource: Object {
         get {
             let object = Object(object: ngsLayerGetDataSource(layerH))
@@ -60,6 +64,7 @@ public class Layer {
         }
     }
     
+    /// Layer style in Json format read/write property
     public var style: JsonObject {
         get {
             return JsonObject(handle: ngsLayerGetStyle(layerH))
@@ -69,6 +74,14 @@ public class Layer {
         }
     }
     
+    /// Layer style name (type) read/write property. The supported styles are:
+    ///  - simplePoint
+    ///  - primitivePoint
+    ///  - simpleLine
+    ///  - simpleFill
+    ///  - simpleFillBordered
+    ///  - marker
+    /// The style connected with geometry type of vector layer. If you set style of incompatible type the layer will not see on map.
     public var styleName: String {
         get {
             return String(cString: ngsLayerGetStyleName(layerH))
@@ -81,7 +94,14 @@ public class Layer {
     init(layerH: LayerH!) {
         self.layerH = layerH
     }
-       
+    
+    
+    /// Find features in vector layer that intersect envelope
+    ///
+    /// - Parameters:
+    ///   - envelope: Envelope to test on intersection
+    ///   - limit: The return feature limit
+    /// - Returns: The array of features from datasource in layer
     public func identify(envelope: Envelope, limit: Int = 0) -> [Feature] {
         
         printMessage("Layer identify")
@@ -105,6 +125,9 @@ public class Layer {
         return out
     }
     
+    /// Hightlight feature in layer. Change the feature style to selection style. The selection style mast be set in map.
+    ///
+    /// - Parameter features: Features array. If array is empty the current hightlighted features will get layer style and drawn not hightlited.
     public func select(features: [Feature] = []) {
         var ids: [Int64] = []
         for feature in features {

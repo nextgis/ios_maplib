@@ -25,6 +25,7 @@ import GLKit
 import ngstore
 import CoreLocation
 
+/// Gesture delegate protocol. Correspondent functions will be executed on gesture events.
 public protocol GestureDelegate: class {
     func onSingleTap(sender: UIGestureRecognizer)
     func onDoubleTap(sender: UIGestureRecognizer)
@@ -37,16 +38,19 @@ public protocol GestureDelegate: class {
 /// “Privacy - Location When In Use Usage Description” and value with description
 /// shown to end user in permissions dialog.
 
+/// Location delegate protocol. Correspondent functions will be executed on location events.
 public protocol LocationDelegate: class {
     func onLocationChanged(location: CLLocation)
     func onLocationStop()
 }
 
+/// Map drawing delegate protocol. Correspondent functions will be executed on map draw events.
 public protocol MapViewDelegate: class {
     func onMapDrawFinished()
     func onMapDraw(percent: Double)
 }
 
+/// Map view class.
 public class MapView: GLKView {
     var map: Map? = nil
     var drawState: Map.DrawState = .PRESERVED
@@ -57,9 +61,11 @@ public class MapView: GLKView {
     weak var mapViewDelegate: MapViewDelegate? = nil
     let locationManager = CLLocationManager()
     
+    /// Last known location or nil.
     public var currentLocation: CLLocation? = nil
         
     var showLocationVal: Bool = false
+    /// Show/hide current position on map. The location overlay mast be set.
     public var showLocation: Bool {
         get {
             return showLocationVal
@@ -91,6 +97,7 @@ public class MapView: GLKView {
         }
     }
     
+    /// Freeze map drawing read/write property.
     public var freeze: Bool {
         get {
             return self.freeze
@@ -101,6 +108,7 @@ public class MapView: GLKView {
         }
     }
     
+    /// Map scale read/write property.
     public var mapScale: Double {
         get {
             return map?.scale ?? 0.0000015
@@ -111,6 +119,7 @@ public class MapView: GLKView {
         }
     }
     
+    /// Map center in spatial reference coordinates read/write property.
     public var mapCenter: Point {
         get {
             return map?.center ?? Point()
@@ -121,6 +130,7 @@ public class MapView: GLKView {
         }
     }
     
+    /// Map curremt extent read/write propertry.
     public var mapExtent: Envelope {
         get {
             return map?.extent ?? Envelope()
@@ -158,6 +168,9 @@ public class MapView: GLKView {
         API.instance.removeMapView(self)
     }
     
+    /// Set map class to view.
+    ///
+    /// - Parameter map: Map class instance.
     public func setMap(map: Map) {
         self.map = map
         map.setSize(width: bounds.width, height: bounds.height)
@@ -185,10 +198,16 @@ public class MapView: GLKView {
         }
     }
     
+    /// Cancel drawing process. Default return value is false. Using override function can cancel drawing on some cases.
+    ///
+    /// - Returns: True to cancel drawing.
     public func cancelDraw() -> Bool {
         return false
     }
     
+    /// Refresh map.
+    ///
+    /// - Parameter normal: If true just refresh view, othervise refill all map tiles.
     public func refresh(normal: Bool = true) {
         if normal {
             draw(.NORMAL)
@@ -197,24 +216,34 @@ public class MapView: GLKView {
         }
     }
     
+    /// Zoom in.
+    ///
+    /// - Parameter multiply: Multiply factor. Default is 2.
     public func zoomIn(multiply: Double = 2.0) {
         map?.zoomIn(multiply)
         draw(.PRESERVED)
         scheduleDraw(drawState: .NORMAL)
     }
     
+    /// Zoom out.
+    ///
+    /// - Parameter multiply: Multiply factor. Default is 2.
     public func zoomOut(multiply: Double = 2.0) {
         map?.zoomOut(multiply)
         draw(.PRESERVED)
         scheduleDraw(drawState: .NORMAL)
     }
     
+    /// Center map at spatial reference coordinates.
+    ///
+    /// - Parameter coordinate: New center coordinates.
     public func centerMap(coordinate: Point) {
         map?.center = coordinate
         draw(.PRESERVED)
         scheduleDraw(drawState: .NORMAL)
     }
     
+    /// Center map in current location. If current location is nil, nothing happened.
     public func centerInCurrentLocation() {
         if currentLocation == nil {
             return
@@ -224,11 +253,19 @@ public class MapView: GLKView {
         centerMap(coordinate: newCenter)
     }
     
+    /// Invalidate part of the map. The refresh function invalidates all visible screen.
+    ///
+    /// - Parameter envelope: Envelope to invalidate.
     public func invalidate(envelope: Envelope) {
         map?.invalidate(extent: envelope)
         scheduleDraw(drawState: .PRESERVED, timeInterval: 0.70)
     }
     
+    /// Pan map to specific screen shift.
+    ///
+    /// - Parameters:
+    ///   - w: horisontal pixel shift
+    ///   - h: vertical pixel shift.
     public func pan(w: Double, h: Double) {
         map?.pan(w, h)
         draw(.PRESERVED)
@@ -247,6 +284,11 @@ public class MapView: GLKView {
         }
     }
     
+    /// Shedule map redraw.
+    ///
+    /// - Parameters:
+    ///   - drawState: Draw state value. See Map.DrawState values.
+    ///   - timeInterval: Time interval in seconds.
     public func scheduleDraw(drawState: Map.DrawState, timeInterval: TimeInterval = Constants.refreshTime) {
         // timer?.invalidate()
         if timerDrawState != drawState {
@@ -267,6 +309,9 @@ public class MapView: GLKView {
                                      repeats: false)
     }
     
+    /// Register gesture delegate function.
+    ///
+    /// - Parameter delegate: delegate function.
     public func registerGestureRecognizers(_ delegate: GestureDelegate) {
         isUserInteractionEnabled = true
         
@@ -291,10 +336,16 @@ public class MapView: GLKView {
         gestureDelegate = delegate
     }
     
+    /// Register location delegate function.
+    ///
+    /// - Parameter delegate: location delegate function.
     public func registerLocation(_ delegate: LocationDelegate) {
         locationDelegate = delegate
     }
     
+    /// Register map drawing delegate function.
+    ///
+    /// - Parameter delegate: map drawing delegate function.
     public func registerView(_ delegate: MapViewDelegate) {
         mapViewDelegate = delegate
     }
@@ -347,6 +398,10 @@ public class MapView: GLKView {
         gestureDelegate?.onPinchGesture(sender: sender)
     }
     
+    /// Get current extent in specified spatial reference system by EPSG code.
+    ///
+    /// - Parameter srs: EPSG code.
+    /// - Returns: Envelope in specified spatial reference system.
     public func getExtent(srs: Int32) -> Envelope {
         return map?.getExtent(srs: srs) ?? Envelope()
     }
@@ -439,6 +494,7 @@ extension MapView: CLLocationManagerDelegate {
     }
 }
 
+/// Map view with vector feature editing functions.
 public class MapViewEdit : MapView {
     
     var editMode: Bool = false
@@ -446,6 +502,7 @@ public class MapViewEdit : MapView {
     var editMoveSelectedPoint: Bool = false
     var beginTouchLocation: CGPoint? = nil
     
+    /// Is in edit mode or not.
     public var isEditMode: Bool {
         get {
             return editMode
@@ -521,30 +578,37 @@ public class MapViewEdit : MapView {
         super.touchesBegan(touches, with: event)
     }
     
+    /// Undo edit operation.
     public func undoEdit() {
         if editOverlay?.undo() ?? false {
             draw(.PRESERVED)
         }
     }
     
+    /// Redo edit operation.
     public func redoEdit() {
         if editOverlay?.redo() ?? false {
             draw(.PRESERVED)
         }
     }
     
+    /// Add geometry part.
     public func addGeometryPart() {
         if editOverlay?.addGeometryPart() ?? false {
             draw(.PRESERVED)
         }
     }
     
+    /// Add geometry point.
     public func addGeometryPoint() {
         if editOverlay?.addGeometryPoint() ?? false {
             draw(.PRESERVED)
         }
     }
     
+    /// Add geometry point in specified coordinates.
+    ///
+    /// - Parameter coordinates: Point coordinates.
     public func addGeometryPoint(with coordinates: Point) {
         if editOverlay?.addGeometryPoint(with: coordinates) ?? false {
             draw(.PRESERVED)
@@ -553,31 +617,39 @@ public class MapViewEdit : MapView {
     
     /// Deletes selected geometry part
     ///
-    /// - Returns: true if last part was deleted, else false
+    /// - Returns: delete result type value. EditOverlay.DeleteResultType. 
     public func deleteGeometryPart() -> EditOverlay.DeleteResultType {
         let result = editOverlay?.deleteGeometryPart() ?? .NON_LAST
         draw(.PRESERVED)
         return result
     }
     
+    /// Delete point from geometry.
+    ///
+    /// - Returns: delete result type value. EditOverlay.DeleteResultType.
     public func deleteGeometryPoint() -> EditOverlay.DeleteResultType {
         let result = editOverlay?.deleteGeometryPoint() ?? .NON_LAST
         draw(.PRESERVED)
         return result
     }
     
+    /// Delete the whole geometry.
     public func deleteGeometry() {
         if editOverlay?.deleteGeometry() ?? false {
             draw(.PRESERVED)
         }
     }
     
+    /// Add hole to geometry.
     public func addGeometryHole() {
         if editOverlay?.addGeometryHole() ?? false {
             draw(.PRESERVED)
         }
     }
     
+    /// Delete geometry hole.
+    ///
+    /// - Returns: delete result type value. EditOverlay.DeleteResultType.
     public func deleteGeometryHole() -> EditOverlay.DeleteResultType {
         let result = editOverlay?.deleteGeometryHole() ?? .NON_LAST
         draw(.PRESERVED)

@@ -25,6 +25,10 @@ import Foundation
 import UIKit
 import ngstore
 
+
+/// Get API class instance. This will be singleton instance.
+///
+/// - Returns: API class instance
 public func getAPI() -> API {
     return API.instance
 }
@@ -42,6 +46,7 @@ func notifyFunction(uri: UnsafePointer<Int8>?, code: ngsChangeCode) -> Swift.Voi
     }
 }
 
+/// A class with common api methods
 public class API {
     public static let instance = API()
     
@@ -153,6 +158,10 @@ public class API {
         return String(cString: ngsGetVersionString(component))
     }
     
+    /// Free library resources. On this call catalog removes all preloaded tree items.
+    /// The map storage closes and removes all maps
+    ///
+    /// - Parameter full: If true catalog and map storage will be freed, otherwise only map storage
     public func freeResources(full: Bool) {
         ngsFreeResources(full ? 1 : 0)
     }
@@ -221,10 +230,18 @@ public class API {
             return (543, nil)
     }
     
+    /// Get catalog class instance. The catalog object is singleton.
+    ///
+    /// - Returns: Catalog class instance
     public func getCatalog() -> Catalog {
         return catalog
     }
     
+    
+    /// Get map by name
+    ///
+    /// - Parameter name: map file name. If map file name extension is not set it will append.
+    /// - Returns: Map class instance or nil
     public func getMap(_ name: String) -> Map? {
         if mapsDir == nil {
             printError("Maps dir undefined. Cannot find map.")
@@ -247,6 +264,11 @@ public class API {
         return Map(id: mapId, path: mapPath)
     }
     
+    
+    /// Get NextGIS store catalog object. The NextGIS store is geopackage file with some addtions needed for library.
+    ///
+    /// - Parameter name: File name. If file name extension is not set it will append.
+    /// - Returns: Catalog object instance or nil
     public func getStore(_ name: String) -> Store? {
         if geodataDir == nil {
             printError("GeoData dir undefined. Cannot find store.")
@@ -277,26 +299,56 @@ public class API {
         return Store(copyFrom: store!)
     }
     
+    
+    /// Get library data directory. Directory to store various data include maps, files, etc.
+    ///
+    /// - Returns: Catalog object instance or nil
     public func getDataDirectory() -> Object? {
         return geodataDir
     }
     
+    
+    /// Get library temp directory.
+    ///
+    /// - Returns: Catalog object instance or nil
     public func getTmpDirectory() -> Object? {
         return catalog.childByPath(path: Constants.tmpDirCatalogPath)
     }
 
+    
+    /// Get library documents directory
+    ///
+    /// - Returns: Catalog object instance or nil
     public func getDocDirectory() -> Object? {
         return catalog.childByPath(path: Constants.docDirCatalogPath)
     }
     
+    
+    /// Create MD5 hash from text
+    ///
+    /// - Parameter string: text to create MD5 hash
+    /// - Returns: MD5 hash string created from text
     public func md5(string: String) -> String {
         return String(cString: ngsMD5(string))
     }
     
+    
+    /// Get library property
+    ///
+    /// - Parameters:
+    ///   - key: key value
+    ///   - value: default value if not exists
+    /// - Returns: property value correspondet to key
     public func getProperty(for key: String, withDefault value: String) -> String {
         return String(cString: ngsSettingsGetString(key, value))
     }
     
+    
+    /// Set library property
+    ///
+    /// - Parameters:
+    ///   - key: key value
+    ///   - value: value to set
     public func setProperty(for key: String, with value: String) {
         _ = ngsSettingsSetString(key, value)
     }

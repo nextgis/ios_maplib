@@ -22,8 +22,12 @@
 
 import Foundation
 
+
+/// Callback function prototype. This function executes when authentication update filed
 public typealias tokenUpdateFailedCallback = () -> Void
 
+
+/// Class for holding library authentication
 public class Auth : Equatable {
     
     private let tokenUpdateFailed: tokenUpdateFailedCallback?
@@ -34,6 +38,17 @@ public class Auth : Equatable {
     private let expiresIn: String
     private let clientId: String
     
+    
+    /// Class constructor
+    ///
+    /// - Parameters:
+    ///   - url: The http request starting from this url will be authenticated.
+    ///   - clientId: client Id for oAuth2 protocol.
+    ///   - authServerUrl: Authentication server url. The update request will use this url.
+    ///   - accessToken: Access token for oAuth2.
+    ///   - updateToken: Update token for oAuth2.
+    ///   - expiresIn: The token expires period.
+    ///   - callback: function executes if update failed. The function must be like prototype function tokenUpdateFailedCallback.
     public init(url: String, clientId: String, authServerUrl: String, accessToken: String,
          updateToken: String, expiresIn: String, callback: tokenUpdateFailedCallback? = nil) {
         self.url = url
@@ -58,10 +73,21 @@ public class Auth : Equatable {
         }
     }
     
+    
+    /// The http request starting from this url will be authenticated
+    ///
+    /// - Returns: url string
     public func getURL() -> String {
         return url
     }
     
+    
+    /// Compare Auth class instances.
+    ///
+    /// - Parameters:
+    ///   - lhs: First class instance to compare
+    ///   - rhs: Second class instance to compare
+    /// - Returns: true if class instances are equal.
     public static func == (lhs: Auth, rhs: Auth) -> Bool {
         if ObjectIdentifier(lhs) == ObjectIdentifier(rhs) {
             return true
@@ -70,6 +96,10 @@ public class Auth : Equatable {
         return lhs.getURL() == rhs.getURL()
     }
     
+    
+    /// Get current authentication options. If some options chaned via interaction with authentication server, this function returns actual values.
+    ///
+    /// - Returns: key-value dictionary of options
     public func options() -> [String: String] {
         return [
             "HTTPAUTH_TYPE" : "bearer",

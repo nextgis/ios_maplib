@@ -22,11 +22,13 @@
 
 import UIKit
 
+/// Radio group class.
 @IBDesignable open class RadioGroupControl: UIControl {
     
     weak var prevView: UIView? = nil
     var bottomCt: NSLayoutConstraint? = nil
     
+    /// Image for on state.
     @IBInspectable open var onImage: UIImage? {
         didSet {
             var itemIndex = 0
@@ -39,6 +41,7 @@ import UIKit
         }
     }
     
+    /// Image for off state.
     @IBInspectable open var offImage: UIImage? {
         didSet {
             var itemIndex = 0
@@ -51,6 +54,7 @@ import UIKit
         }
     }
     
+    /// Text size. Default 17.
     @IBInspectable open var textSize: CGFloat = 17.0 {
         didSet {
             for button in radioButtons {
@@ -59,6 +63,7 @@ import UIKit
         }
     }
     
+    /// Text color. Default is black.
     @IBInspectable open var textColor: UIColor? = UIColor.black {
         didSet {
             for button in radioButtons {
@@ -67,6 +72,7 @@ import UIKit
         }
     }
     
+    /// Array of values. The radio group values should be divide by "|" character.
     @IBInspectable open var items: String = "" {
         didSet {
             clear()
@@ -80,8 +86,12 @@ import UIKit
     
     var radioButtons: [UIButton] = []
     
+    /// Selected item. Default is 0.
     open var selectedItem: Int = 0
        
+    /// Select item by index.
+    ///
+    /// - Parameter index: Index to select.
     public func select(item index: Int) {
         if index < 0 || index >= radioButtons.count {
             return

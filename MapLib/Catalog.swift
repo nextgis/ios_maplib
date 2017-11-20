@@ -23,12 +23,16 @@
 import Foundation
 import ngstore
 
+
+/// Catalog object class. This is base class for all catalog objects.
 public class Object {
     public let type: Int
     public let name: String
     public let path: String
     let object: CatalogObjectH!
     
+    
+    /// Catalog object type
     public enum ObjectType: UInt32 {
         case UNKNOWN
         case FOLDER
@@ -52,6 +56,10 @@ public class Object {
         }
     }
     
+    /// Get catalog object metadata.
+    ///
+    /// - Parameter domain: Domain to search metadata. May  be empty srting.
+    /// - Returns: Dictionary of key-value.
     public func getMetadata(for domain: String) -> [String: String] {
         if let rawArray = ngsCatalogObjectMetadata(object, domain) {
             var count = 0
@@ -70,6 +78,13 @@ public class Object {
         return [:]
     }
     
+    /// Set catalog object metadata.
+    ///
+    /// - Parameters:
+    ///   - name: Key name.
+    ///   - value: Key value.
+    ///   - domain: Domain name.
+    /// - Returns: True on success.
     public func setMetadata(item name: String, value: String, domain: String) -> Bool {
         return ngsCatalogObjectSetMetadataItem(object, name, value, domain) == Int32(COD_SUCCESS.rawValue)
     }
@@ -95,10 +110,17 @@ public class Object {
         self.object = copyFrom.object
     }
     
+    /// Compare current catalog object with other.
+    ///
+    /// - Parameter object: Catalog object to compare.
+    /// - Returns: True if equal.
     public func isSame(_ object: Object) -> Bool {
         return self.object == object.object
     }
     
+    /// Get catalog object children.
+    ///
+    /// - Returns: Array of catalog object class instances.
     public func children() -> [Object] {
         var out: [Object] = []
         
@@ -119,6 +141,10 @@ public class Object {
         return out
     }
     
+    /// Get child by name.
+    ///
+    /// - Parameter name: Catalog object child name.
+    /// - Returns: Catalog object child instance or nil.
     public func child(name: String) -> Object? {
         for childItem in children() {
             if childItem.name == name {
@@ -128,10 +154,18 @@ public class Object {
         return nil
     }
     
+    /// Refresh catalog object. Rerad children.
     public func refresh() {
         ngsCatalogObjectRefresh(object)
     }
     
+    /// Create new catalog object.
+    ///
+    /// - Parameters:
+    ///   - name: New object name.
+    ///   - options: Dictionary describing new catalog objec. The keys are created object dependent. The mandatory key is:
+    ///     - TYPE - this is string value of type ObjectType
+    /// - Returns: Created catalog object instance or nil.
     public func create(name: String, options: [String:String] = [:]) -> Object? {
         if(ngsCatalogObjectCreate(object, name, toArrayOfCStrings(options)) ==
             Int32(COD_SUCCESS.rawValue)) {
@@ -182,6 +216,10 @@ public class Object {
         return create(name: name, options: createOptions)
     }
     
+    /// Create new directory.
+    ///
+    /// - Parameter name: Directory name.
+    /// - Returns: Created directory or nil.
     public func createDirectory(name: String) -> Object? {
         let options = [
             "TYPE": "\(ObjectType.FOLDER.rawValue)",
@@ -190,10 +228,17 @@ public class Object {
         return create(name: name, options: options)
     }
     
+    /// Delete catalog object.
+    ///
+    /// - Returns: True on success.
     public func delete() -> Bool {
         return ngsCatalogObjectDelete(object) == Int32(COD_SUCCESS.rawValue)
     }
     
+    /// Delete catalog object with name.
+    ///
+    /// - Parameter name: Object name to delete.
+    /// - Returns: True on success.
     public func delete(name: String) -> Bool {
         if let deleteObject = child(name: name) {
             return deleteObject.delete()
@@ -201,6 +246,14 @@ public class Object {
         return false
     }
     
+    /// Copy current catalog object to destination object.
+    ///
+    /// - Parameters:
+    ///   - type: Output catalog object type.
+    ///   - destination: Destination catalog object.
+    ///   - move: Move object. This object will be deleted.
+    ///   - options: Key-value dictionary. This will affect how the copy will be performed.
+    /// - Returns: True on success.
     public func copy(as type: ObjectType, in destination: Object, move: Bool,
                      with options: [String: String] = [:]) -> Bool {
         
@@ -218,22 +271,42 @@ public class Object {
         Int32(COD_SUCCESS.rawValue)
     }
 
+    /// Check if type is non spatial table.
+    ///
+    /// - Parameter type: Type to check.
+    /// - Returns: True if this type belongs to table types.
     public static func isTable(_ type: Int) -> Bool {
         return type >= 1500 && type <= 1999
     }
     
+    /// Check if type is raster.
+    ///
+    /// - Parameter type: Type to check.
+    /// - Returns: True if this type belongs to raster types.
     public static func isRaster(_ type: Int) -> Bool {
         return type >= 1000 && type <= 1499
     }
     
+    /// Check if type is featureclass.
+    ///
+    /// - Parameter type: Type to check.
+    /// - Returns: True if this type belongs to featureclass types.
     public static func isFeatureClass(_ type: Int) -> Bool {
         return type >= 500 && type <= 999
     }
     
+    /// Check if type is container (catalog object which can hold other objects).
+    ///
+    /// - Parameter type: Type to check.
+    /// - Returns: True if this type belongs to container types.
     public static func isContainer(_ type: Int) -> Bool {
         return type >= 50 && type <= 499
     }
     
+    /// Force catalog object instance to table.
+    ///
+    /// - Parameter table: Catalog object instance.
+    /// - Returns: Table class instance or nil.
     public static func forceChildTo(table: Object) -> Table? {
         if isTable(table.type) {
             return Table(copyFrom: table)
@@ -241,6 +314,10 @@ public class Object {
         return nil
     }
     
+    /// Force catalog object instance to featureclass.
+    ///
+    /// - Parameter featureClass: Catalog object instance.
+    /// - Returns: FeatureClass class instance or nil.
     public static func forceChildTo(featureClass: Object) -> FeatureClass? {
         if isFeatureClass(featureClass.type) {
             return FeatureClass(copyFrom: featureClass)
@@ -248,6 +325,10 @@ public class Object {
         return nil
     }
     
+    /// Force catalog object instance to raster.
+    ///
+    /// - Parameter raster: Catalog object instance.
+    /// - Returns: Raster class instance or nil.
     public static func forceChildTo(raster: Object) -> Raster? {
         if isRaster(raster.type) {
             return Raster(copyFrom: raster)
@@ -255,6 +336,10 @@ public class Object {
         return nil
     }
     
+    /// Force catalog object instance to memory store.
+    ///
+    /// - Parameter memoryStore: Catalog object instance.
+    /// - Returns: MemoryStore class instance or nil.
     public static func forceChildTo(memoryStore: Object) -> MemoryStore? {
         if memoryStore.type == 71 {
             return MemoryStore(copyFrom: memoryStore)
@@ -263,7 +348,10 @@ public class Object {
     }
 }
 
+/// The catalog root object class.
 public class Catalog: Object {
+    
+    /// The separator in catalog paths
     static public let separator = "/"
     
     init(catalog: CatalogObjectH!) {
@@ -271,10 +359,18 @@ public class Catalog: Object {
                    path: "ngc://", object: catalog)
     }
     
+    
+    /// Get current directory
+    ///
+    /// - Returns: Get current directory. This is file system path
     public func getCurrentDirectory() -> String {
         return String(cString: ngsGetCurrentDirectory())
     }
     
+    /// Get catalog child by file system path.
+    ///
+    /// - Parameter path: File system path.
+    /// - Returns: Catalog object class instance or nil.
     public func childByPath(path: String) -> Object? {
         if let objectHandler = ngsCatalogObjectGet(path) {
             let objectType = Int(ngsCatalogObjectType(objectHandler).rawValue)

@@ -23,9 +23,21 @@
 import Foundation
 import ngstore
 
+/// In memory spatial data storage. After destruction all data will be loose.
 public class MemoryStore: Object {
+    
+    /// Memory storage description file extension.
     public static let ext = ".ngmem"
     
+    /// Create feature class in storage.
+    ///
+    /// - Parameters:
+    ///   - name: Feature class name.
+    ///   - geometryType: Geometry type.
+    ///   - epsg: Spatial reference EPSG code.
+    ///   - fields: Feature class fields.
+    ///   - options: Any other create option if form of key-value dictionary.
+    /// - Returns: FeatureClass class instance or nil.
     public func createFeatureClass(name: String,
                                    geometryType: Geometry.GeometryType,
                                    epsg: Int32,
@@ -56,9 +68,20 @@ public class MemoryStore: Object {
     }
 }
 
+/// Spatial data storage. This is geopackage file with library additions.
 public class Store: Object {
+    
+    /// Spatial data storage file extension.
     public static let ext = ".ngst"
     
+    /// Create feature class in storage.
+    ///
+    /// - Parameters:
+    ///   - name: Feature class name.
+    ///   - geometryType: Geometry type.
+    ///   - fields: Feature class fields.
+    ///   - options: Any other create option if form of key-value dictionary.
+    /// - Returns: FeatureClass class instance or nil.
     public func createFeatureClass(name: String,
                                    geometryType: Geometry.GeometryType,
                                    fields: [Field],
@@ -87,6 +110,13 @@ public class Store: Object {
         return nil
     }
     
+    /// Create table in storage.
+    ///
+    /// - Parameters:
+    ///   - name: Table name.
+    ///   - fields: Table fields.
+    ///   - options: Any other create option if form of key-value dictionary.
+    /// - Returns: Table class instance or nil.
     public func createTable(name: String, fields: [Field],
                             options: [String: String]) -> Table? {
         
@@ -111,11 +141,20 @@ public class Store: Object {
 
 }
 
+/// Edit operation type.
+///
+/// - NOP: No operation.
+/// - CREATE_FEATURE: Create feature/row.
+/// - CHANGE_FEATURE: Change feature/row.
+/// - DELETE_FEATURE: Delete feature/row.
+/// - DELETE_ALL_FEATURES: Delete all features.
+/// - : This is enumerator of edit operation types.
 public enum EditOperationType {
     case NOP, CREATE_FEATURE, CHANGE_FEATURE, DELETE_FEATURE, DELETE_ALL_FEATURES,
     CREATE_ATTACHMENT, CHANGE_ATTACHMENT, DELETE_ATTACHMENT, DELETE_ALL_ATTACHMENTS
 }
 
+/// Edit operation for logging properties.
 public struct EditOperation {
     public var fid: Int64
     public var aid: Int64
@@ -181,6 +220,7 @@ public struct EditOperation {
     }
 }
 
+/// Spatial referenced raster or image
 public class Raster: Object {
     
     var isOpened: Bool {
@@ -197,6 +237,13 @@ public class Raster: Object {
         }
     }
     
+    /// Cache tiles for some area for TMS datasource.
+    ///
+    /// - Parameters:
+    ///   - bbox: Area to cache.
+    ///   - zoomLevels: Zoom levels to cache.
+    ///   - callback: Callback function which executes periodically indicating progress.
+    /// - Returns: True on success.
     public func cacheArea(bbox: Envelope, zoomLevels: [Int8],
                           callback: (func: ngstore.ngsProgressFunc,
         data: UnsafeMutableRawPointer)? = nil) -> Bool {
@@ -221,10 +268,15 @@ public class Raster: Object {
     }
 }
 
+/// Non spatial table.
 public class Table: Object {
+    
+    /// Fields array
     public var fields: [Field] = []
 
     var batchModeValue = false
+    
+    /// Enable/disable batch mode property. The sqlite journal will be swith on/off.
     public var batchMode: Bool {
         get {
             return batchModeValue
@@ -235,6 +287,7 @@ public class Table: Object {
         }
     }
     
+    /// Feature/row count readonly property.
     public var count: Int64 {
         get {
             return ngsFeatureClassCount(object)
@@ -263,6 +316,9 @@ public class Table: Object {
         super.init(copyFrom: copyFrom)
     }
     
+    /// Create new feature/row in memory.
+    ///
+    /// - Returns: New feature class instane or nil.
     public func createFeature() -> Feature? {
         if let handle = ngsFeatureClassCreateFeature(object) {
             return Feature(handle: handle, table: self)
@@ -270,35 +326,67 @@ public class Table: Object {
         return nil
     }
     
+    /// Insert feature into table.
+    ///
+    /// - Parameters:
+    ///   - feature: Feature/row to insert.
+    ///   - logEdits: Log edits in history table. This log can be received using editOperations function.
+    /// - Returns: True on success.
     public func insertFeature(_ feature: Feature, logEdits: Bool = true) -> Bool {
         return ngsFeatureClassInsertFeature(object, feature.handle, logEdits ? 1 : 0) ==
             Int32(COD_SUCCESS.rawValue)
     }
     
+    /// Update feature/row.
+    ///
+    /// - Parameters:
+    ///   - feature: Feature/row to update.
+    ///   - logEdits: Log edits in history table. This log can be received using editOperations function.
+    /// - Returns: True on success.
     public func updateFeature(_ feature: Feature, logEdits: Bool = true) -> Bool {
         return ngsFeatureClassUpdateFeature(object, feature.handle, logEdits ? 1 : 0) ==
             Int32(COD_SUCCESS.rawValue)
     }
     
+    /// Delete feature/row.
+    ///
+    /// - Parameters:
+    ///   - id: Feature/row identificator.
+    ///   - logEdits: Log edits in history table. This log can be received using editOperations function.
+    /// - Returns: True on success.
     public func deleteFeature(id: Int64, logEdits: Bool = true) -> Bool {
         return ngsFeatureClassDeleteFeature(object, id, logEdits ? 1 : 0) ==
             Int32(COD_SUCCESS.rawValue)
     }
     
+    /// Delete feature/row.
+    ///
+    /// - Parameters:
+    ///   - feature: Feature/row to delete.
+    ///   - logEdits: Log edits in history table. This log can be received using editOperations function.
+    /// - Returns: True on success.
     public func deleteFeature(feature: Feature, logEdits: Bool = true) -> Bool {
         return ngsFeatureClassDeleteFeature(object, feature.id, logEdits ? 1 : 0) ==
             Int32(COD_SUCCESS.rawValue)
     }
     
+    /// Delete all features/rows in table.
+    ///
+    /// - Parameter logEdits: Log edits in history table. This log can be received using editOperations function.
+    /// - Returns: True on success.
     public func deleteFeatures(logEdits: Bool = true) -> Bool {
         return ngsFeatureClassDeleteFeatures(object, logEdits ? 1 : 0) ==
             Int32(COD_SUCCESS.rawValue)
     }
     
+    /// Reset reading features/rows.
     public func reset() {
         ngsFeatureClassResetReading(object)
     }
     
+    /// Get next feature/row.
+    ///
+    /// - Returns: Feature class instance or nil.
     public func nextFeature() -> Feature? {
         if let handle = ngsFeatureClassNextFeature(object) {
             return Feature(handle: handle, table: self)
@@ -306,6 +394,10 @@ public class Table: Object {
         return nil
     }
     
+    /// Get feature/row by identificator.
+    ///
+    /// - Parameter index: Feature/row
+    /// - Returns: Feature class instance or nil.
     public func getFeature(index: Int64) -> Feature? {
         if let handle = ngsFeatureClassGetFeature(object, index) {
             return Feature(handle: handle, table: self)
@@ -313,6 +405,10 @@ public class Table: Object {
         return nil
     }
     
+    /// Get feature/row by remote identificator.
+    ///
+    /// - Parameter remoteId: remote identificator.
+    /// - Returns: Feature class instance or nil.
     public func getFeature(remoteId: Int64) -> Feature? {
         if let handle = ngsStoreFeatureClassGetFeatureByRemoteId(object, remoteId) {
             return Feature(handle: handle, table: self)
@@ -320,6 +416,10 @@ public class Table: Object {
         return nil
     }
     
+    /// Search field index and type by field name.
+    ///
+    /// - Parameter name: Field name.
+    /// - Returns: Tuple with index and type. If field not exists the index will be negative and field type will be UNKNOWN.Get e
     public func fieldIndexAndType(by name: String) -> (index: Int32, type: Field.FieldType) {
         var count: Int32 = 0
         for field in fields {
@@ -331,6 +431,9 @@ public class Table: Object {
         return (-1, Field.FieldType.UNKNOWN)
     }
 
+    /// Get edit operations log.
+    ///
+    /// - Returns: EditOperation class array. It may be empty.
     public func editOperations() -> [EditOperation] {
         var out: [EditOperation] = []
         if let op = ngsFeatureClassGetEditOperations(object) {
@@ -351,12 +454,19 @@ public class Table: Object {
         return out
     }
     
+    
+    /// Delete edit operation from log.
+    ///
+    /// - Parameter editOperation: EditOperation to delete.
     public func delete(editOperation: EditOperation) {
         ngsFeatureClassDeleteEditOperation(object, editOperation.rawOperation)
     }
 }
 
+/// Spatial table.
 public class FeatureClass: Table {
+    
+    /// Geometry type of feature class.
     public let geometryType: Geometry.GeometryType
     
     override init(copyFrom: Object) {
@@ -366,6 +476,13 @@ public class FeatureClass: Table {
         super.init(copyFrom: copyFrom)
     }
     
+    /// Create vector overviews to speedup drawing. This is a synchronous method.
+    ///
+    /// - Parameters:
+    ///   - force: If true the previous overviews will be deleted.
+    ///   - zoomLevels: The list of zoom levels to generate.
+    ///   - callback: Callback function to show process and cancel creation if needed.
+    /// - Returns: True on success.
     public func createOverviews(force: Bool, zoomLevels: [Int8],
                                 callback: (func: ngstore.ngsProgressFunc,
         data: UnsafeMutableRawPointer)? = nil) -> Bool {
@@ -389,52 +506,75 @@ public class FeatureClass: Table {
             Int32(COD_SUCCESS.rawValue)
     }
     
+    /// Clear any filters set on feature class.
+    ///
+    /// - Returns: True on success.
     public func clearFilters() -> Bool {
         let result = ngsFeatureClassSetFilter(object, nil, nil) ==
             Int32(COD_SUCCESS.rawValue)
-//        reset()
         return result
     }
     
+    /// Set spatial filter.
+    ///
+    /// - Parameter envelope: Features intesect with envelope will be returned via nextFeature.
+    /// - Returns: True on success.
     public func setSpatialFilter(envelope: Envelope) -> Bool {
         let result = ngsFeatureClassSetSpatialFilter(object,
                                                envelope.minX, envelope.minY,
                                                envelope.maxX, envelope.maxY) ==
             Int32(COD_SUCCESS.rawValue)
-//        reset()
         return result
     }
     
+    /// Set spatial filter.
+    ///
+    /// - Parameter geometry: Features intesect with geometry will be returned via nextFeature.
+    /// - Returns: True on success.
     public func setSpatialFilter(geometry: Geometry) -> Bool {
         let result = ngsFeatureClassSetFilter(object, geometry.handle, nil) ==
             Int32(COD_SUCCESS.rawValue)
         return result
     }
     
+    /// Set attribute filter.
+    ///
+    /// - Parameter query: SQL WHERE clause.
+    /// - Returns: True on success.
     public func setAttributeFilter(query: String) -> Bool {
         let result = ngsFeatureClassSetFilter(object, nil, query) ==
             Int32(COD_SUCCESS.rawValue)
-//        reset()
         return result
     }
     
+    /// Set spatial and attribute filtes.
+    ///
+    /// - Parameters:
+    ///   - geometry: Features intesect with geometry will be returned via nextFeature.
+    ///   - query: SQL WHERE clause.
+    /// - Returns: True on success.
     public func setFilters(geometry: Geometry, query: String) -> Bool {
         let result = ngsFeatureClassSetFilter(object, geometry.handle, query) ==
             Int32(COD_SUCCESS.rawValue)
-//        reset()
         return result
     }
 }
 
+/// Feature or row from featureclass or table.
 public class Feature {
     let handle: FeatureH!
+    
+    /// FeatureClass or Table class instance.
     public let table: Table?
+    
+    /// Feature/row identificator.
     public var id: Int64 {
         get {
             return ngsFeatureGetId(handle)
         }
     }
     
+    /// Feature/row geometry.
     public var geometry: Geometry? {
         get {
             if let handle = ngsFeatureGetGeometry(handle) {
@@ -454,6 +594,7 @@ public class Feature {
         }
     }
     
+    /// Feature/row remote identificator or -1.
     public var remoteId: Int64 {
         get {
             return ngsStoreFeatureGetRemoteId(handle)
@@ -472,22 +613,42 @@ public class Feature {
         ngsFeatureFree(handle)
     }
     
+    /// Check if field set.
+    ///
+    /// - Parameter index: Field index.
+    /// - Returns: True if field set.
     public func isFieldSet(index: Int32) -> Bool {
         return ngsFeatureIsFieldSet(handle, index) == 1 ? true : false
     }
     
+    /// Get field value.
+    ///
+    /// - Parameter index: Field index.
+    /// - Returns: Field value.
     public func getField(asInteger index: Int32) -> Int32 {
         return ngsFeatureGetFieldAsInteger(handle, index)
     }
     
+    /// Get field value.
+    ///
+    /// - Parameter index: Field index.
+    /// - Returns: Field value.
     public func getField(asDouble index: Int32) -> Double {
         return ngsFeatureGetFieldAsDouble(handle, index)
     }
     
+    /// Get field value.
+    ///
+    /// - Parameter index: Field index.
+    /// - Returns: Field value.
     public func getField(asString index: Int32) -> String {
         return String(cString: ngsFeatureGetFieldAsString(handle, index))
     }
     
+    /// Get field value.
+    ///
+    /// - Parameter index: Field index.
+    /// - Returns: Field value.
     public func getField(asDateTime index: Int32) -> Date {
         if ngsFeatureIsFieldSet(handle, index) == 1 {
             let year = UnsafeMutablePointer<Int32>.allocate(capacity: 1)
@@ -520,18 +681,38 @@ public class Feature {
         return Date()
     }
     
+    /// Set field value.
+    ///
+    /// - Parameters:
+    ///   - index: Fieldd index.
+    ///   - value: Value to set.
     public func setField(for index: Int32, string value: String) {
         ngsFeatureSetFieldString(handle, index, value)
     }
     
+    /// Set field value.
+    ///
+    /// - Parameters:
+    ///   - index: Fieldd index.
+    ///   - value: Value to set.
     public func setField(for index: Int32, double value: Double) {
         ngsFeatureSetFieldDouble(handle, index, value)
     }
     
+    /// Set field value.
+    ///
+    /// - Parameters:
+    ///   - index: Fieldd index.
+    ///   - value: Value to set.
     public func setField(for index: Int32, int value: Int32) {
         ngsFeatureSetFieldInteger(handle, index, value)
     }
     
+    /// Set field value.
+    ///
+    /// - Parameters:
+    ///   - index: Fieldd index.
+    ///   - value: Value to set.
     public func setField(for index: Int32, date value: Date) {
         var calendar = Calendar.current
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!
@@ -547,6 +728,10 @@ public class Feature {
                                    Float(second), 100) // 100 is UTC
     }
     
+    /// Create geometry from json object. The GeoJson geomtry part.
+    ///
+    /// - Parameter json: JsonObject class instance.
+    /// - Returns: Geometry or nil.
     static public func createGeometry(fromJson json: JsonObject) -> Geometry? {
         if let handle = ngsFeatureCreateGeometryFromJson(json.handle) {
             return Geometry(handle: handle)
@@ -554,6 +739,9 @@ public class Feature {
         return nil
     }
     
+    /// Create new geometry. The type of geometry will be coresspondent feature class.
+    ///
+    /// - Returns: Geometry class instance or nil.
     public func createGeometry() -> Geometry? {
         if table is FeatureClass {
             return Geometry(handle: ngsFeatureCreateGeometry(handle))
@@ -561,6 +749,10 @@ public class Feature {
         return nil
     }
     
+    /// Get attachment.
+    ///
+    /// - Parameter aid: Attachment identificator.
+    /// - Returns: Attachment class instance or nil.
     public func getAttachment(aid: Int64) -> Attachment? {
         if let attachments = ngsFeatureAttachmentsGet(handle) {
             var count = 0
@@ -579,6 +771,9 @@ public class Feature {
         return nil
     }
     
+    /// Get all attachments.
+    ///
+    /// - Returns: Attachment array.
     public func getAttachments() -> [Attachment] {
         var attachmentsArray = [Attachment]()
         if let attachments = ngsFeatureAttachmentsGet(handle) {
@@ -598,6 +793,16 @@ public class Feature {
         return attachmentsArray
     }
     
+    /// Add new attachment.
+    ///
+    /// - Parameters:
+    ///   - name: Name.
+    ///   - description: Description text.
+    ///   - path: File system path.
+    ///   - move: If true the attachment file will be
+    ///   - remoteId: Remote identificator.
+    ///   - logEdits: Log edits in history table. This log can be received using editOperations function.
+    /// - Returns: New attachment identificator.
     public func addAttachment(name: String, description: String, path: String,
                               move: Bool, remoteId: Int64 = -1,
                               logEdits: Bool = true) -> Int64 {
@@ -610,21 +815,37 @@ public class Feature {
                                        toArrayOfCStrings(options), logEdits ? 1 : 0)
     }
     
+    /// Delete attachment.
+    ///
+    /// - Parameters:
+    ///   - aid: Attachment identificator.
+    ///   - logEdits: Log edits in history table. This log can be received using editOperations function.
+    /// - Returns: True on success.
     public func deleteAttachment(aid: Int64, logEdits: Bool = true) -> Bool {
         return ngsFeatureAttachmentDelete(handle, aid, logEdits ? 1 : 0) ==
             Int32(COD_SUCCESS.rawValue)
     }
     
+    /// Delete attachment.
+    ///
+    /// - Parameters:
+    ///   - attachment: Attachment class instance.
+    ///   - logEdits: Log edits in history table. This log can be received using editOperations function.
+    /// - Returns: True on success.
     public func deleteAttachment(attachment: Attachment, logEdits: Bool = true) -> Bool {
         return ngsFeatureAttachmentDelete(handle, attachment.id, logEdits ? 1 : 0) ==
             Int32(COD_SUCCESS.rawValue)
     }
     
+    /// Delete feature.
+    ///
+    /// - Returns: True on success.
     public func delete() -> Bool {
         return table?.deleteFeature(id: id) ?? false
     }
 }
 
+/// Coordinate transformation class. Helps to transform from one spatial reference to another.
 public class CoordinateTransformation {
     let handle: CoordinateTransformationH!
     
@@ -636,11 +857,21 @@ public class CoordinateTransformation {
         ngsCoordinateTransformationFree(handle)
     }
     
+    /// Create new coordinate transformation.
+    ///
+    /// - Parameters:
+    ///   - fromEPSG: Source EPSG spatial reference code.
+    ///   - toEPSG: Destination EPSG spatial reference code.
+    /// - Returns: CoordinateTransformation class instance.
     public static func new(fromEPSG: Int32, toEPSG: Int32) -> CoordinateTransformation {
         return CoordinateTransformation(
             handle: ngsCoordinateTransformationCreate(fromEPSG, toEPSG))
     }
     
+    /// Perform transformation of point from one spatial reference to another.
+    ///
+    /// - Parameter point: Point to transform.
+    /// - Returns: Point with new coordinates.
     public func transform(_ point: Point) -> Point {
         let coordIn: ngsCoordinate = ngsCoordinate(X: point.x, Y: point.y, Z: 0.0)
         let coordOut = ngsCoordinateTransformationDo(handle, coordIn)
@@ -648,10 +879,19 @@ public class CoordinateTransformation {
     }
 }
 
+/// Spatial envelope.
 public struct Envelope : Equatable {
+    
+    /// Minimum X coordinate.
     public var minX: Double
+    
+    /// Maximum X coordinate.
     public var maxX: Double
+    
+    /// Minimum Y coordinate.
     public var minY: Double
+    
+    /// Maximum Y coordinate.
     public var maxY: Double
     
     var extent: ngsExtent {
@@ -660,6 +900,13 @@ public struct Envelope : Equatable {
         }
     }
     
+    /// Init envelope with values.
+    ///
+    /// - Parameters:
+    ///   - minX: Minimum X coordinate.
+    ///   - minY: Minimum Y coordinate.
+    ///   - maxX: Maximum X coordinate.
+    ///   - maxY: Maximum Y coordinate.
     public init(minX: Double, minY: Double, maxX: Double, maxY: Double) {
         self.minX = minX
         self.maxX = maxX
@@ -667,6 +914,7 @@ public struct Envelope : Equatable {
         self.maxY = maxY
     }
     
+    /// Init envelope with zeroo coordinates. Envelope will be invalid.
     public init() {
         self.minX = 0.0
         self.maxX = 0.0
@@ -681,10 +929,16 @@ public struct Envelope : Equatable {
         self.maxY = envelope.maxY
     }
     
+    /// Check if envelope is init.
+    ///
+    /// - Returns: True if envelope is init.
     public func isInit() -> Bool {
         return minX != 0.0 && minY != 0.0 && maxX != 0.0 && maxY != 0.0
     }
     
+    /// Merge envelope with other envelope. The result of extent of this and other envelop will be set to this envelope.
+    ///
+    /// - Parameter other: Other envelope.
     public mutating func merge(other: Envelope) {
         if isInit() {
             self.minX = min(minX, other.minX)
@@ -700,23 +954,32 @@ public struct Envelope : Equatable {
         }
     }
     
+    /// Compare if envelopes are same.
+    ///
+    /// - Parameters:
+    ///   - lhs: Envelope to compare.
+    ///   - rhs: Envelope to compare.
+    /// - Returns: True if same.
     public static func ==(lhs: Envelope, rhs: Envelope) -> Bool {
         return lhs.maxX == rhs.maxX && lhs.maxY == rhs.maxY &&
                 lhs.minX == rhs.minX && lhs.minY == rhs.minY
     }
     
+    /// Envelope width.
     public var width: Double {
         get {
             return maxX - minX
         }
     }
     
+    /// Envelope height.
     public var height: Double {
         get {
             return maxY - minY
         }
     }
     
+    /// Envelope center.
     public var center: Point {
         get {
             let x = minX + width / 2
@@ -725,6 +988,9 @@ public struct Envelope : Equatable {
         }
     }
     
+    /// Increase envelope by value.
+    ///
+    /// - Parameter value: Value to increase width and height of envelope. May be negative for decrease sizes.
     public mutating func increase(by value: Double) {
         let deltaWidth = (width * value - width) / 2.0
         let deltaHeight = (height * value - height) / 2.0
@@ -733,15 +999,66 @@ public struct Envelope : Equatable {
         maxX += deltaWidth
         maxY += deltaHeight
     }
+    
+    /// Transform envelope from one spatial reference to another.
+    ///
+    /// - Parameters:
+    ///   - fromEPSG: Source spatial reference EPSG code.
+    ///   - toEPSG: Destination spatial reference EPSD code.
+    public mutating func transform(fromEPSG: Int32, toEPSG: Int32) {
+        let newTransform = CoordinateTransformation.new(fromEPSG: fromEPSG, toEPSG: toEPSG)
+        var points: [Point] = []
+        points.append(Point(x: minX, y: minY))
+        points.append(Point(x: minX, y: maxY))
+        points.append(Point(x: maxX, y: maxY))
+        points.append(Point(x: maxX, y: minY))
+        
+        for index in 0..<4 {
+            points[index] = newTransform.transform(points[index])
+        }
+        
+        minX = Constants.bigValue
+        minY = Constants.bigValue
+        maxX = -Constants.bigValue
+        maxY = -Constants.bigValue
+        for index in 0..<4 {
+            if minX > points[index].x {
+                minX = points[index].x
+            }
+            if minY > points[index].y {
+                minY = points[index].y
+            }
+            if maxX < points[index].x {
+                maxX = points[index].x
+            }
+            if maxY < points[index].y {
+                maxY = points[index].y
+            }
+        }
+    }
 }
 
+/// Geometry class.
 public class Geometry {
     let handle: GeometryH!
     
+    /// Geometry type.
+    ///
+    /// - NONE: No geometry.
+    /// - POINT: Point.
+    /// - LINESTRING: Linestring.
+    /// - POLYGON: Polygon.
+    /// - MULTIPOINT: Multipoint.
+    /// - MULTILINESTRING: Multilinestring.
+    /// - MULTIPOLYGON: Multipolygon.
     public enum GeometryType: Int32 {
         case NONE = 0, POINT, LINESTRING, POLYGON, MULTIPOINT, MULTILINESTRING, MULTIPOLYGON
     }
     
+    /// Get name from geometry type.
+    ///
+    /// - Parameter geometryType: Geometry type.
+    /// - Returns: Geometry type name string.
     static func geometryTypeToName(_ geometryType: GeometryType) -> String {
         switch geometryType {
         case .NONE:
@@ -761,18 +1078,21 @@ public class Geometry {
         }
     }
     
+    /// Envelope of geometry.
     public var envelope: Envelope {
         get {
             return Envelope(envelope: ngsGeometryGetEnvelope(handle))
         }
     }
     
+    /// Is empty geometry.
     public var isEmpty: Bool {
         get {
             return ngsGeometryIsEmpty(handle) == 1
         }
     }
     
+    /// Geometry type.
     public var type: GeometryType {
         get {
             return Geometry.GeometryType(rawValue:
@@ -788,30 +1108,64 @@ public class Geometry {
         ngsGeometryFree(handle)
     }
     
+    /// Transform geometry from one spatial reference to another.
+    ///
+    /// - Parameter epsg: Destination spatial reference.
+    /// - Returns: True on success.
     public func transform(to epsg: Int32) -> Bool {
         return ngsGeometryTransformTo(handle, epsg) == Int32(COD_SUCCESS.rawValue)
     }
     
+    /// Transform geometry from one spatial reference to another.
+    ///
+    /// - Parameter transformation: CoordinateTransformation class instance.
+    /// - Returns: True on success.
     public func transform(_ transformation: CoordinateTransformation) -> Bool {
         return ngsGeometryTransform(handle, transformation.handle) ==
             Int32(COD_SUCCESS.rawValue)
     }
     
+    /// Transform geometry to GeoJson string.
+    ///
+    /// - Returns: GeoJson string.
     public func asJson() -> String {
         return String(cString: ngsGeometryToJson(handle))
     }
 }
 
+/// FeatureClass/Table filed class.
 public class Field {
+    
+    /// Field name.
     public let name: String
+    
+    /// Field alias.
     public let alias: String
+    
+    /// Field type.
     public let type: FieldType
+    
+    /// Field default value.
     public let defaultValue: String?
     
+    /// Field type enum.
+    ///
+    /// - UNKNOWN: Unknown type.
+    /// - INTEGER: Integer type.
+    /// - REAL: Real type.
+    /// - STRING: String type.
+    /// - DATE: Date/time type.
     public enum FieldType: Int32 {
         case UNKNOWN = -1, INTEGER = 0, REAL = 2, STRING = 4, DATE = 11
     }
     
+    /// Init field with values.
+    ///
+    /// - Parameters:
+    ///   - name: Field name.
+    ///   - alias: Field alias.
+    ///   - type: Field type.
+    ///   - defaultValue: Default value or nil.
     public init(name: String, alias: String, type: FieldType, defaultValue: String? = nil) {
         self.name = name
         self.alias = alias
@@ -819,6 +1173,10 @@ public class Field {
         self.defaultValue = defaultValue
     }
     
+    /// Field type name string.
+    ///
+    /// - Parameter fieldType: Field type.
+    /// - Returns: Name string.
     static func fieldTypeToName(_ fieldType: FieldType) -> String {
         switch fieldType {
         case .INTEGER:
@@ -835,15 +1193,25 @@ public class Field {
     }
 }
 
+/// Attachment class.
 public class Attachment {
     let id: Int64
+    
+    /// Attachment name.
     public let name: String
+    
+    /// Attachment description.
     public let description: String
+    
+    /// File system path to attachmetn if exists.
     public let path: String
+    
+    /// Attachment file size in bytes.
     public let size: Int64
     var remoteIdVal: Int64
     let handle: FeatureH!
     
+    /// Remote identificator read/write property.
     public var remoteId: Int64 {
         get {
             return remoteIdVal
@@ -877,10 +1245,20 @@ public class Attachment {
         self.remoteIdVal = -1
     }
     
+    /// If attachment file available.
+    ///
+    /// - Returns: True of file exists.
     public func isFileAvailable() -> Bool {
         return path.isEmpty
     }
     
+    /// Update attachment.
+    ///
+    /// - Parameters:
+    ///   - name: New attachment name.
+    ///   - description: New attachment description.
+    ///   - logEdits: Log edits in history table. This log can be received using editOperations function.
+    /// - Returns: True on success.
     public func update(name: String, description: String, logEdits: Bool = true) -> Bool {
         if handle == nil {
             return false

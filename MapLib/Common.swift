@@ -42,11 +42,19 @@ func toArrayOfCStrings(_ values: [String:String]?) -> UnsafeMutablePointer<Unsaf
     return buffer
 }
 
+/// Helper function to wrap swift class to UnsafeMutableRawPointer
+///
+/// - Parameter obj: Swift class or function.
+/// - Returns: UnsafeMutableRawPointer class instance.
 public func bridge<T: AnyObject>(obj: T) -> UnsafeMutableRawPointer {
     return Unmanaged.passUnretained(obj).toOpaque()
     // return unsafeAddressOf(obj) // ***
 }
 
+/// Helper function to unwrap swift class from UnsafeMutableRawPointer
+///
+/// - Parameter ptr: UnsafeMutableRawPointer class instance.
+/// - Returns: Swift class or function.
 public func bridge<T: AnyObject>(ptr: UnsafeMutableRawPointer) -> T {
     return Unmanaged<T>.fromOpaque(ptr).takeUnretainedValue()
     // return unsafeBitCast(ptr, T.self) // ***
@@ -87,6 +95,10 @@ extension UIView {
 
 public typealias funcReturnCode = ngstore.ngsCode
 
+/// Convers hex string to  UIColor.
+///
+/// - Parameter hex: Hex string.
+/// - Returns: UIColor instance.
 public func hexStringToUIColor (hex: String) -> UIColor {
     var cString: String = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
     
@@ -109,6 +121,10 @@ public func hexStringToUIColor (hex: String) -> UIColor {
     )
 }
 
+/// Conerts UIColor to hex string.
+///
+/// - Parameter color: UIColor class instance.
+/// - Returns: Hex string.
 public func uiColorToHexString(color: UIColor) -> String {
     var (red, green, blue, alpha) = (CGFloat(0.0), CGFloat(0.0),
                                      CGFloat(0.0), CGFloat(0.0))
@@ -120,6 +136,7 @@ public func uiColorToHexString(color: UIColor) -> String {
                   Int(alpha * 255))
 }
 
+/// Return codes enumerator.
 public struct returnCodeEnum {
     public static let SUCCESS = COD_SUCCESS
     public static let FINISHED = COD_FINISHED
@@ -130,6 +147,7 @@ public struct returnCodeEnum {
 struct Constants {
     static let debugMode = true
     static let refreshTime = 0.35
+    static let bigValue = 10000000.0
     
     struct Map {
         static let tolerance = 11.0

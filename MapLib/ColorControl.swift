@@ -61,13 +61,19 @@ extension UIColor {
     }
 }
 
+/// Control to get color from user.
 @IBDesignable open class ColorControl: UIControl {
     
+    /// Label with description.
     public var label: UILabel!
+    /// Image view which tint color will be changed. Expected some white figure.
     public var imageView: UIImageView!
+    /// Some additional text.
     public var text: UILabel!
+    /// Edit view with RGB values.
     public var value: UITextField!
     
+    /// Label with description text.
     @IBInspectable open var labelText: String? {
         get {
             return label.text
@@ -82,6 +88,7 @@ extension UIColor {
         }
     }
     
+    /// Label with description color.
     @IBInspectable open var labelColor: UIColor? {
         get {
             return label.textColor
@@ -91,12 +98,14 @@ extension UIColor {
         }
     }
     
+    /// Label with description text size. Default is 17.
     @IBInspectable open var labelTextSize: CGFloat = 17.0 {
         didSet {
             label.font = UIFont.systemFont(ofSize: labelTextSize)
         }
     }
     
+    /// Additional text color.
     @IBInspectable open var textColor: UIColor? {
         get {
             return text.textColor
@@ -106,12 +115,14 @@ extension UIColor {
         }
     }
     
+    /// Additional text size. Default is 17.
     @IBInspectable open var textTextSize: CGFloat = 17.0 {
         didSet {
             text.font = UIFont.systemFont(ofSize: textTextSize)
         }
     }
     
+    /// RGB text size. Default is 17.
     @IBInspectable open var valueTextSize: CGFloat = 17.0 {
         didSet {
             value.font = UIFont.systemFont(ofSize: valueTextSize)
@@ -119,6 +130,7 @@ extension UIColor {
     }
     
     
+    /// Image view which tint color will be changed. Expected some white figure.
     @IBInspectable open var image: UIImage? {
         didSet {
             imageView.image = image?.withRenderingMode(UIImageRenderingMode.alwaysTemplate)
@@ -126,6 +138,7 @@ extension UIColor {
         }
     }
     
+    /// Current color. Default is red.
     @IBInspectable open var color: UIColor = UIColor.red {
         didSet {
             imageView.tintColor = color
@@ -133,8 +146,11 @@ extension UIColor {
         }
     }
     
+    /// Dialog slider color for ser R, G and B values.
     @IBInspectable open var sliderColor: UIColor = UIColor.white
+    /// Dialog slider minimum color for ser R, G and B values.
     @IBInspectable open var sliderMinColor: UIColor = UIColor.blue
+    /// Dialog slider maximum color for ser R, G and B values.
     @IBInspectable open var sliderMaxColor: UIColor = UIColor.gray
     
     //MARK: Initialization

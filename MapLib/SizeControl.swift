@@ -24,10 +24,16 @@
 
 import UIKit
 
+/// Size control class. Control consist of slider and input field. Slider change input field value. If input field changes, slider changed too.
 @IBDesignable open class SizeControl: UIControl {
     
+    /// Label near slider.
     public var label: UILabel!
+    
+    /// Slider.
     public var slider: UISlider!
+    
+    /// Input field.
     public var value: UITextField!
     
     var labelTopCt: NSLayoutConstraint?
@@ -43,6 +49,7 @@ import UIKit
     var valueTrailingCt: NSLayoutConstraint?
     var valueWidth: NSLayoutConstraint?
     
+    /// Label text read/write property.
     @IBInspectable open var labelText: String? {
         get {
             return label.text
@@ -57,6 +64,7 @@ import UIKit
         }
     }
     
+    /// Label color read/write property.
     @IBInspectable open var labelColor: UIColor? {
         get {
             return label.textColor
@@ -66,12 +74,14 @@ import UIKit
         }
     }
     
+    /// Label text size. Default value is 17.
     @IBInspectable open var labelTextSize: CGFloat = 17.0 {
         didSet {
             label.font = UIFont.systemFont(ofSize: labelTextSize)
         }
     }
     
+    /// Slider thumb tint color.
     @IBInspectable open var sliderColor: UIColor? {
         get {
             return slider.thumbTintColor
@@ -81,6 +91,7 @@ import UIKit
         }
     }
     
+    /// Slider minimum track tint color.
     @IBInspectable open var sliderMinColor: UIColor? {
         get {
             return slider.minimumTrackTintColor
@@ -90,6 +101,7 @@ import UIKit
         }
     }
     
+    /// Slider maximum track tint color.
     @IBInspectable open var sliderMaxColor: UIColor? {
         get {
             return slider.maximumTrackTintColor
@@ -99,6 +111,7 @@ import UIKit
         }
     }
     
+    /// Slider minimum value.
     @IBInspectable open var sliderMinValue: Float {
         get {
             return slider.minimumValue
@@ -108,6 +121,7 @@ import UIKit
         }
     }
     
+    /// Slider maximum value.
     @IBInspectable open var sliderMaxValue: Float {
         get {
             return slider.maximumValue
@@ -117,6 +131,7 @@ import UIKit
         }
     }
     
+    /// Slider value.
     @IBInspectable open var sliderValue: String = "0" {
         didSet {
             slider.value = Float(sliderValue) ?? 0.0
@@ -124,12 +139,14 @@ import UIKit
         }
     }
     
+    /// Input text control text ize. Default value is 17.
     @IBInspectable open var valueTextSize: CGFloat = 17.0 {
         didSet {
             value.font = UIFont.systemFont(ofSize: valueTextSize)
         }
     }
     
+    /// The slider, label and input filed are in one or two lines.
     @IBInspectable open var oneLine: Bool = false {
         didSet {
             setConstraints(oneLine)
@@ -164,11 +181,17 @@ import UIKit
         sendActions(for: .valueChanged)
     }
     
+    /// Set control value.
+    ///
+    /// - Parameter size: Value to set.
     public func setSizeValue(_ size: String) {
         slider.value = Float(size) ?? 0.0
         value.text = size
     }
     
+    /// Get control value.
+    ///
+    /// - Returns: Float value.
     public func getSizeValue() -> Float {
         return Float(value.text!) ?? 0.0
     }

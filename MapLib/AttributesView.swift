@@ -26,25 +26,54 @@ class UIButtonWithAttachment: UIButton {
     var attachment: Attachment? = nil
 }
 
+/// Attachments delegate class
 public protocol AttachmentDelegate: class {
+    
+    /// Executes when attachment clicked/touched.
+    ///
+    /// - Parameter attachment: Attachment clicked/touched.
     func onAttachment(attachment: Attachment?)
+    
+    /// Executes when attachment add.
     func onAddAttachment()
 }
 
+/// Attributes view. Shows feature attributes.
 public class AttributesView: UIScrollView {
     
     weak var prevView: UIView? = nil
 
+    /// Show not set fields. Default is false.
     public var showUnsetFields: Bool = false
+    
+    /// Section labels uppercased or not. Default is true.
     public var isSectionUppercased = true
+    
+    /// Label color. Default is black.
     public var labelColor: UIColor = UIColor.black
+    
+    /// Label size. Default 13.
     public var labelSize: CGFloat = 13.0
+    
+    /// Text color. Default is black.
     public var textColor: UIColor = UIColor.black
+    
+    /// Text size. Default is 16.
     public var textSize: CGFloat = 16.0
+    
+    /// Section text color. Default is black.
     public var sectionTextColor: UIColor = UIColor.black
+    
+    /// Section text size. Default value is 13.
     public var sectionTextSize: CGFloat = 13.0
+    
+    /// Attachment icon image.
     public var attachmentImage: UIImage? = nil
+    
+    /// Attachment icon image if file is not exists in file system.
     public var attachmentRemoteImage: UIImage? = nil
+    
+    /// Attachments operation delegate.
     public var attachmentDelegate: AttachmentDelegate? = nil
 
     /*
@@ -56,6 +85,9 @@ public class AttributesView: UIScrollView {
     */
     
     
+    /// Fill controls with values from feature.
+    ///
+    /// - Parameter feature: Feature class instance.
     public func fill(feature: Feature) {
         prevView = nil
         for subview in subviews {
@@ -102,6 +134,9 @@ public class AttributesView: UIScrollView {
         attachmentDelegate?.onAttachment(attachment: sender.attachment)
     }
     
+    /// Add attachment to this view.
+    ///
+    /// - Parameter attachment: Attachment class instance.
     public func addAttachment(_ attachment: Attachment) {
         
         let lb = UIButtonWithAttachment()
@@ -243,6 +278,12 @@ public class AttributesView: UIScrollView {
         return feature.getField(asString: pos)
     }
     
+    /// Add field label.
+    ///
+    /// - Parameters:
+    ///   - feature: Feature class instance.
+    ///   - field: Field class instance.
+    ///   - pos: Field position if table or feature class.
     public func addFieldLabel(_ feature: Feature, _ field: Field, _ pos: Int32) {
         addFieldNameLabel(field)
         
@@ -326,6 +367,9 @@ public class AttributesView: UIScrollView {
         
     }
     
+    /// Add section with name.
+    ///
+    /// - Parameter name: Section name.
     public func addSection(_ name: String) {
         let lb = UILabel()
         lb.translatesAutoresizingMaskIntoConstraints = false
@@ -388,17 +432,28 @@ public class AttributesView: UIScrollView {
 
 }
 
+/// Attributes view with edit capabilities.
 public class AttributesEditView: AttributesView, UITextFieldDelegate {
     
+    /// Attachment button color.
     public var attachmentBtnColor: UIColor = UIColor.blue
+    
+    /// Attachment button image.
     public var attachmentBtnImage: UIImage? = nil
+    
+    /// Delete attachment button image.
     public var delAttachmentBtnImage: UIImage? = nil
     private var fieldControlMap: [Int32: UITextField] = [:]
     weak var attachments: UIView!
     weak var bottomAttribute: NSLayoutConstraint? = nil
+    
+    /// Mark if any attribute edits were in view.
     public var hasEdits: Bool = false
     var prevAttachmentCellView: UIView? = nil
     
+    /// Fill view with edit controls correspondent to feature fields.
+    ///
+    /// - Parameter feature: Feature class instance.
     public override func fill(feature: Feature) {
         prevView = nil
         for subview in subviews {
@@ -446,6 +501,12 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
         hasEdits = true
     }
     
+    /// Add field edit control.
+    ///
+    /// - Parameters:
+    ///   - feature: Feature clas instance.
+    ///   - field: Field class instance.
+    ///   - pos: Field position in fields atrray.
     public func addFieldEdit(_ feature: Feature, _ field: Field, _ pos: Int32) {
         addFieldNameLabel(field)
         
@@ -515,6 +576,9 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
         prevView = tv
     }
     
+    /// Add attachment with delete button.
+    ///
+    /// - Parameter attachment: Attachment class instance.
     public func addAttachmentEdit(_ attachment: Attachment) {
         let lb = AttachmentCell(parent: self, attachment: attachment, textSize: textSize,
                                 textColor: textColor, attachRemoteImg: attachmentRemoteImage,
@@ -592,6 +656,7 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
         prevAttachmentCellView = lb
     }
     
+    /// Add "add attachment" button to view.
     public func addAttachmentBtn() {
         
         let lb = UIButtonWithAttachment()
@@ -658,6 +723,10 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
         attachmentDelegate?.onAddAttachment()
     }
 
+    /// Executes while text field begin editint. Used by calendar control.
+    ///
+    /// - Parameter textField: Text field class instance.
+    /// - Returns: true if editing available or false to prevent editing.
     public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
         // user touch field
         let h = 265.0
@@ -721,6 +790,10 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
         textField.text = formatter.string(from: view.date)
     }
     
+    /// Save edits to feature in FeatureClass/Table.
+    ///
+    /// - Parameter feature: Feature class instance.
+    /// - Returns: True on success.
     public func save(feature: Feature) -> Bool {
         if let fc = feature.table {
             // Update fields
@@ -780,6 +853,11 @@ public class AttributesEditView: AttributesView, UITextFieldDelegate {
         return false
     }
 
+    /// Add new attachment to view
+    ///
+    /// - Parameters:
+    ///   - name: Attachment name
+    ///   - path: File system path to attachment file.
     public func addAttachment(name: String, path: String) {
         printMessage("Add attachment with name: \(name) and path: \(path)")
         let newAttachment = Attachment(name: name, description: "", path: path)
