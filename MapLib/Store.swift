@@ -1036,6 +1036,13 @@ public struct Envelope : Equatable {
             }
         }
     }
+    
+    /// Create strong copy of envelope.
+    ///
+    /// - Returns: New envelope clas instance.
+    public func clone() -> Envelope {
+        return Envelope(minX: minX, minY: minY, maxX: maxX, maxY: maxY)
+    }
 }
 
 /// Geometry class.
