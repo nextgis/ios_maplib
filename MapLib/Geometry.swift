@@ -320,7 +320,7 @@ public class Geometry {
 
 
 /// Geometry point class.
-class GeoPoint : Geometry {
+public class GeoPoint : Geometry {
     
     /// Set the point location
     ///
