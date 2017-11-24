@@ -19,6 +19,9 @@
 		356511D71F488DCC00AC46B2 /* ComboBoxControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356511D61F488DCC00AC46B2 /* ComboBoxControl.swift */; };
 		356511D91F48910700AC46B2 /* SizeControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356511D81F48910700AC46B2 /* SizeControl.swift */; };
 		356511DB1F48946C00AC46B2 /* ColorControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356511DA1F48946C00AC46B2 /* ColorControl.swift */; };
+		3598063C1FC8C7B00069871C /* Geometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3598063B1FC8C7B00069871C /* Geometry.swift */; };
+		3598063E1FC8C8710069871C /* Feature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3598063D1FC8C8710069871C /* Feature.swift */; };
+		359806401FC8CC720069871C /* Overlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3598063F1FC8CC720069871C /* Overlay.swift */; };
 		35B7D6F71F8B772F0016CAB0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 35B7D6F91F8B772F0016CAB0 /* InfoPlist.strings */; };
 		35B7D6FC1F8B77300016CAB0 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 35B7D6FE1F8B77300016CAB0 /* Localizable.strings */; };
 		35C1A8D51EF6EE5F00C2CF67 /* ngstore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35C1A8D41EF6EE5F00C2CF67 /* ngstore.framework */; };
@@ -54,6 +57,9 @@
 		356511D61F488DCC00AC46B2 /* ComboBoxControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComboBoxControl.swift; sourceTree = "<group>"; };
 		356511D81F48910700AC46B2 /* SizeControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SizeControl.swift; sourceTree = "<group>"; };
 		356511DA1F48946C00AC46B2 /* ColorControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorControl.swift; sourceTree = "<group>"; };
+		3598063B1FC8C7B00069871C /* Geometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Geometry.swift; sourceTree = "<group>"; };
+		3598063D1FC8C8710069871C /* Feature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feature.swift; sourceTree = "<group>"; };
+		3598063F1FC8CC720069871C /* Overlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Overlay.swift; sourceTree = "<group>"; };
 		35B7D6FF1F8B7AF30016CAB0 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		35B7D7001F8B7AF30016CAB0 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		35C1A8D41EF6EE5F00C2CF67 /* ngstore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ngstore.framework; path = Carthage/Build/iOS/ngstore.framework; sourceTree = "<group>"; };
@@ -163,6 +169,9 @@
 				35D46B8C1EEF5D4D00024E7E /* Api.swift */,
 				3536760B1EFB30CA00C7B846 /* Catalog.swift */,
 				354A8DC81F0869F800113CA5 /* Auth.swift */,
+				3598063B1FC8C7B00069871C /* Geometry.swift */,
+				3598063D1FC8C8710069871C /* Feature.swift */,
+				3598063F1FC8CC720069871C /* Overlay.swift */,
 			);
 			path = MapLib;
 			sourceTree = "<group>";
@@ -308,11 +317,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				359806401FC8CC720069871C /* Overlay.swift in Sources */,
+				3598063C1FC8C7B00069871C /* Geometry.swift in Sources */,
 				35F1D34E1F015AC2005114E2 /* MapView.swift in Sources */,
 				3560B1C61F7BB8FC0046EE85 /* TimeIntervalControl.swift in Sources */,
 				356066BE1F2E6A6300D2EF59 /* Json.swift in Sources */,
 				353675FF1EF9270A00C7B846 /* Common.swift in Sources */,
 				35D46B8D1EEF5D4D00024E7E /* Api.swift in Sources */,
+				3598063E1FC8C8710069871C /* Feature.swift in Sources */,
 				355FB9B01F1F8B1B008D26D7 /* Store.swift in Sources */,
 				35D46B891EEF594C00024E7E /* Map.swift in Sources */,
 				356511D91F48910700AC46B2 /* SizeControl.swift in Sources */,
