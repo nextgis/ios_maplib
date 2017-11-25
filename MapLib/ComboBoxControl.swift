@@ -75,7 +75,7 @@ import UIKit
     
     /// Set selection.
     ///
-    /// - Parameter value: Value to select. If value is not from selection nothing will be changed.
+    /// - Parameter value: Value to select. If value is not from selection array nothing will be changed.
     public func setSelection(value: String) {
         if selection.contains(value) {
             self.setTitle(value, for: .normal)

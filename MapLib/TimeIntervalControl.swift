@@ -22,11 +22,11 @@
 
 import UIKit
 
-/// Control to set time. For exampe update timeout or fetch timeout.
+/// Control to set time. For example update timeout or fetch timeout.
 @IBDesignable open class TimeIntervalControl: UIControl {
     /// Text field.
     public var interval: FormTextField!
-    /// Combo box button.
+    /// Combobox button.
     public var type: ComboBoxControl!
     /// Interval type.
     ///

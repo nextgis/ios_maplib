@@ -24,7 +24,7 @@
 
 import UIKit
 
-/// Size control class. Control consist of slider and input field. Slider change input field value. If input field changes, slider changed too.
+/// Size control class. Control consist of slider and input field. Slider change input field value. If input field changes, slider changes too.
 @IBDesignable open class SizeControl: UIControl {
     
     /// Label near slider.

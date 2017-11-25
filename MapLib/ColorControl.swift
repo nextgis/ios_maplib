@@ -66,7 +66,7 @@ extension UIColor {
     
     /// Label with description.
     public var label: UILabel!
-    /// Image view which tint color will be changed. Expected some white figure.
+    /// Image view which tint color will be changed. Expected some white image.
     public var imageView: UIImageView!
     /// Some additional text.
     public var text: UILabel!
@@ -130,7 +130,7 @@ extension UIColor {
     }
     
     
-    /// Image view which tint color will be changed. Expected some white figure.
+    /// Image view which tint color will be changed. Expected some white image.
     @IBInspectable open var image: UIImage? {
         didSet {
             imageView.image = image?.withRenderingMode(UIImageRenderingMode.alwaysTemplate)
@@ -146,11 +146,11 @@ extension UIColor {
         }
     }
     
-    /// Dialog slider color for ser R, G and B values.
+    /// Dialog slider color for set R, G and B values.
     @IBInspectable open var sliderColor: UIColor = UIColor.white
-    /// Dialog slider minimum color for ser R, G and B values.
+    /// Dialog slider minimum color for set R, G and B values.
     @IBInspectable open var sliderMinColor: UIColor = UIColor.blue
-    /// Dialog slider maximum color for ser R, G and B values.
+    /// Dialog slider maximum color for set R, G and B values.
     @IBInspectable open var sliderMaxColor: UIColor = UIColor.gray
     
     //MARK: Initialization
