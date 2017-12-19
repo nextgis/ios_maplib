@@ -28,6 +28,10 @@ The library code, CMake scripts and other files are distributed under the terms
 of GNU Lesser Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
+# Documentation
+
+http://docs.nextgis.com/ngmobile_dev/ngmiv3.html
+
 # Commercial support
 
 Need to fix a bug or add a feature to NextGIS Datastore? We provide custom
