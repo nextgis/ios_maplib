@@ -30,7 +30,8 @@ either version 3 of the License, or (at your option) any later version.
 
 # Documentation
 
-http://docs.nextgis.com/ngmobile_dev/ngmiv3.html
+* Official documentation: http://docs.nextgis.com/ngmobile_dev/ngmiv3.html
+* Release announcement: http://nextgis.com/blog/nextgis-mobile-sdk-v3-ios/
 
 # Commercial support
 
