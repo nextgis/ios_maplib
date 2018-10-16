@@ -1,1 +1,1 @@
-github "nextgis/nextgis_datastore"
+github "nextgis/nextgis_datastore" == 0.3.0
