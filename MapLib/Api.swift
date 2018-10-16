@@ -338,7 +338,7 @@ public class API {
     /// - Parameters:
     ///   - key: key value
     ///   - value: default value if not exists
-    /// - Returns: property value correspondet to key
+    /// - Returns: property value correspondent to key
     public func getProperty(for key: String, withDefault value: String) -> String {
         return String(cString: ngsSettingsGetString(key, value))
     }
